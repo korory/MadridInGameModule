@@ -5,7 +5,6 @@
 //  Created by Arnau Rivas Rivas on 17/10/24.
 //
 
-import SwiftUICore
 import SwiftUI
 
 struct NewsModel {

@@ -10,18 +10,19 @@ import SwiftUI
 let mockIndividualReservation =
     ReservationQRModel(dateSelected: "19/12/2014", hoursSelected: ["16:00", "17:00", "18:00"], consoleSelected: "PC", isReservationValid: false, isDNICorrect: false)
 
+let imageDefaultProfile = UIImage(named: "imageDefaultProfile") ?? UIImage()
 
 let mockAllPlayersInTeam = [
-    PlayerModel(name: "Player1", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Manager"),
-    PlayerModel(name: "Player2", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Player"),
-    PlayerModel(name: "Player3", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Trainer"),
-    PlayerModel(name: "Player4", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Trainer"),
-    PlayerModel(name: "Player5", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Player"),
-    PlayerModel(name: "Player6", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Player"),
-    PlayerModel(name: "Player7", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Player"),
-    PlayerModel(name: "Player8", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Player"),
-    PlayerModel(name: "Player9", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Player"),
-    PlayerModel(name: "Player10", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Player")
+    PlayerModel(name: "Player1", image: imageDefaultProfile, roleAssign: "Manager"),
+    PlayerModel(name: "Player2", image: imageDefaultProfile, roleAssign: "Player"),
+    PlayerModel(name: "Player3", image: imageDefaultProfile, roleAssign: "Trainer"),
+    PlayerModel(name: "Player4", image: imageDefaultProfile, roleAssign: "Trainer"),
+    PlayerModel(name: "Player5", image: imageDefaultProfile, roleAssign: "Player"),
+    PlayerModel(name: "Player6", image: imageDefaultProfile, roleAssign: "Player"),
+    PlayerModel(name: "Player7", image: imageDefaultProfile, roleAssign: "Player"),
+    PlayerModel(name: "Player8", image: imageDefaultProfile, roleAssign: "Player"),
+    PlayerModel(name: "Player9", image: imageDefaultProfile, roleAssign: "Player"),
+    PlayerModel(name: "Player10", image: imageDefaultProfile, roleAssign: "Player")
 ]
 
 let mockAllTeams = [
@@ -31,15 +32,15 @@ let mockAllTeams = [
     mockTeamVisa
 ]
 
-let mockOnePlayer = PlayerModel(name: "Player1", image: UIImage(named: "imageDefaultProfile")!, roleAssign: "Manager")
+let mockOnePlayer = PlayerModel(name: "Player1", image: imageDefaultProfile, roleAssign: "Manager")
 
-let mockTeamPapaFrita = TeamModel(name: "Team Papa Frita", descriptionText: "description Text", discordLink: "", image: UIImage(named: "imageDefaultTeam")!, allRolesAvailable: ["Manager", "Trainer", "Player"], allPlayersAssigned: Array(mockAllPlayersInTeam.prefix(5)))
+let mockTeamPapaFrita = TeamModel(name: "Team Papa Frita", descriptionText: "description Text", discordLink: "", image: imageDefaultProfile, allRolesAvailable: ["Manager", "Trainer", "Player"], allPlayersAssigned: Array(mockAllPlayersInTeam.prefix(5)))
 
-let mockTeamSamsung = TeamModel(name: "Team Samsung", descriptionText: "description Textdescription Text", discordLink: "", image: UIImage(named: "imageDefaultTeam")!, allRolesAvailable: ["Manager", "Trainer", "Player"], allPlayersAssigned: Array(mockAllPlayersInTeam.prefix(7)))
+let mockTeamSamsung = TeamModel(name: "Team Samsung", descriptionText: "description Textdescription Text", discordLink: "", image: imageDefaultProfile, allRolesAvailable: ["Manager", "Trainer", "Player"], allPlayersAssigned: Array(mockAllPlayersInTeam.prefix(7)))
 
-let mockTeamCoffee = TeamModel(name: "Team Coffee", descriptionText: "", discordLink: "", image: UIImage(named: "imageDefaultTeam")!, allRolesAvailable: ["Manager", "Trainer", "Player"], allPlayersAssigned: Array(mockAllPlayersInTeam.prefix(4)))
+let mockTeamCoffee = TeamModel(name: "Team Coffee", descriptionText: "", discordLink: "", image: imageDefaultProfile, allRolesAvailable: ["Manager", "Trainer", "Player"], allPlayersAssigned: Array(mockAllPlayersInTeam.prefix(4)))
 
-let mockTeamVisa = TeamModel(name: "Team Visa", descriptionText: "description Text", discordLink: "", image: UIImage(named: "imageDefaultTeam")!, allRolesAvailable: ["Manager", "Trainer", "Player"], allPlayersAssigned: Array(mockAllPlayersInTeam.prefix(4)))
+let mockTeamVisa = TeamModel(name: "Team Visa", descriptionText: "description Text", discordLink: "", image: imageDefaultProfile, allRolesAvailable: ["Manager", "Trainer", "Player"], allPlayersAssigned: Array(mockAllPlayersInTeam.prefix(4)))
 
 // Mock de datos para la lista de reservas
 let mockTeamReservationCellViewModel = [
@@ -98,7 +99,7 @@ let mockAllNews = [
     NewsModel(title: "No vea tu otro club de E-Sports", description: "Al contrario del pensamiento popular, el texto de Lorem Ipsum no es simplemente texto aleatorio. Tiene sus raices en una pieza cl´sica de la literatura del Latin, que data del año 45 antes de Cristo, haciendo que este adquiera mas de 2000 años de antiguedad. Richard McClintock, un profesor de Latin de la Universidad de Hampden-Sydney en Virginia, encontró una de las palabras más oscu de éticas, muy popular durante el Renacimiento. La primera linea del Lorem Ipsum, Lorem ipsum dolor sit amet.., viene de una linea en la sección 1.10.32", image: UIImage(named: "imageDefaultNews")!, imageText: "")
 ]
 
-let mockOneNewEmpty = NewsModel(title: "", description: "", image: UIImage(named: "imageDefaultNews")!, imageText: "")
+let mockOneNewEmpty = NewsModel(title: "", description: "", image: imageDefaultProfile, imageText: "")
 
 let mockCompetitions = CompetitionsModel(
     seasons: [

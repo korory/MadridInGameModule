@@ -10,14 +10,14 @@ import SwiftUI
 struct CreateOrEditNewsComponentView: View {
     @State var newsInformation: NewsModel?
     var createNew: Bool = false
-    let rejectAction: () -> Void
-    let publishAction: (NewsModel) -> Void
+    //let rejectAction: () -> Void
+    //let publishAction: (NewsModel) -> Void
     
     init(createNew: Bool, newsInformation: NewsModel? = mockOneNewEmpty, rejectAction: @escaping () -> Void, publishAction: @escaping (NewsModel) -> Void) {
         self.createNew = createNew
         self.newsInformation = newsInformation
-        self.rejectAction = rejectAction
-        self.publishAction = publishAction
+        //self.rejectAction = rejectAction
+        //self.publishAction = publishAction
     }
     
     var body: some View {
@@ -64,7 +64,7 @@ extension CreateOrEditNewsComponentView {
                          backgroundColor: Color.cyan,
                          pressEnabled: true,
                          widthButton: 180, heightButton: 50) {
-                rejectAction()
+                //rejectAction()
 
             }
                          .padding(.trailing, 10)
@@ -73,7 +73,7 @@ extension CreateOrEditNewsComponentView {
                          backgroundColor: Color.cyan,
                          pressEnabled: true,
                          widthButton: 180, heightButton: 50) {
-                publishAction(newsInformation ?? mockOneNewEmpty)
+                //publishAction(newsInformation ?? mockOneNewEmpty)
             }
         }
     }

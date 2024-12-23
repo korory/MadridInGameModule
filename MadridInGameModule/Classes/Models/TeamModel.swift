@@ -5,7 +5,6 @@
 //  Created by Arnau Rivas Rivas on 15/10/24.
 //
 
-import SwiftUICore
 import SwiftUI
 
 struct TeamModel {
