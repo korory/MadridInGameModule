@@ -12,7 +12,6 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '17.0'
   s.source_files = 'MadridInGameModule/Classes/**/*.{swift}'
-  s.resources    = 'MadridInGameModule/Resources/**/*'
 
 end
 
