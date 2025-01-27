@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'MadridInGameModule'
-  s.version      = '1.0.1'
+  s.version      = '1.0.0'
   s.summary      = 'Un módulo para integrar MadridInGame con funcionalidades avanzadas.'
   s.description  = <<-DESC
     MadridInGameModule es un módulo diseñado para facilitar la integración de experiencias interactivas de juego en aplicaciones iOS.
