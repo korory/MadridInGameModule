@@ -2,16 +2,6 @@
 
 # MadridInGameModule
 
-MadridInGameModule es un framework desarrollado en Swift que proporciona componentes y funcionalidades avanzadas para integrar experiencias de juego interactivas en aplicaciones iOS.
-
-## Características
-
-- **Dropdowns**: Componentes personalizables para selecciones simples y múltiples.
-- **Calendario**: Vista de calendario interactiva para manejar eventos.
-- **Gestión de Equipos**: Componentes para crear y gestionar equipos.
-- **Reservas**: Gestión de reservas individuales y en equipo.
-- **Popups y Componentes Personalizados**: Elementos visuales reutilizables y altamente configurables.
-
 ## Requisitos
 
 - iOS 13.0 o superior
@@ -43,32 +33,15 @@ import MadridInGameModule
 
 ### Ejemplo básico
 
-#### Crear un Dropdown
+#### Instanciar el modulo
 
 ```swift
-let dropdown = DropdownComponentView()
-dropdown.items = ["Opción 1", "Opción 2", "Opción 3"]
-dropdown.didSelectItem = { selectedItem in
-    print("Seleccionaste: \(selectedItem)")
+struct ContentView: View {
+    var body: some View {
+        MadridInGameModule(email: "adriortega19@gmail.com")
+    }
 }
 ```
-
-#### Mostrar un Calendario
-
-```swift
-let calendarView = CustomCalendarView()
-calendarView.onDateSelected = { date in
-    print("Fecha seleccionada: \(date)")
-}
-```
-
-## Ejemplo completo
-
-Revisa el proyecto de ejemplo en la carpeta `Example/` para ver implementaciones más detalladas.
-
-## Contribuciones
-
-¡Las contribuciones son bienvenidas! Por favor, crea un pull request o abre un issue en el repositorio para discutir mejoras.
 
 ## Licencia
 
