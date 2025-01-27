@@ -51,7 +51,7 @@ extension CompatitionsCarouselComponentView {
                 ForEach(leagueInformation.competitions, id: \.id) { competitonInformation in
                     VStack {
                         NavigationLink(destination: CompatitionsDetailViewComponentView(viewModel: CompetitionsDetailViewModel(competitionsInformation: competitonInformation))) {
-                            Image(uiImage: UIImage(named: "imageCompetitionCarrouselImage")!)
+                            Image(uiImage: UIImage())
                                 .resizable()
                                 .frame(width: 280, height: 470)
                                 .cornerRadius(15)

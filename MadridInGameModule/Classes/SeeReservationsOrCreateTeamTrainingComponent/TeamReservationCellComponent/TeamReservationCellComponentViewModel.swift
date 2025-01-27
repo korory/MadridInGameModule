@@ -13,35 +13,29 @@ enum TeamReservationCellComponentOptionSelected {
     case editTraining
 }
 
-class TeamReservationCellComponentViewModel: ObservableObject {
-    @Published var trainingLocation: TeamReservationTrainningLocationSelected
-    @Published var dateSelected: String
-    @Published var hoursSelected: [String]
-    @Published var players: [PlayerModel]
-    @Published var descriptionText: String
+import SwiftUI
 
+class TeamReservationCellComponentViewModel: ObservableObject {
+    @Published var reservation: TeamReservation
     
-    init(trainingLocation: TeamReservationTrainningLocationSelected, dateSelected: String, hoursSelected: [String], playersAsigned: [PlayerModel], descriptionText: String) {
-        self.trainingLocation = trainingLocation
-        self.dateSelected = dateSelected
-        self.hoursSelected = hoursSelected
-        self.players = playersAsigned
-        self.descriptionText = descriptionText
+    init(reservation: TeamReservation) {
+        self.reservation = reservation
     }
     
     // Propiedad calculada para la imagen del sistema
     var trainingLocationImage: String {
-        return trainingLocation == .virtual ? "desktopcomputer" : "building.columns"
+        "desktopcomputer" // Ajusta según la lógica si hay más ubicaciones en el futuro
     }
     
-    // Función para obtener el texto de la ubicación
-    func getTrainingLocationText() -> String {
-        switch trainingLocation {
-        case .eSportsCenter:
-            return "ESPORTS CENTER"
-        case .virtual:
-            return "VIRTUAL"
-        }
+    // Propiedad para obtener la fecha formateada
+    var formattedDate: String {
+        reservation.date.formatted(date: .numeric, time: .omitted)
+    }
+    
+    // Propiedad para obtener las horas seleccionadas como texto
+    var formattedHours: String {
+        let hours = reservation.times.map { $0.time }
+        return hours.count > 1 ? "Horas: \(hours.joined(separator: ", "))" : "Hora: \(hours.first ?? "")"
     }
     
     // Función para manejar las acciones del componente
@@ -49,4 +43,3 @@ class TeamReservationCellComponentViewModel: ObservableObject {
         action(optionSelected)
     }
 }
-

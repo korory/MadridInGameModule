@@ -37,7 +37,7 @@ struct TeamsComponentView: View {
                 get: { viewModel.isEditTeamPressed },
                 set: { viewModel.isEditTeamPressed = $0 }
             )) {
-                TeamsCreateOrEditNewTeamComponentView(team: viewModel.allTeams.first, editTeam: true, action: { teamSelected in
+                TeamsCreateOrEditNewTeamComponentView(team: viewModel.allTeams?.first, editTeam: true, action: { teamSelected in
                     self.viewModel.editInformationTeamExists(updateTeam: teamSelected)
                     self.viewModel.isEditTeamPressed = false
                 })
@@ -115,7 +115,7 @@ extension TeamsComponentView {
     private var cellTeamsComponent: some View {
         ScrollView {
             LazyVStack {
-                ForEach(viewModel.allTeams, id: \.id) { team in
+                ForEach(viewModel.allTeams ?? [], id: \.id) { team in
                     TeamsComponentCellView(teamSelected: team, isUserMode: viewModel.isUserMode, editButtonPressed: { teamSelected in
                         self.viewModel.isEditTeamPressed = true
                     })

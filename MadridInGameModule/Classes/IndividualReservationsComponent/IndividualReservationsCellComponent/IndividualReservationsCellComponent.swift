@@ -9,73 +9,71 @@ import SwiftUI
 
 enum IndividualReservationsCellOptions {
     case seeReservation
-    case cancelReservarion
+    case cancelReservation
 }
 
 struct IndividualReservationsCellComponent: View {
-    var consoleSelected = ""
-    var date = ""
-    var hours = [""]
-    var onReservationPressed: (IndividualReservationsCellOptions, String, String, [String]) -> Void
+    var reservation: Reservation
+    var onReservationPressed: (IndividualReservationsCellOptions, Reservation) -> Void
     
     var body: some View {
-        VStack (spacing: 40){
+        VStack(spacing: 16) {
             HStack {
-                titleSubtitleAndAlertComponent
+                iconAndDetailsComponent
                 Spacer()
-                seeReservationAndCancelComponent
+                actionButtonsComponent
             }
+            .padding()
+            .background(Color.gray.opacity(0.2))
+            .cornerRadius(12)
         }
     }
 }
 
 extension IndividualReservationsCellComponent {
-    
-    private var titleSubtitleAndAlertComponent: some View {
-        VStack (alignment: .leading, spacing: 15){
-            HStack {
-                Image(systemName: "exclamationmark.triangle")
-                    .resizable()
-                    .frame(width: 24, height: 24)
-                    .foregroundStyle(Color.yellow)
-                    .padding(.top, 5)
-                    .padding(.trailing, 5)
+    private var iconAndDetailsComponent: some View {
+        HStack(spacing: 12) {
+            // Ícono de reserva
+            Image(systemName: "gamecontroller")
+                .resizable()
+                .frame(width: 32, height: 32)
+                .foregroundStyle(Color.cyan)
+            
+            // Detalles de la reserva
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Reserva - \(reservation.slot.space)")
+                    .font(.headline)
+                    .foregroundColor(.white)
                 
-                VStack (alignment: .leading){
-                    Text("Reserva - \(consoleSelected)")
-                        .font(.body)
-                        .fontWeight(.bold)
-                        .foregroundStyle(Color.white)
-                        .padding(.bottom, 5)
-                    
-                    Text("Fecha: \(date)")
-                        .font(.system(size: 15))
-                        .foregroundStyle(Color.white)
-                        .padding(.bottom, 2)
-                    
-                    Text(hours.count > 1
-                         ? "Horas: \(hours.joined(separator: ", "))"
-                         : "Hora: \(hours.joined(separator: ", "))")
-                    .font(.system(size: 15))
-                    .foregroundStyle(Color.white)
-                }
+                Text("Fecha: \(reservation.date.formatted(date: .numeric, time: .omitted))")
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.8))
+                
+                Text("Horas: \(reservation.times.map { $0.time }.joined(separator: ", "))")
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.8))
             }
         }
     }
     
-    private var seeReservationAndCancelComponent: some View {
-        VStack (spacing: 20){
+    private var actionButtonsComponent: some View {
+        VStack(spacing: 12) {
+            // Botón para ver la reserva
             Button {
-                onReservationPressed(IndividualReservationsCellOptions.seeReservation, consoleSelected, date, hours)
+                onReservationPressed(.seeReservation, reservation)
             } label: {
                 Text("Ver reserva")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.cyan)
             }
             
+            // Botón para cancelar la reserva
             Button {
-                onReservationPressed(IndividualReservationsCellOptions.cancelReservarion, consoleSelected, date, hours)
+                onReservationPressed(.cancelReservation, reservation)
             } label: {
                 Text("Cancelar")
-                    .foregroundStyle(Color.red)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.red)
             }
         }
     }

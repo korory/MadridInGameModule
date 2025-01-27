@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PlayerModel {
-    let id = UUID()
+    let id: String
     let name: String
     let image: UIImage
     let roleAssign: String

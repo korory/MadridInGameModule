@@ -35,14 +35,14 @@ extension TeamsScreenView {
                     }
                     .tag(TabBarTeamsBottom.news)
                     
-                    PlayersTeamComponentView(teamSelected: mockTeamPapaFrita)
+                    PlayersTeamComponentView(viewModel: PlayersTeamComponentViewModel(user: UserManager.shared.getUser()))
                         .tabItem {
                             Label("Jugadores", systemImage: "person.3.fill")
                         }
                         .tag(TabBarTeamsBottom.team
                         )
                     
-                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: false, allTeams: [mockTeamSamsung]))
+                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: false, allTeams: []))
                         .tabItem {
                             Label("Equipo", systemImage: "person.3.fill")
                         }

@@ -17,17 +17,51 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     @Published var isRemoveTraning: Bool = false
     @Published var isCreateNewTraining: Bool = false
     
-    @Published var teamReservationCellInformation = TeamReservationModel(trainingLocation: .virtual, dateSelected: "", hoursSelected: [""], playersAsigned: [], descriptionText: "", consoleSelected: "")
-        
-    // Mock data for team training reservations
-    @Published var teamReservations: [TeamReservationModel] = mockTeamReservationCellViewModel
+    @Published var teamReservationCellInformation: TeamReservation?
     
-    // Mock data for individual training reservations
-    @Published var individualReservations: [IndividualReservationModel] = mockIndividualReservationCellViewModel
+    /* // Mock data for team training reservations
+     @Published var teamReservations: [TeamReservationModel] = mockTeamReservationCellViewModel
+     
+     // Mock data for individual training reservations
+     @Published var individualReservations: [IndividualReservationModel] = mockIndividualReservationCellViewModel*/
+    
+    @Published var teamReservations: [TeamReservation] = []
+    @Published var individualReservations: [IndividualReservationModel] = []
+    
+    private let reservationService = ReservationService()
     
     init(isUserMode: Bool, markedDates: [Date]) {
         self.isUserMode = isUserMode
         self.markedDates = markedDates
+    }
+    
+    func fetchTeamReservations() {
+        let teamId = "6d8fd820-5aa4-479a-89e9-1f85c906f189"
+        reservationService.getReservesByTeam(teamId: teamId) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let reservations):
+                    self?.teamReservations = reservations
+                case .failure(let error):
+                    print("Error al obtener reservas de equipo: \(error)")
+                }
+            }
+        }
+    }
+    
+    func fetchTeamReservationsByUser() {
+        let teamId = "6d8fd820-5aa4-479a-89e9-1f85c906f189"
+        let userId = "bbb4b8e6-8dc3-4fe2-b029-43a5c55b071a"
+        reservationService.getReservesByTeamAndUser(teamId: teamId, userId: userId) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let reservations):
+                    self?.teamReservations = reservations
+                case .failure(let error):
+                    print("Error al obtener reservas de equipo: \(error)")
+                }
+            }
+        }
     }
     
     // Handle date selection from the calendar
@@ -41,7 +75,7 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
         switch option {
         case .removeCell:
             // Handle the removal logic here
-            teamReservations.removeAll { $0.dateSelected == reservation.dateSelected }
+            teamReservations.removeAll { $0.date.formatted() == reservation.dateSelected }
         case .editTraining:
             // Handle the edit logic
             print("Edit training for \(reservation.dateSelected)")
@@ -51,19 +85,20 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
         }
     }
     
-    func trainingTeamListCellPressed (teamSelectedInformation: TeamReservationModel, optionSelected: TeamReservationCellComponentOptionSelected) {
+    func trainingTeamListCellPressed (teamSelectedInformation: TeamReservation, optionSelected: TeamReservationCellComponentOptionSelected) {
         
         teamReservationCellInformation = teamSelectedInformation
         
         switch optionSelected {
         case .removeCell:
-            print("Remove Cell for \(teamSelectedInformation.dateSelected)")
+            //print("Remove Cell for \(teamSelectedInformation.dateSelected)")
             self.isRemoveTraning = true
         case .editTraining:
-            print("Edit Training for \(teamSelectedInformation.dateSelected)")
+            //print("Edit Training for \(teamSelectedInformation.dateSelected)")
             self.isEditTraning = true
         case .seeDetails:
-            print("See Details for \(teamSelectedInformation.dateSelected)")
+            //print("See Details for \(teamSelectedInformation.dateSelected)")
+            break
         }
     }
 }

@@ -36,14 +36,14 @@ extension DashboardScreenView {
                         }
                         .tag(TabBarDashboardBottom.reservation)
                     
-                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: true, allTeams: mockAllTeams))
+                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: true, allTeams: []))
                         .tabItem {
                             Label("Equipos", systemImage: "person.3.fill")
                         }
                         .tag(TabBarDashboardBottom.teams)
 
                     
-                    ProfileInformationComponentView()
+                    ProfileInformationComponentView(user: UserManager.shared.getUser())
                         .tabItem {
                             Label("Sobre Mi", systemImage: "person.circle")
                         }

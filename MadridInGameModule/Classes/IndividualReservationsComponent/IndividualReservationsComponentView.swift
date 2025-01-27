@@ -9,6 +9,7 @@ import SwiftUI
 
 struct IndividualReservationsComponentView: View {
     @StateObject var viewModel: IndividualReservationComponentViewModel
+    @State private var isReservationFlowPresented = false
     
     var body: some View {
         VStack {
@@ -19,7 +20,7 @@ struct IndividualReservationsComponentView: View {
                 
                 VStack (spacing: 20){
                     titleBanner
-                    reservationsCellComponent
+                    reservationsListComponent
                     Spacer()
                     reservationButton
                 }
@@ -47,21 +48,37 @@ struct IndividualReservationsComponentView: View {
                 .transition(.scale)
                 .zIndex(1)
                 
-                CustomPopup(isPresented: Binding(
-                    get: { viewModel.cancelReservation },
-                    set: { viewModel.cancelReservation = $0 }
-                )) {
-                    CancelOrDeleteComponent(title: "CANCELAR RESERVA", subtitle: "¿Quieres cancelar la reserva del día \(viewModel.reservationModel.dateSelected)") {
-                        self.viewModel.cancelReservation = false
-                    } aceptedAction: {
-                        self.viewModel.cancelReservation = false
-                        //TODO: Delete reservation to the Backend
+                CustomPopup(isPresented: $viewModel.cancelReservation) {
+                    Group {
+                        if let reservation = viewModel.selectedReservation {
+                            CancelOrDeleteComponent(
+                                title: "CANCELAR RESERVA",
+                                subtitle: "¿Quieres cancelar la reserva del día \(reservation.date.formatted(date: .numeric, time: .omitted))?"
+                            ) {
+                                viewModel.cancelReservation = false
+                            } aceptedAction: {
+                                viewModel.deleteReservation()
+                            }
+                        } else {
+                            EmptyView()
+                        }
                     }
                 }
                 .transition(.scale)
                 .zIndex(1)
             }
         }
+        .sheet(isPresented: $isReservationFlowPresented) {
+            ReservationFlowView(
+                            isPresented: $isReservationFlowPresented,
+                            viewModel: ReservationFlowViewModel(onReservationSuccess: {
+                                viewModel.fetchReservations()
+                                isReservationFlowPresented = false
+                            }, onReservationFail: {
+                                isReservationFlowPresented = false
+                            })
+                        )
+                }
     }
 }
 
@@ -76,12 +93,24 @@ extension IndividualReservationsComponentView {
         }
     }
     
-    private var reservationsCellComponent: some View {
-        IndividualReservationsCellComponent(consoleSelected: viewModel.reservationModel.consoleSelected, date: viewModel.reservationModel.dateSelected, hours: viewModel.reservationModel.hoursSelected) { optionPressed, consoleSelected, dateSelected, hoursSelected in
-            viewModel.isCellIsPressed(optionPressed, consoleSelected, dateSelected, hoursSelected)
+    private var reservationsListComponent: some View {
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(viewModel.reservations, id: \.id) { reservation in
+                        IndividualReservationsCellComponent(
+                            reservation: reservation) { optionPressed, reservation in
+                            switch optionPressed {
+                                                    case .cancelReservation:
+                                                        viewModel.isCancelReservationButtonPressed(for: reservation)
+                                                    case .seeReservation:
+                                                        viewModel.isSeeReservationButtonPressed()
+                                                    }
+                        }
+                    }
+                }
+            }
+            .padding()
         }
-        .padding()
-    }
     
     private var reservationButton: some View {
         CustomButton(text: "Reservar",
@@ -89,7 +118,8 @@ extension IndividualReservationsComponentView {
                      backgroundColor: Color.cyan,
                      pressEnabled: true,
                      widthButton: 280, heightButton: 50) {
-            viewModel.isCreateReservationButtonPressed()
+            //viewModel.isCreateReservationButtonPressed()
+            self.isReservationFlowPresented = true
         }
     }
 }

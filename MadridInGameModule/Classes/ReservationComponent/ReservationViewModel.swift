@@ -45,9 +45,27 @@ class ReservationViewModel: ObservableObject {
     }
     
     func reservationCall() {
-        if (dateSelected != "" && !hoursSelected.isEmpty && consoleSelected != "") {
-            print("Reservation")
-            isReservationValid = true
-        }
+        guard !dateSelected.isEmpty, !hoursSelected.isEmpty, !consoleSelected.isEmpty else { return }
+        
+        /*
+        let times = hoursSelected.map { GamingTime(gaming_space_times_id: GamingTimeID(id: $0)) }
+        let reservation = Reservation(date: dateSelected, user: "USER_ID", slot: consoleSelected, times: [])
+         */
+        
+        /*/let reservation = Reservation(id: 0, status: "", slot: 0, date: "22-04-2022", user: "", times: [])
+        
+        let service = ReservationService()
+        service.createReservation(reservation: reservation) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.isReservationValid = true
+                    print("Reservation created successfully")
+                case .failure(let error):
+                    self?.isReservationValid = false
+                    print("Error creating reservation: \(error)")
+                }
+            }
+        }*/
     }
 }

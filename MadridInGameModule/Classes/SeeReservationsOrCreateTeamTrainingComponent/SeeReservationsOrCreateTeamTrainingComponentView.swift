@@ -26,19 +26,23 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                         if !viewModel.isUserMode {
                             trainningTeamList
                         } else {
-                            trainningIndividualList
+                            //trainningIndividualList
                         }
                     }
                 }
             }
             .padding(.leading, 10)
             .padding(.trailing, 10)
+            .onAppear {
+                viewModel.fetchTeamReservationsByUser()
+            }
             
             CustomPopup(isPresented: Binding(
                 get: { viewModel.isEditTraning },
                 set: { viewModel.isEditTraning = $0 }
             )) {
-                EditTrainingComponentView(reservationModel: viewModel.teamReservationCellInformation)
+                //EditTrainingComponentView(reservationModel: viewModel.teamReservationCellInformation)
+                EmptyView()
             }
             .transition(.scale)
             .zIndex(1)
@@ -137,22 +141,24 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
     }
     
     private var trainningTeamList: some View {
-        VStack(spacing: 20) {
-            ForEach(mockTeamReservationCellViewModel, id: \.id) { reservation in
-                TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(trainingLocation: reservation.trainingLocation, dateSelected: reservation.dateSelected, hoursSelected: reservation.hoursSelected, playersAsigned: reservation.playersAsigned, descriptionText: reservation.descriptionText)) { optionSelected in
-                    viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)
+            VStack(spacing: 20) {
+                ForEach(viewModel.teamReservations, id: \.id) { reservation in
+                    TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation
+                    )) { optionSelected in
+                        viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)
+                    }
                 }
             }
+            .padding()
         }
-    }
     
-    private var trainningIndividualList: some View {
+    /*private var trainningIndividualList: some View {
         VStack(spacing: 20) {
             ForEach(mockIndividualReservationCellViewModel, id: \.id) { reservation in
                 IndividualReservationCellComponent(viewModel: IndividualReservationCellComponentViewModel(trainingLocation: reservation.trainingLocation, teamAssigned: reservation.teamAssign, dateSelected: reservation.dateSelected, hourSelected: reservation.hoursSelected))
             }
         }
-    }
+    }*/
 }
 
 

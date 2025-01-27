@@ -12,7 +12,7 @@ let mockIndividualReservation =
 
 let imageDefaultProfile = UIImage(named: "imageDefaultProfile") ?? UIImage()
 
-let mockAllPlayersInTeam = [
+/*let mockAllPlayersInTeam = [
     PlayerModel(name: "Player1", image: imageDefaultProfile, roleAssign: "Manager"),
     PlayerModel(name: "Player2", image: imageDefaultProfile, roleAssign: "Player"),
     PlayerModel(name: "Player3", image: imageDefaultProfile, roleAssign: "Trainer"),
@@ -23,16 +23,16 @@ let mockAllPlayersInTeam = [
     PlayerModel(name: "Player8", image: imageDefaultProfile, roleAssign: "Player"),
     PlayerModel(name: "Player9", image: imageDefaultProfile, roleAssign: "Player"),
     PlayerModel(name: "Player10", image: imageDefaultProfile, roleAssign: "Player")
-]
+]*/
 
-let mockAllTeams = [
+/*let mockAllTeams = [
     mockTeamPapaFrita,
     mockTeamSamsung,
     mockTeamCoffee,
     mockTeamVisa
-]
+]*/
 
-let mockOnePlayer = PlayerModel(name: "Player1", image: imageDefaultProfile, roleAssign: "Manager")
+/*let mockOnePlayer = PlayerModel(name: "Player1", image: imageDefaultProfile, roleAssign: "Manager")
 
 let mockTeamPapaFrita = TeamModel(name: "Team Papa Frita", descriptionText: "description Text", discordLink: "", image: imageDefaultProfile, allRolesAvailable: ["Manager", "Trainer", "Player"], allPlayersAssigned: Array(mockAllPlayersInTeam.prefix(5)))
 
@@ -90,13 +90,13 @@ let mockIndividualReservationCellViewModel = [
         dateSelected: "19/12/1996",
         hoursSelected: "20:00"
     ),
-]
+]*/
 
 let mockAllNews = [
-    NewsModel(title: "Nuevo club de E-Sports", description: "Al contrario del pensamiento popular, el texto de Lorem Ipsum no es simplemente texto aleatorio. Tiene sus raices en una pieza cl´sica de la literatura del Latin, que data del año 45 antes de Cristo, haciendo que este adquiera mas de 2000 años de antiguedad. Richard McClintock, un profesor de Latin de la Universidad de Hampden-Sydney en Virginia, encontró una de las palabras más oscuras de la lengua del latín, , en un pasaje de Lorem Ipsum, y al seguir leyendo distintos textos del latín, descubrió la fuente indudable. Lorem Ipsum viene de las secciones 1.10.32 y 1.10.33 de de Finnibus Bonorum et Malorum (Los Extremos del Bien y El Mal) por Cicero, escrito en el año 45 antes de Cristo. Este libro es un tratado de teoría de éticas, muy popular durante el Renacimiento. La primera linea del Lorem Ipsum, Lorem ipsum dolor sit amet.., viene de una linea en la sección 1.10.32", image: UIImage(named: "imageDefaultNews")!, imageText: ""),
-    NewsModel(title: "Segundo Nuevo club de E-Sports", description: "Al contrario del pensamiento popular, el texto de Lorem Ipsum no es simplemente texto aleatorio. La primera linea del Lorem Ipsum, Lorem ipsum dolor sit amet.., viene de una linea en la sección 1.10.32", image: UIImage(named: "imageDefaultNews")!, imageText: ""),
-    NewsModel(title: "Otro club de E-Sports", description: "Al contrario del pensamiento popular, el texto de Lorem Ipsum no es simplemente texto aleatorio. Tiene sus raices en una pieza cl´sica de la literatura del Latin, que data del año 45 antes de Cristo, haciendo que este adquiera mas de 2000 añticas, muy popular durante el Renacimiento. La primera linea del Lorem Ipsum, Lorem ipsum dolor sit amet.., viene de una linea en la sección 1.10.32", image: UIImage(named: "imageDefaultNews")!, imageText: ""),
-    NewsModel(title: "No vea tu otro club de E-Sports", description: "Al contrario del pensamiento popular, el texto de Lorem Ipsum no es simplemente texto aleatorio. Tiene sus raices en una pieza cl´sica de la literatura del Latin, que data del año 45 antes de Cristo, haciendo que este adquiera mas de 2000 años de antiguedad. Richard McClintock, un profesor de Latin de la Universidad de Hampden-Sydney en Virginia, encontró una de las palabras más oscu de éticas, muy popular durante el Renacimiento. La primera linea del Lorem Ipsum, Lorem ipsum dolor sit amet.., viene de una linea en la sección 1.10.32", image: UIImage(named: "imageDefaultNews")!, imageText: "")
+    NewsModel(title: "Nuevo club de E-Sports", description: "Al contrario del pensamiento popular, el texto de Lorem Ipsum no es simplemente texto aleatorio. Tiene sus raices en una pieza cl´sica de la literatura del Latin, que data del año 45 antes de Cristo, haciendo que este adquiera mas de 2000 años de antiguedad. Richard McClintock, un profesor de Latin de la Universidad de Hampden-Sydney en Virginia, encontró una de las palabras más oscuras de la lengua del latín, , en un pasaje de Lorem Ipsum, y al seguir leyendo distintos textos del latín, descubrió la fuente indudable. Lorem Ipsum viene de las secciones 1.10.32 y 1.10.33 de de Finnibus Bonorum et Malorum (Los Extremos del Bien y El Mal) por Cicero, escrito en el año 45 antes de Cristo. Este libro es un tratado de teoría de éticas, muy popular durante el Renacimiento. La primera linea del Lorem Ipsum, Lorem ipsum dolor sit amet.., viene de una linea en la sección 1.10.32", image: UIImage(), imageText: ""),
+    NewsModel(title: "Segundo Nuevo club de E-Sports", description: "Al contrario del pensamiento popular, el texto de Lorem Ipsum no es simplemente texto aleatorio. La primera linea del Lorem Ipsum, Lorem ipsum dolor sit amet.., viene de una linea en la sección 1.10.32", image: UIImage(), imageText: ""),
+    NewsModel(title: "Otro club de E-Sports", description: "Al contrario del pensamiento popular, el texto de Lorem Ipsum no es simplemente texto aleatorio. Tiene sus raices en una pieza cl´sica de la literatura del Latin, que data del año 45 antes de Cristo, haciendo que este adquiera mas de 2000 añticas, muy popular durante el Renacimiento. La primera linea del Lorem Ipsum, Lorem ipsum dolor sit amet.., viene de una linea en la sección 1.10.32", image: UIImage(), imageText: ""),
+    NewsModel(title: "No vea tu otro club de E-Sports", description: "Al contrario del pensamiento popular, el texto de Lorem Ipsum no es simplemente texto aleatorio. Tiene sus raices en una pieza cl´sica de la literatura del Latin, que data del año 45 antes de Cristo, haciendo que este adquiera mas de 2000 años de antiguedad. Richard McClintock, un profesor de Latin de la Universidad de Hampden-Sydney en Virginia, encontró una de las palabras más oscu de éticas, muy popular durante el Renacimiento. La primera linea del Lorem Ipsum, Lorem ipsum dolor sit amet.., viene de una linea en la sección 1.10.32", image: UIImage(), imageText: "")
 ]
 
 let mockOneNewEmpty = NewsModel(title: "", description: "", image: imageDefaultProfile, imageText: "")
@@ -115,11 +115,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .fornite,
                             title: "Esports Series Madrid Fortnite",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "Madrid in Game, iniciativa del Ayuntamiento de Madrid, inicia el Split 2 de la segunda temporada de la Esports Series Madrid de Fortnite. Busca una pareja, compite, entrena en el Esports Center de Casa de Campo con tus amigos y llega a lo más alto en los clasificatorios de las ligas municipales para reinar en la capital.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "Madrid in Game, iniciativa del Ayuntamiento de Madrid, inicia el Split 2 de la segunda temporada de la Esports Series Madrid de Fortnite. Busca una pareja, compite, entrena en el Esports Center de Casa de Campo con tus amigos y llega a lo más alto en los clasificatorios de las ligas municipales para reinar en la capital.",
                                             details: "Se competirá mediante el formato Dúos, contará con cuatro clasificatorios en cada split, que sumarán puntos en una tabla clasificatoria. Apúntate a los distintos clasificatorios, llega a la fase final y consigue puntos para llegar a la Gran Final.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "Podréis contactar con Madrid in Game a través del Canal de Discord de la Esports Series Madrid o a través del siguiente correo electrónico: esportscenter@madridingame.es Además, dentro del servidor de Discord podréis también hablar con cydoniaknight, el administrador de la competición."),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -129,11 +129,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .valorant,
                             title: "Esports Series Madrid Fortnite",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -143,11 +143,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .rocketLeague,
                             title: "Esports Series Madrid Rocket League",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -164,11 +164,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .valorant,
                             title: "Esports Series Madrid Valorant",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -185,11 +185,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .valorant,
                             title: "Esports Series Madrid Valorant",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -206,11 +206,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .lol,
                             title: "Torneo 1vs1 League of Legends Cazacracks",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -232,11 +232,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .fornite,
                             title: "Esports Series Madrid Fortnite",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "Madrid in Game, iniciativa del Ayuntamiento de Madrid, inicia el Split 2 de la segunda temporada de la Esports Series Madrid de Fortnite. Busca una pareja, compite, entrena en el Esports Center de Casa de Campo con tus amigos y llega a lo más alto en los clasificatorios de las ligas municipales para reinar en la capital.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "Madrid in Game, iniciativa del Ayuntamiento de Madrid, inicia el Split 2 de la segunda temporada de la Esports Series Madrid de Fortnite. Busca una pareja, compite, entrena en el Esports Center de Casa de Campo con tus amigos y llega a lo más alto en los clasificatorios de las ligas municipales para reinar en la capital.",
                                             details: "Se competirá mediante el formato Dúos, contará con cuatro clasificatorios en cada split, que sumarán puntos en una tabla clasificatoria. Apúntate a los distintos clasificatorios, llega a la fase final y consigue puntos para llegar a la Gran Final.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "Podréis contactar con Madrid in Game a través del Canal de Discord de la Esports Series Madrid o a través del siguiente correo electrónico: esportscenter@madridingame.es Además, dentro del servidor de Discord podréis también hablar con cydoniaknight, el administrador de la competición."),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -253,11 +253,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .valorant,
                             title: "Esports Series Madrid Valorant",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -274,11 +274,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .valorant,
                             title: "Esports Series Madrid Valorant",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -295,11 +295,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .lol,
                             title: "Torneo 1vs1 League of Legends Cazacracks",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -321,11 +321,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .fornite,
                             title: "Esports Series Madrid Fortnite",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "Madrid in Game, iniciativa del Ayuntamiento de Madrid, inicia el Split 2 de la segunda temporada de la Esports Series Madrid de Fortnite. Busca una pareja, compite, entrena en el Esports Center de Casa de Campo con tus amigos y llega a lo más alto en los clasificatorios de las ligas municipales para reinar en la capital.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "Madrid in Game, iniciativa del Ayuntamiento de Madrid, inicia el Split 2 de la segunda temporada de la Esports Series Madrid de Fortnite. Busca una pareja, compite, entrena en el Esports Center de Casa de Campo con tus amigos y llega a lo más alto en los clasificatorios de las ligas municipales para reinar en la capital.",
                                             details: "Se competirá mediante el formato Dúos, contará con cuatro clasificatorios en cada split, que sumarán puntos en una tabla clasificatoria. Apúntate a los distintos clasificatorios, llega a la fase final y consigue puntos para llegar a la Gran Final.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "Podréis contactar con Madrid in Game a través del Canal de Discord de la Esports Series Madrid o a través del siguiente correo electrónico: esportscenter@madridingame.es Además, dentro del servidor de Discord podréis también hablar con cydoniaknight, el administrador de la competición."),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -335,11 +335,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .rocketLeague,
                             title: "Esports Series Madrid Rocket League",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -356,11 +356,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .valorant,
                             title: "Esports Series Madrid Valorant",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -377,11 +377,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .valorant,
                             title: "Esports Series Madrid Valorant",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
@@ -398,11 +398,11 @@ let mockCompetitions = CompetitionsModel(
                             competitionType: .lol,
                             title: "Torneo 1vs1 League of Legends Cazacracks",
                             allSplitsAvailable: [
-                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Otoño", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com"),
-                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(named: "imageCompetitionDetail")!, overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
+                                SplitsModel(title: "Split de Invierno", bannerImage: UIImage(), overviewDescription: "The biggest Valorant competition featuring the best teams worldwide.",
                                             details: "Teams compete in a multi-stage tournament with a final showdown in the Grand Finals.",
                                             rules: "Participants must adhere to Riot Games' competition rulebook.",
                                             contact: "valorant-support@example.com")
