@@ -7,10 +7,10 @@ Pod::Spec.new do |s|
   DESC
   s.homepage     = 'https://github.com/hamzadiverger/MadridInGameModule'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
-  s.author       = { 'Tu Nombre' => 'hamza.elhamdaoui@diverger.ai' }
+  s.author       = { 'Diverger Thinking' => 'hamza.elhamdaoui@diverger.ai' }
   s.source       = { :git => 'https://github.com/hamzadiverger/MadridInGameModule', :tag => s.version.to_s }
 
-  s.ios.deployment_target = '17.0'
+  s.ios.deployment_target = '16.0'
   s.source_files = 'MadridInGameModule/Classes/**/*.{swift}'
 
 end
