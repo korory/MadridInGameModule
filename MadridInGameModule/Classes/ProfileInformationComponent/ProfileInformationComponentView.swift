@@ -9,9 +9,9 @@ struct ProfileInformationComponentView: View {
     @State private var phone: String = ""
     @State private var avatar: UIImage? = UIImage()
     
-    var user: User?
+    var user: UserModel?
     
-    init(user: User?) {
+    init(user: UserModel?) {
         self.user = user
         _firstName = State(initialValue: user?.firstName ?? "")
         _lastName = State(initialValue: user?.lastName ?? "")

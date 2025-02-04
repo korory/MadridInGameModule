@@ -18,11 +18,11 @@ struct DashboardScreenView: View {
 extension DashboardScreenView {
     private var tabBarComponent: some View {
         Group {
-            if let selectedSplit = viewModel.optionTabSelected {
+            if (viewModel.optionTabSelected != nil) {
                 TabView(selection: $viewModel.selectedTab) {
                     SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: true, markedDates: [
-                        Calendar.current.date(from: DateComponents(year: 2024, month: 11, day: 17))!,
-                        Calendar.current.date(from: DateComponents(year: 2024, month: 11, day: 20))!
+                        Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 17))!,
+                        Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 20))!
                     ]))
                         .tabItem {
                             Label("Calendario", systemImage: "calendar")
@@ -60,46 +60,3 @@ extension DashboardScreenView {
         }
     }
 }
-
-//    private var bottomBarView: some View {
-//        VStack {
-//            HStack {
-//                Button(action: {
-//                    selectedTab = 0
-//                }) {
-//                    VStack {
-//                        Text("Calendario")
-//                            .foregroundColor(selectedTab == 0 ? .blue : .white)
-//                            .frame(maxWidth: .infinity)
-//
-//                        Rectangle()
-//                            .fill(selectedTab == 0 ? Color.blue : Color.clear)
-//                            .frame(height: 3)
-//                    }
-//                }
-//
-//                Button(action: {
-//                    selectedTab = 1
-//                }) {
-//                    VStack {
-//                        Text("Equipo")
-//                            .foregroundColor(selectedTab == 1 ? .blue : .white)
-//                            .frame(maxWidth: .infinity)
-//
-//                        Rectangle()
-//                            .fill(selectedTab == 1 ? Color.blue : Color.clear)
-//                            .frame(height: 3)
-//                    }
-//                }
-//            }
-//            .padding(.leading, 10)
-//            .padding(.trailing, 10)
-//            // Contenido dinámico basado en la pestaña seleccionada
-//            if selectedTab == 0 {
-//                DashboardScreenView()
-//            } else {
-//                EquipoView()
-//            }
-//        }
-//    }
-//}

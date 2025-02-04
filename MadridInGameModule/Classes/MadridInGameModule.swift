@@ -6,14 +6,20 @@ import SwiftUI
 public struct MadridInGameModule: View {
     @State private var selectedTab = 0
     @State private var isLoading = true
-    @State private var user: User?
+    @State private var user: UserModel?
     @State private var errorMessage: String?
     
     private let email: String
     private let userManager = UserManager.shared
+    private let environmentManager: EnvironmentManager
     
-    public init(email: String) {
+    public init(email: String, environment: String) {
         self.email = email
+        self.environmentManager = EnvironmentManager(environment: environment)
+        
+        Task.detached { [envManager = self.environmentManager] in
+            await DirectusService.shared.configure(with: envManager)
+        }
     }
     
     public var body: some View {
@@ -58,7 +64,7 @@ extension MadridInGameModule {
             }
         }
 
-        private func contentView(user: User) -> some View {
+        private func contentView(user: UserModel) -> some View {
             VStack {
                 topBarView
             }
