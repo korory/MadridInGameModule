@@ -20,7 +20,7 @@ extension DashboardScreenView {
         Group {
             if (viewModel.optionTabSelected != nil) {
                 TabView(selection: $viewModel.selectedTab) {
-                    SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: true))
+                    SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: true, selectedTeam: nil))
                         .tabItem {
                             Label("Calendario", systemImage: "calendar")
                         }

@@ -208,42 +208,63 @@ class ReservationService {
 //    }
 //
     
-    func getReservesByTeam(teamId: String, completion: @escaping (Result<[TeamReservation], Error>) -> Void) {
-        let parameters: [String: String] = [
-            "fields": "id,date,slot.*,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
-            "filter[team][_eq]": teamId,
-            "filter[status][_neq]": "cancelled",
-            "sort[]": "date"
-        ]
-        
-        Task {
-            do {
-                let response: TeamReservationResponse = try await DirectusService.shared.request(
-                    endpoint: "gaming_space_reserves",
-                    method: .GET,
-                    parameters: parameters
-                )
-                
-                completion(.success(response.data))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-    }
+//    func getReservesByTeam(teamId: String, completion: @escaping (Result<[TeamReservation], Error>) -> Void) {
+//        let parameters: [String: String] = [
+//            "fields": "id,date,slot.*,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
+//            "filter[team][_eq]": teamId,
+//            "filter[status][_neq]": "cancelled",
+//            "sort[]": "date"
+//        ]
+//        
+//        Task {
+//            do {
+//                let response: TeamReservationResponse = try await DirectusService.shared.request(
+//                    endpoint: "gaming_space_reserves",
+//                    method: .GET,
+//                    parameters: parameters
+//                )
+//                
+//                completion(.success(response.data))
+//            } catch {
+//                completion(.failure(error))
+//            }
+//        }
+//    }
+//    
+//    func getReservesByTeamAndUser(teamId: String, userId: String, completion: @escaping (Result<[TeamReservation], Error>) -> Void) {
+//        let parameters: [String: String] = [
+//            "fields": "id,date,slot.*,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
+//            "filter[team][_eq]": teamId,
+//            "filter[status][_neq]": "cancelled",
+//            "filter[user][_eq]": userId,
+//            "sort[]": "date"
+//        ]
+//        
+//        Task {
+//            do {
+//                let response: TeamReservationResponse = try await DirectusService.shared.request(
+//                    endpoint: "gaming_space_reserves",
+//                    method: .GET,
+//                    parameters: parameters
+//                )
+//                
+//                completion(.success(response.data))
+//            } catch {
+//                completion(.failure(error))
+//            }
+//        }
+//    }
     
-    func getReservesByTeamAndUser(teamId: String, userId: String, completion: @escaping (Result<[TeamReservation], Error>) -> Void) {
+    func getAllTrainnings(teamId: String, userId: String, completion: @escaping (Result<[EventModel], Error>) -> Void) {
         let parameters: [String: String] = [
-            "fields": "id,date,slot.*,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
+            "fields": "id, status, start_date, time, players, type, reserves, notes",
             "filter[team][_eq]": teamId,
-            "filter[status][_neq]": "cancelled",
-            "filter[user][_eq]": userId,
-            "sort[]": "date"
         ]
         
         Task {
             do {
-                let response: TeamReservationResponse = try await DirectusService.shared.request(
-                    endpoint: "gaming_space_reserves",
+                let response: EventModelResponse = try await DirectusService.shared.request(
+                    endpoint: "trainings",
                     method: .GET,
                     parameters: parameters
                 )

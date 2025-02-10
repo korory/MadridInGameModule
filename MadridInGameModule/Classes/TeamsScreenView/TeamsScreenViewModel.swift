@@ -19,6 +19,7 @@ class TeamsScreenViewModel: ObservableObject {
     @Published var optionTabSelected: TabBarTeamsBottom? = .trainning
     @Published var userManager = UserManager.shared
     @Published var teamSelected = false
+    @Published var selectedTeam: TeamModelReal?
 
     init() {
         optionTabSelected = .trainning
@@ -28,7 +29,12 @@ class TeamsScreenViewModel: ObservableObject {
         return userManager.getUser()?.teams ?? []
     }
     
-    func getTeamSelected() -> TeamModelReal? {
-        return userManager.getUser()?.selectedTeam
+    func setTeamSelected(team: TeamModelReal) {
+        self.selectedTeam = team
+        self.teamSelected = true
+    }
+    
+    func getTeamSelected() -> TeamModelReal {
+        return self.selectedTeam!//userManager.getUser()?.selectedTeam
     }
 }

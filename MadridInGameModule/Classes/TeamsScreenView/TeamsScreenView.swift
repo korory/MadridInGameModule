@@ -15,8 +15,8 @@ struct TeamsScreenView: View {
             if viewModel.getAllTeams().count >= 2 && !viewModel.teamSelected {
                 SelectTeamComponent(allTeams: viewModel.getAllTeams(),
                                     onTeamSelected: { team in
-                    self.viewModel.userManager.setSelectedTeam(team)
-                    self.viewModel.teamSelected = true
+                    //self.viewModel.userManager.setSelectedTeam(team)
+                    self.viewModel.setTeamSelected(team: team)
                 })
             } else if viewModel.getAllTeams().count == 1 || viewModel.teamSelected {
                 tabBarComponent
@@ -30,7 +30,7 @@ extension TeamsScreenView {
         Group {
             if (viewModel.optionTabSelected != nil) {
                 TabView(selection: $viewModel.selectedTab) {
-                    SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: false))
+                    SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: false, selectedTeam: viewModel.getTeamSelected()))
                         .tabItem {
                             Label("Entrenamiento", systemImage: "calendar")
                         }
