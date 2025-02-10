@@ -66,7 +66,7 @@ class IndividualReservationComponentViewModel: ObservableObject {
                     self?.isLoading = false
                     switch result {
                     case .success:
-                        self?.fetchReservations()
+                        //self?.fetchReservations()
                         self?.cancelReservation.toggle()
                         //self?.reservations.removeAll { $0.id == reservation.id }
                     case .failure(let error):

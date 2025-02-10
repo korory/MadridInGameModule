@@ -54,6 +54,22 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                 }
             }
         }
+        
+        reservationService.getReservesByUser(userId: userId) { [weak self] result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let reservations):
+                        for reservation in reservations {
+                            if let createDate = Utils.createDate(from: reservation.date) {
+                                self?.markedDates.append(createDate)
+                            }
+                        }
+                        print("Reservas obtenidas: \(reservations)")
+                    case .failure(let error):
+                        print("Error al obtener reservas: \(error)")
+                    }
+                }
+            }
     }
     
     func fetchTeamReservationsByTeam(completion: @escaping () -> Void) {

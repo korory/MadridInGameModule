@@ -44,6 +44,29 @@ struct ReservationResponse: Codable {
     let data: [Reservation]
 }
 
+struct IndividualReservationResponse: Codable {
+    let data: [IndividualReservation]
+}
+
+struct IndividualReservation: Codable {
+    let id: Int?
+    let status: String?
+    let slot: Slot
+    let date: String
+    let user: String?
+    let team: String?
+    let training: String?
+    let qrImage: String?
+    let qrValue: String?
+    var times: [GamingTime]?
+    //let peripheralLoans: [Int]?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, status, slot, date, user, team, training, qrImage, qrValue
+        //case peripheralLoans = "peripheral_loans"
+    }
+}
+
 struct Reservation: Codable {
     let id: Int?
     let status: String?
@@ -276,7 +299,7 @@ class ReservationService {
         }
     }
 
-    func getReservesByUser(userId: String, completion: @escaping (Result<[Reservation], Error>) -> Void) {
+    func getReservesByUser(userId: String, completion: @escaping (Result<[IndividualReservation], Error>) -> Void) {
         let parameters: [String: String] = [
             "fields": "id,date,slot.*,qrImage,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
             "filter[user][_eq]": userId,
@@ -288,7 +311,7 @@ class ReservationService {
         
         Task {
             do {
-                let response: ReservationResponse = try await DirectusService.shared.request(
+                let response: IndividualReservationResponse = try await DirectusService.shared.request(
                     endpoint: "gaming_space_reserves",
                     method: .GET,
                     parameters: parameters
