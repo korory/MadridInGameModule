@@ -17,8 +17,18 @@ enum TabBarTeamsBottom: Hashable {
 class TeamsScreenViewModel: ObservableObject {
     @Published var selectedTab: TabBarTeamsBottom = .trainning
     @Published var optionTabSelected: TabBarTeamsBottom? = .trainning
+    @Published var userManager = UserManager.shared
+    @Published var teamSelected = false
 
     init() {
         optionTabSelected = .trainning
+    }
+    
+    func getAllTeams() -> [TeamModelReal] {
+        return userManager.getUser()?.teams ?? []
+    }
+    
+    func getTeamSelected() -> TeamModelReal? {
+        return userManager.getUser()?.selectedTeam
     }
 }

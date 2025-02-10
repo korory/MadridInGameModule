@@ -73,6 +73,17 @@ actor DirectusService {
         guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
             throw NetworkError.invalidResponse
         }
+        
+        do {
+            if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                print("Datos JSON (sin decodificar): \(jsonResponse)")
+            } else {
+                print("La respuesta no es un [String: Any]")
+            }
+        } catch {
+            print("Error al deserializar JSON: \(error.localizedDescription)")
+        }
+
 
         do {
             return try JSONDecoder().decode(T.self, from: data)

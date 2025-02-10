@@ -21,6 +21,9 @@ struct UserModel: Codable {
     let gamingSpaceReserves: [Int]
     let invitations: [Int]
     var teams: [TeamModelReal] = []
+    var selectedTeam: TeamModelReal?
+    var trainningsComplete: [TrainningsModel] = []
+    var gammingSpacesComplete: [LoanModel] = []
 
     enum CodingKeys: String, CodingKey {
         case id, status, username, email, dni, token, firstName = "first_name", lastName = "last_name", avatar

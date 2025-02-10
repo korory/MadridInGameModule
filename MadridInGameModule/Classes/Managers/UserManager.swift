@@ -11,6 +11,26 @@ class UserManager {
     static let shared = UserManager()
     
     private var user: UserModel?
+    
+    func getUser() -> UserModel? {
+        return user
+    }
+    
+    func setSelectedTeam(_ team: TeamModelReal) {
+        self.user?.selectedTeam = team
+    }
+
+    func getSelectedTeam() -> TeamModelReal? {
+        return self.user?.selectedTeam
+    }
+    
+    struct TeamResponse: Codable {
+        let data: [TeamModelReal]
+    }
+    
+    struct TrainningsResponseModel: Codable {
+        let data: [TrainningsModel]
+    }
 
     private init() {}
     
@@ -37,6 +57,26 @@ class UserManager {
                         case .failure(let error):
                             completion(.failure(error))
                         }
+                        
+//                        self.fetchUserTrainings(userId: user.id) { result in
+//                            switch result {
+//                            case .success(let trainings):
+//                                self.user?.trainningsComplete = trainings
+//                                //completion(.success(()))
+//                            case .failure(let error):
+//                                completion(.failure(error))
+//                        }
+//                    }
+//                        
+//                        self.fetchUserGameSpace(userId: user.id) { result in
+//                            switch result {
+//                            case .success(let gammingSpaces):
+//                                self.user?.gammingSpacesComplete = gammingSpaces
+//                                completion(.success(()))
+//                            case .failure(let error):
+//                                completion(.failure(error))
+//                        }
+//                    }
                     }
                 } else {
                     completion(.failure(NSError(domain: "No User Found", code: 0, userInfo: nil)))
@@ -65,14 +105,98 @@ class UserManager {
             }
         }
     }
-
-
-    struct TeamResponse: Codable {
-        let data: [TeamModelReal]
-    }
-
     
-    func getUser() -> UserModel? {
-        return user
+    func fetchUserTrainings(userId: String, completion: @escaping (Result<[TrainningsModel], Error>) -> Void) {
+        guard let userTrainingIds = user?.trainings else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No hay entrenamientos disponibles en el perfil del usuario."])))
+            return
+        }
+
+        Task {
+            do {
+                var allTrainings: [TrainningsModel] = []
+
+                for trainingId in userTrainingIds {
+                    let parameters = ["filter[id][_eq]": "\(trainingId)"]
+                    let trainingResponse: TrainingUserConnectionResponseModel = try await DirectusService.shared.request(
+                        endpoint: "trainings_users",
+                        method: .GET,
+                        parameters: parameters
+                    )
+
+                    if let trainingId = trainingResponse.data?.first?.trainingsId {
+                        let trainingParameters = ["filter[id][_eq]": "\(trainingId)"]
+                        let eventResponse: TrainningsResponseModel = try await DirectusService.shared.request(
+                            endpoint: "trainings",
+                            method: .GET,
+                            parameters: trainingParameters
+                        )
+
+                        if let trainingInfo = eventResponse.data.first {
+                            allTrainings.append(trainingInfo)
+                        }
+                    }
+                }
+                completion(.success(allTrainings))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func fetchUserGameSpace(userId: String, completion: @escaping (Result<[LoanModel], Error>) -> Void) {
+        guard let userGammingSpacesIds = user?.gamingSpaceReserves, !userGammingSpacesIds.isEmpty else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No hay entrenamientos disponibles en el perfil del usuario."])))
+            return
+        }
+
+        Task {
+            do {
+                var allGammingSpaces: [LoanModel] = []
+
+                for gammingSpaceId in userGammingSpacesIds {
+                    let parameters = ["filter[id][_eq]": "\(gammingSpaceId)"]
+                    guard let gammingResponse: GamingSpaceResponse = try? await DirectusService.shared.request(
+                        endpoint: "gaming_space_reserves",
+                        method: .GET,
+                        parameters: parameters
+                    ), let gammingInfo = gammingResponse.data.first else {
+                        continue
+                    }
+
+                    var updatedGammingInfo = gammingInfo
+
+                    if let userGammingSpacesTimesIds = gammingInfo.times {
+                        for gammingSpaceTimeId in userGammingSpacesTimesIds {
+                            let timeParameters = ["filter[id][_eq]": "\(gammingSpaceTimeId)"]
+                            guard let gammingTimeResponse: GamingSpacesReservationIds = try? await DirectusService.shared.request(
+                                endpoint: "gaming_space_reserves_gaming_space_times",
+                                method: .GET,
+                                parameters: timeParameters
+                            ), let gammingSpaceTimesId = gammingTimeResponse.data.first?.gamingSpaceTimesId else {
+                                continue
+                            }
+
+                            let timeInfoParameters = ["filter[id][_eq]": "\(gammingSpaceTimesId)"]
+                            guard let gammingSpaceTimeResponse: GamingSpacesReservationTime = try? await DirectusService.shared.request(
+                                endpoint: "gaming_space_times",
+                                method: .GET,
+                                parameters: timeInfoParameters
+                            ) else {
+                                continue
+                            }
+
+                            updatedGammingInfo.gammingSpacesTimesComplete.append(contentsOf: gammingSpaceTimeResponse.data)
+                        }
+                    }
+
+                    allGammingSpaces.append(updatedGammingInfo)
+                }
+
+                completion(.success(allGammingSpaces))
+            } catch {
+                completion(.failure(error))
+            }
+        }
     }
 }

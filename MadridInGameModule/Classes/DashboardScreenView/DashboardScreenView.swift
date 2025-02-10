@@ -20,10 +20,7 @@ extension DashboardScreenView {
         Group {
             if (viewModel.optionTabSelected != nil) {
                 TabView(selection: $viewModel.selectedTab) {
-                    SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: true, markedDates: [
-                        Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 17))!,
-                        Calendar.current.date(from: DateComponents(year: 2025, month: 2, day: 20))!
-                    ]))
+                    SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: true))
                         .tabItem {
                             Label("Calendario", systemImage: "calendar")
                         }

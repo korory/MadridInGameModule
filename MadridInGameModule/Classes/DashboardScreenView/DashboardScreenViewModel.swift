@@ -17,6 +17,7 @@ enum TabBarDashboardBottom: Hashable {
 class DashboardScreenViewModel: ObservableObject {
     @Published var selectedTab: TabBarDashboardBottom = .calendar
     @Published var optionTabSelected: TabBarDashboardBottom? = .calendar
+    @Published var userManager = UserManager.shared
 
     init() {
         optionTabSelected = .calendar

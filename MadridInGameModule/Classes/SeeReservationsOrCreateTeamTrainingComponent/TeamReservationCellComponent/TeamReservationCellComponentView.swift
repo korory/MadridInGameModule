@@ -22,7 +22,6 @@ struct TeamReservationCellComponentView: View {
         .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
         .shadow(radius: 4)
-        .padding(.horizontal)
     }
 }
 
@@ -32,11 +31,13 @@ extension TeamReservationCellComponentView {
         HStack {
             Image(systemName: "calendar")
                 .resizable()
-                .frame(width: 24, height: 24)
+                .frame(width: 20, height: 20)
                 .foregroundStyle(Color.yellow)
+                .padding(.trailing, 2)
+            
             Text(viewModel.reservation.date.formatted(date: .numeric, time: .omitted))
-                .font(.headline)
-                .foregroundColor(.white)
+                .font(.system(size: 20))
+                .foregroundStyle(Color.white)
         }
     }
 
