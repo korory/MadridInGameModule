@@ -11,29 +11,36 @@ struct TeamsScreenView: View {
     @StateObject private var viewModel = TeamsScreenViewModel()
     
     var body: some View {
-        tabBarComponent
+        VStack {
+            if viewModel.getAllTeams().count >= 2 && !viewModel.teamSelected {
+                SelectTeamComponent(allTeams: viewModel.getAllTeams(),
+                                    onTeamSelected: { team in
+                    //self.viewModel.userManager.setSelectedTeam(team)
+                    self.viewModel.setTeamSelected(team: team)
+                })
+            } else if viewModel.getAllTeams().count == 1 || viewModel.teamSelected {
+                tabBarComponent
+            }
+        }
     }
 }
 
 extension TeamsScreenView {
     private var tabBarComponent: some View {
         Group {
-            if let selectedSplit = viewModel.optionTabSelected {
+            if (viewModel.optionTabSelected != nil) {
                 TabView(selection: $viewModel.selectedTab) {
-                    SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: false, markedDates: [
-                        Calendar.current.date(from: DateComponents(year: 2024, month: 11, day: 17))!,
-                        Calendar.current.date(from: DateComponents(year: 2024, month: 11, day: 20))!
-                    ]))
-                    .tabItem {
-                        Label("Entrenamiento", systemImage: "calendar")
-                    }
-                    .tag(TabBarTeamsBottom.trainning)
+                    SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: false, selectedTeam: viewModel.getTeamSelected()))
+                        .tabItem {
+                            Label("Entrenamiento", systemImage: "calendar")
+                        }
+                        .tag(TabBarTeamsBottom.trainning)
                     
                     NewsComponentView(viewModel: NewsViewModel(allNews: mockAllNews))
-                    .tabItem {
-                        Label("Noticias", systemImage: "newspaper.circle.fill")
-                    }
-                    .tag(TabBarTeamsBottom.news)
+                        .tabItem {
+                            Label("Noticias", systemImage: "newspaper.circle.fill")
+                        }
+                        .tag(TabBarTeamsBottom.news)
                     
                     PlayersTeamComponentView(viewModel: PlayersTeamComponentViewModel(user: UserManager.shared.getUser()))
                         .tabItem {
@@ -56,7 +63,6 @@ extension TeamsScreenView {
                     .padding()
             }
         }
-        
     }
 }
 

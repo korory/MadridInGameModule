@@ -17,17 +17,17 @@ class IndividualReservationComponentViewModel: ObservableObject {
     }
 
     func fetchReservations() {
-        reservationService.getReservesByUser(userId: "f7a09e83-281e-4bb4-952a-e5ae40c99105") { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let reservations):
-                    self?.reservations = reservations
-                    print("Reservas obtenidas: \(reservations)")
-                case .failure(let error):
-                    print("Error al obtener reservas: \(error)")
-                }
-            }
-        }
+//        reservationService.getReservesByUser(userId: "f7a09e83-281e-4bb4-952a-e5ae40c99105") { [weak self] result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .success(let reservations):
+//                    self?.reservations = reservations
+//                    print("Reservas obtenidas: \(reservations)")
+//                case .failure(let error):
+//                    print("Error al obtener reservas: \(error)")
+//                }
+//            }
+//        }
     }
 
     func isSeeReservationButtonPressed() {
@@ -66,7 +66,7 @@ class IndividualReservationComponentViewModel: ObservableObject {
                     self?.isLoading = false
                     switch result {
                     case .success:
-                        self?.fetchReservations()
+                        //self?.fetchReservations()
                         self?.cancelReservation.toggle()
                         //self?.reservations.removeAll { $0.id == reservation.id }
                     case .failure(let error):
