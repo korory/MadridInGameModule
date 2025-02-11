@@ -62,7 +62,7 @@ public struct MadridInGameModule: View {
                 TeamsScreenView()
             } else {
                 NavigationView {
-                    CompetitionsView(viewModel: CompetitionsViewModel(competitionsInformation: mockCompetitions))
+                    CompetitionsView(viewModel: CompetitionsViewModel())
                 }
             }
         }

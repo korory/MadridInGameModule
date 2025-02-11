@@ -52,18 +52,18 @@ extension PlayerTeamComponentCell {
                     .foregroundStyle(Color.white)
                     .padding(.trailing, 10)
                 
-                dropdownSelectPlayerRolesComponent
+                //dropdownSelectPlayerRolesComponent
             }
         }
     }
     
-    private var dropdownSelectPlayerRolesComponent: some View {
-        let options = allRolesAvailable.map { DropdownSingleSelectionModel(title: $0, isOptionSelected: checkSelectedRole(role: $0)) }
-
-        return DropdownSingleSelectionComponentView(options: options, userInteraction: !checkManagerRole()) { selection in
-            print("czxcxz")
-        }
-    }
+//    private var dropdownSelectPlayerRolesComponent: some View {
+//        let options = allRolesAvailable.map { DropdownSingleSelectionModel(title: $0, isOptionSelected: checkSelectedRole(role: $0)) }
+//
+//        return DropdownSingleSelectionComponentView(options: options, userInteraction: !checkManagerRole()) { selection in
+//            print("czxcxz")
+//        }
+//    }
     
     private var removePlayerButton: some View {
         Button {

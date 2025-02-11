@@ -7,6 +7,7 @@
 
 
 import Foundation
+import SwiftUICore
 
 class Utils {
     static func createDate(from dateString: String) -> Date? {
@@ -35,3 +36,9 @@ class Utils {
         }
     
 }
+
+//extension Font {
+//    static func customFont(size: CGFloat) -> Font {
+//        return .custom("Madrid_in_game_font", size: size)
+//    }
+//}

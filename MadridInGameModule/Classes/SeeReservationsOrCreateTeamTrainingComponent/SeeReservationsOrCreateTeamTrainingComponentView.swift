@@ -80,16 +80,16 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                 .transition(.scale)
                 .zIndex(1)
                 
-                CustomPopup(isPresented: Binding(
-                    get: { viewModel.isCreateNewTraining },
-                    set: { viewModel.isCreateNewTraining = $0 }
-                )) {
-                    CreateNewTrainingView(viewModel: CreateNewTrainingViewModel(dateSelected: viewModel.dateSelected, availableHoursReservation: ["14:00", "15:00", "16:00", "17:00", "18:00", "19:00"], availableConsoleReservation: ["PC", "Xbox", "PlayStation", "Tablet"])) {
-                        self.viewModel.isCreateNewTraining = false
-                    }
-                }
-                .transition(.scale)
-                .zIndex(1)
+//                CustomPopup(isPresented: Binding(
+//                    get: { viewModel.isCreateNewTraining },
+//                    set: { viewModel.isCreateNewTraining = $0 }
+//                )) {
+//                    CreateNewTrainingView(viewModel: CreateNewTrainingViewModel(dateSelected: viewModel.dateSelected, availableHoursReservation: ["14:00", "15:00", "16:00", "17:00", "18:00", "19:00"], availableConsoleReservation: ["PC", "Xbox", "PlayStation", "Tablet"])) {
+//                        self.viewModel.isCreateNewTraining = false
+//                    }
+//                }
+//                .transition(.scale)
+//                .zIndex(1)
             }
         }
         .onAppear {
@@ -140,17 +140,17 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             HStack (spacing: 8){
                 TextWithUnderlineComponent(title: viewModel.isDateSelected ? "Entrenamientos" : "Próximos entrenamientos", underlineColor: Color.cyan)
                 
-                if (viewModel.isDateSelected){
-                    Button {
-                        self.viewModel.isCreateNewTraining = true
-                    } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .resizable()
-                                .frame(width: 20, height: 20)
-                                .clipShape(Circle())
-                                .foregroundStyle(Color.cyan)
-                    }
-                }
+//                if (viewModel.isDateSelected){
+//                    Button {
+//                        self.viewModel.isCreateNewTraining = true
+//                    } label: {
+//                            Image(systemName: "plus.circle.fill")
+//                                .resizable()
+//                                .frame(width: 20, height: 20)
+//                                .clipShape(Circle())
+//                                .foregroundStyle(Color.cyan)
+//                    }
+//                }
                 
                 Spacer ()
                 

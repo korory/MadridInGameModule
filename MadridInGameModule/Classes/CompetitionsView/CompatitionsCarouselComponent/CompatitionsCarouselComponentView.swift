@@ -28,7 +28,7 @@ struct CompatitionsCarouselComponentView: View {
 
 extension CompatitionsCarouselComponentView {
     private var titleBanner: some View {
-        VStack (spacing: 12){
+        VStack (alignment: .leading, spacing: 12){
             Text(leagueInformation.title)
                 .font(.system(size: 25).weight(.bold))
                 .foregroundStyle(Color.white)
@@ -48,13 +48,32 @@ extension CompatitionsCarouselComponentView {
     private var carrouselComponent: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 20) {
-                ForEach(leagueInformation.competitions, id: \.id) { competitonInformation in
+                ForEach(leagueInformation.allCompetitions) { competitonInformation in
                     VStack {
                         NavigationLink(destination: CompatitionsDetailViewComponentView(viewModel: CompetitionsDetailViewModel(competitionsInformation: competitonInformation))) {
-                            Image(uiImage: UIImage())
-                                .resizable()
-                                .frame(width: 280, height: 470)
-                                .cornerRadius(15)
+                            AsyncImage(url: URL(string: "https://premig.randomkesports.com/cms/assets/\(competitonInformation.game?.image ?? "")")) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                        .frame(width: 50, height: 50)
+                                        .tint(.purple)
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFit()
+                                        .cornerRadius(15)
+                                        .frame(maxWidth: 250, maxHeight: 450)
+                                case .failure:
+                                    Image(systemName: "photo")
+                                        .resizable()
+                                        .cornerRadius(15)
+                                        .frame(width: 280, height: 470)
+                                        .foregroundColor(.gray)
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                            
                         }
                     }
                 }

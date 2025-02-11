@@ -24,14 +24,14 @@ struct CompatitionsDetailViewComponentView: View {
             VStack(alignment: .leading, spacing: 5) {
                 titleBanner
                 dropdownTitle
-                dropdownSplitSelectorComponent
-                tabBarComponent
+                //dropdownSplitSelectorComponent
+                //tabBarComponent
             }
         }
     }
     
     private var titleBanner: some View {
-        Text(viewModel.competitionsInformation.title)
+        Text((viewModel.competitionsInformation.game?.banner)!)//viewModel.competitionsInformation.title)
             .font(.largeTitle)
             .fontWeight(.bold)
             .foregroundColor(.white)
@@ -47,54 +47,54 @@ struct CompatitionsDetailViewComponentView: View {
         }
     }
     
-    private var dropdownSplitSelectorComponent: some View {
-        let options = viewModel.competitionsInformation.allSplitsAvailable.map { DropdownSingleSelectionModel(title: $0.title, isOptionSelected: viewModel.markFirstOptionDefault(title: $0.title)) }
-        
-        return DropdownSingleSelectionComponentView(options: options, onOptionSelected: { optionSelected in
-            viewModel.selectOption(option: optionSelected)
-        })
-        .padding(.top, 15)
-        .padding(.leading, 15)
-        .padding(.trailing, 15)
-    }
+//    private var dropdownSplitSelectorComponent: some View {
+//        let options = viewModel.competitionsInformation.allSplitsAvailable.map { DropdownSingleSelectionModel(title: $0.title, isOptionSelected: viewModel.markFirstOptionDefault(title: $0.title)) }
+//        
+//        return DropdownSingleSelectionComponentView(options: options, onOptionSelected: { optionSelected in
+//            viewModel.selectOption(option: optionSelected)
+//        })
+//        .padding(.top, 15)
+//        .padding(.leading, 15)
+//        .padding(.trailing, 15)
+//    }
     
-    private var tabBarComponent: some View {
-        Group {
-            if let selectedSplit = viewModel.optionTabSelected {
-                TabView(selection: $viewModel.selectedTab) {
-                    DetailSectionView(title: "Sobre esta competición...", content: selectedSplit.overviewDescription, image: viewModel.competitionsInformation.allSplitsAvailable.first!.bannerImage)
-                        .tabItem {
-                            Label("Overview", systemImage: "info.circle")
-                        }
-                        .tag(Tab.overview)
-                    
-                    DetailSectionView(title: "DETALLES", content: selectedSplit.details, image: viewModel.competitionsInformation.allSplitsAvailable.first!.bannerImage)
-                        .tabItem {
-                            Label("Detalles", systemImage: "person.2")
-                        }
-                        .tag(Tab.teams)
-                    
-                    DetailSectionView(title: "REGLAS", content: selectedSplit.rules, image: viewModel.competitionsInformation.allSplitsAvailable.first!.bannerImage)
-                        .tabItem {
-                            Label("Reglas", systemImage: "clock")
-                        }
-                        .tag(Tab.schedule)
-                    
-                    DetailSectionView(title: "CONTACTO", content: selectedSplit.contact, image: viewModel.competitionsInformation.allSplitsAvailable.first!.bannerImage)
-                        .tabItem {
-                            Label("Contacto", systemImage: "info.circle.fill")
-                        }
-                        .tag(Tab.results)
-                }
-                .accentColor(.blue)
-                .padding(.top)
-            } else {
-                Text("No hay información disponible.")
-                    .foregroundColor(.white)
-                    .padding()
-            }
-        }
-    }
+//    private var tabBarComponent: some View {
+//        Group {
+//            if let selectedSplit = viewModel.optionTabSelected {
+//                TabView(selection: $viewModel.selectedTab) {
+//                    DetailSectionView(title: "Sobre esta competición...", content: selectedSplit.overviewDescription, image: viewModel.competitionsInformation.allSplitsAvailable.first!.bannerImage)
+//                        .tabItem {
+//                            Label("Overview", systemImage: "info.circle")
+//                        }
+//                        .tag(Tab.overview)
+//                    
+//                    DetailSectionView(title: "DETALLES", content: selectedSplit.details, image: viewModel.competitionsInformation.allSplitsAvailable.first!.bannerImage)
+//                        .tabItem {
+//                            Label("Detalles", systemImage: "person.2")
+//                        }
+//                        .tag(Tab.teams)
+//                    
+//                    DetailSectionView(title: "REGLAS", content: selectedSplit.rules, image: viewModel.competitionsInformation.allSplitsAvailable.first!.bannerImage)
+//                        .tabItem {
+//                            Label("Reglas", systemImage: "clock")
+//                        }
+//                        .tag(Tab.schedule)
+//                    
+//                    DetailSectionView(title: "CONTACTO", content: selectedSplit.contact, image: viewModel.competitionsInformation.allSplitsAvailable.first!.bannerImage)
+//                        .tabItem {
+//                            Label("Contacto", systemImage: "info.circle.fill")
+//                        }
+//                        .tag(Tab.results)
+//                }
+//                .accentColor(.blue)
+//                .padding(.top)
+//            } else {
+//                Text("No hay información disponible.")
+//                    .foregroundColor(.white)
+//                    .padding()
+//            }
+//        }
+//    }
 }
 
 //struct CompatitionsDetailViewComponentView: View {
