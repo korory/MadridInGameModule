@@ -25,7 +25,7 @@ struct TournamentCellView: View {
             subscribeButton
         }
         .background(Color.black.opacity(0.9))
-        .cornerRadius(10)
+        .cornerRadius(20)
         .shadow(radius: 2)
     }
 }

@@ -23,6 +23,14 @@ struct CompetitionsView: View {
                     }
                     Spacer()
                 }
+                .onAppear {
+                    let currentYear = Calendar.current.component(.year, from: Date())
+                    
+                    if viewModel.seasonSelected == nil, let allSeasons = viewModel.initAllSeasons().first(where: { $0.year == String(currentYear) }) {
+                        viewModel.seasonSelected = SeasonsModel(year: allSeasons.year, isOptionSelected: true)
+                        viewModel.getSeasonInformation()
+                    }
+                }
             }
         }
     }
@@ -40,7 +48,7 @@ extension CompetitionsView {
     
     private var dropdownSplitSelectorComponent: some View {
         let currentYear = Calendar.current.component(.year, from: Date())
-
+        
         let options = viewModel.initAllSeasons().map { season -> DropdownSingleSelectionModel in
             let isSelected = season.year == String(currentYear)
             return DropdownSingleSelectionModel(title: season.year, isOptionSelected: isSelected)
