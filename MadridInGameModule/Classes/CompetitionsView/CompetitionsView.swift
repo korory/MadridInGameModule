@@ -12,7 +12,7 @@ struct CompetitionsView: View {
     
     var body: some View {
         ZStack {
-            Color.black
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.black.opacity(0.9)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             ScrollView {
                 VStack (alignment: .leading){
@@ -31,18 +31,17 @@ struct CompetitionsView: View {
 extension CompetitionsView {
     private var titleBanner: some View {
         Text("COMPETICIONES")
-            //.font(.customFont(size: 24))
-            //.font(.title)
-            //.fontWeight(.bold)
+            .font(.custom("Madridingamefont-Regular", size: 24))
             .foregroundColor(.white)
-            .padding(.leading, 10)
-            .padding(.bottom, 1)
+            .padding(.leading, 20)
+            .padding(.bottom, 7)
+            .padding(.top, 5)
     }
     
     private var dropdownSplitSelectorComponent: some View {
         let options = viewModel.initAllSeasons().map { DropdownSingleSelectionModel(title: $0.year, isOptionSelected: false) }
         
-        return DropdownSingleSelectionComponentView(options: options, onOptionSelected: { optionSelected in
+        return DropdownSingleSelectionComponentView(options: options, textTop: "Temporada", onOptionSelected: { optionSelected in
             self.viewModel.seasonSelected = SeasonsModel(year: optionSelected.title, isOptionSelected: optionSelected.isOptionSelected)
             viewModel.getSeasonInformation()
         })

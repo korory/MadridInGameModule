@@ -8,9 +8,8 @@
 class CompetitionsService {
     
     func getCompetitions(year: String, completion: @escaping (Result<[CompetitionData], Error>) -> Void) {
-        
         let parameters: [String: String] = [
-            "fields": "*,game.*",
+            "fields": "*,game.*, splits.*, splits.tournaments.*",
             "filter[start_date][_between]": "\(year)-01-01,\(year)-12-31"
         ]
         

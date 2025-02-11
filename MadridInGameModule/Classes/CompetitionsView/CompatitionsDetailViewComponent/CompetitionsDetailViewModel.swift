@@ -10,23 +10,16 @@ import SwiftUI
 
 class CompetitionsDetailViewModel: ObservableObject {
     let competitionsInformation: CompetitionData//CompetitionsDetailModel
-    @Published var optionTabSelected: SplitsModel?
+    @Published var optionTabSelected: SplitModel?
     @Published var selectedTab: Tab = .overview
-    
+    @Published var isSplitVisible: Bool = true
+    @Published var trainingArrowRotation: Double = 0
+
     init(competitionsInformation: CompetitionData) {
         self.competitionsInformation = competitionsInformation
-        //self.optionTabSelected = competitionsInformation.allSplitsAvailable.first!
     }
     
-    // Lógica para verificar si la primera opción debe ser marcada por defecto
-//    func markFirstOptionDefault(title: String) -> Bool {
-//        return title == competitionsInformation.allSplitsAvailable.first?.title
-//    }
-    
-    // Lógica para seleccionar un split
-//    func selectOption(option: DropdownSingleSelectionModel) {
-//        if let selectedModel = competitionsInformation.allSplitsAvailable.first(where: { $0.title == option.title }) {
-//            self.optionTabSelected = selectedModel
-//        }
-    //}
+    func getFirstOptionSelected() {
+        self.optionTabSelected = competitionsInformation.splits?.first!
+    }
 }

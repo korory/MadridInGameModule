@@ -14,7 +14,8 @@ public struct MadridInGameModule: View {
     
     public var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.black.opacity(0.9)]), startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea(.all)
             
             if viewModel.isLoading {
                 LoadingView(logoMIG: logoMIG)

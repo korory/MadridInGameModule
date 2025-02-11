@@ -30,7 +30,9 @@ extension DropdownSingleSelectionCellComponent {
                 .foregroundStyle(Color.cyan)
             
             Text(title)
-                .font(.body)
+                .font(.custom("Madridingamefont-Regular", size: 18))
+
+                //.font(.body)
             
             Spacer()
         }

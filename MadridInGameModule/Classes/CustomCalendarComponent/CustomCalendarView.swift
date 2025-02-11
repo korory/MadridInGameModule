@@ -32,7 +32,7 @@ struct CustomCalendarView: View {
             }
             Spacer()
             Text(viewModel.monthAndYearString(viewModel.currentDate).uppercased())
-                .font(.system(size: 20) .weight(.bold))
+                .font(.custom("Madridingamefont-Regular", size: 20))
                 .foregroundStyle(Color.white)
             Spacer()
             Button(action: {

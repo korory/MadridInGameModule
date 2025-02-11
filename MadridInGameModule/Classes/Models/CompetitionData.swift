@@ -8,20 +8,18 @@
 
 import SwiftUI
 
-// MARK: - Competition Data Model
-
 struct CompetitionDataResponde: Codable {
     let data: [CompetitionData]
 }
 
-// MARK: - Datum
 struct CompetitionData: Codable , Identifiable{
     let id, dateCreated: String?
     let dateUpdated: String?
     let startDate, title, rules, endSignDate: String?
     let overview, details, contact: String?
     let startSignDate: String?
-    let teams, splits: [Int]?
+    let teams: [Int]?
+    let splits: [SplitModel]?
     let game: Game?
 
     enum CodingKeys: String, CodingKey {
@@ -37,7 +35,43 @@ struct CompetitionData: Codable , Identifiable{
     }
 }
 
-// MARK: - Game
+struct SplitModel: Codable ,Identifiable {
+    let competition: String
+    let dateCreated: String
+    let id: Int
+    let name: String
+    let tournaments: [TournamentModel]
+    
+    enum CodingKeys: String, CodingKey {
+        case competition
+        case dateCreated = "date_created"
+        case id
+        case name
+        case tournaments
+    }
+}
+
+struct TournamentModel: Identifiable, Codable {
+    let id: Int
+    let name: String
+    let date: String
+    let dateCreated: String
+    let link: String
+    let split: Int
+    let status: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case date
+        case dateCreated = "date_created"
+        case link
+        case split
+        case status
+    }
+}
+
+
 struct Game: Codable ,Identifiable{
     let id: String?
     let status: String?
@@ -57,30 +91,30 @@ struct Game: Codable ,Identifiable{
     }
 }
 
-//struct CompetitionData: Codable {
-//    let id: String
-//    let contact: String?
+//struct CompetitionModel: Codable, Identifiable {
+//    let contact: String
 //    let dateCreated: String
-//    let dateUpdated: String?
-//    let details: String?
-//    let endSignDate: String?
-//    let game: Game
-//    let overview: String?
-//    let rules: String?
-//    let splits: [Int]?
-//    let startDate: String?
-//    let startSignDate: String?
-//    let teams: [Int]?
-//    let title: String?
-//
+//    let dateUpdated: String
+//    let details: String
+//    let endSignDate: String
+//    let game: String
+//    let id: String
+//    let overview: String
+//    let rules: String
+//    let splits: [Int]
+//    let startDate: String
+//    let startSignDate: String
+//    let teams: [String] // Cambia el tipo si los equipos tienen un modelo específico
+//    let title: String
+//    
 //    enum CodingKeys: String, CodingKey {
-//        case id
 //        case contact
 //        case dateCreated = "date_created"
 //        case dateUpdated = "date_updated"
 //        case details
 //        case endSignDate = "end_sign_date"
 //        case game
+//        case id
 //        case overview
 //        case rules
 //        case splits
@@ -89,38 +123,4 @@ struct Game: Codable ,Identifiable{
 //        case teams
 //        case title
 //    }
-//
-//}
-//
-//// MARK: - Game Model
-//
-//struct Game: Codable {
-//    let id: String
-//    let banner: String?
-//    let competitions: [String]?
-//    let dateCreated: String
-//    let dateUpdated: String?
-//    let description: String?
-//    let image: String?
-//    let name: String?
-//    let status: String?
-//    let type: String?
-//    let userCreated: String?
-//    let userUpdated: String?
-//
-//    enum CodingKeys: String, CodingKey {
-//        case id
-//        case banner
-//        case competitions
-//        case dateCreated = "date_created"
-//        case dateUpdated = "date_updated"
-//        case description
-//        case image
-//        case name
-//        case status
-//        case type
-//        case userCreated = "user_created"
-//        case userUpdated = "user_updated"
-//    }
-//
 //}

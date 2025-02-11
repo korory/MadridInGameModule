@@ -15,17 +15,18 @@ struct SelectTeamComponent: View {
         ZStack {
             // Fondo con degradado
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.black.opacity(0.9)]), startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
+                .ignoresSafeArea(.all)
             
             VStack {
                 Spacer()
                 
                 Text("¿Qué equipo quieres gestionar?")
-                    .font(.title2)
+                    .font(.custom("Madridingamefont-Regular", size: 20))
                     .bold()
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
+                    .padding(.bottom, 15)
                 
                 ScrollView {
                     VStack(spacing: 15) {
@@ -34,7 +35,7 @@ struct SelectTeamComponent: View {
                                 onTeamSelected(team)
                             }) {
                                 Text(team.name ?? "Equipo sin nombre")
-                                    .font(.headline)
+                                    .font(.custom("Madridingamefont-Regular", size: 15))
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                                     .padding()

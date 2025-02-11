@@ -15,7 +15,7 @@ class CompetitionsViewModel: ObservableObject {
     @Published var compatitionInformation: [CompetitionData] = []
         
     func initAllSeasons() -> [SeasonsModel] {
-        let years = ["2022", "2023", "2024", "2025", "2026"]
+        let years = ["2024", "2025", "2026"]
         
         var allYearSessons: [SeasonsModel] = []
         for year in years {            

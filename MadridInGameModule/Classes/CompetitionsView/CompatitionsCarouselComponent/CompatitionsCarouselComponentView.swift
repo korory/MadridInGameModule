@@ -12,8 +12,9 @@ struct CompatitionsCarouselComponentView: View {
     
     var body: some View {
         ZStack {
-            Color.black
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.black.opacity(0.9)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
+            
             VStack (alignment: .leading, spacing: 20){
                 titleBanner
                 if !leagueInformation.description.isEmpty {
@@ -73,7 +74,6 @@ extension CompatitionsCarouselComponentView {
                                     EmptyView()
                                 }
                             }
-                            
                         }
                     }
                 }

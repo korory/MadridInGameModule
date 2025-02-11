@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FontBlaster
 
 class MadridInGameViewModel: ObservableObject {
     @Published var selectedTab: Int = 0
@@ -24,6 +25,7 @@ class MadridInGameViewModel: ObservableObject {
         Task.detached { [envManager = self.environmentManager] in
             await DirectusService.shared.configure(with: envManager)
         }
+        FontManager().loadCustomFonts()
     }
     
     func initializeModule() {
@@ -52,4 +54,19 @@ class MadridInGameViewModel: ObservableObject {
     func getUserTeams() -> [TeamModelReal] {
         return userManager.getUser()?.teams ?? []
     }
+    
+//    func loadCustomFonts() {
+//        guard let fontURL = Bundle.frameworkBundle?.url(forResource: "Madrid_in_game_font", withExtension: "otf") else {
+//            print("Fuente no encontrada")
+//            return
+//        }
+//        
+//        do {
+//            try FontBlaster.blast(fonts: [fontURL])
+//            print("Fuente cargada correctamente")
+//        } catch {
+//            print("Error al cargar la fuente: \(error)")
+//        }
+//    }
+
 }
