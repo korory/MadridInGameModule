@@ -7,8 +7,8 @@ public struct MadridInGameModule: View {
     @StateObject private var viewModel: MadridInGameViewModel
     private let logoMIG: UIImage
     
-    public init(email: String, environment: String, logoMIG: UIImage) {
-        _viewModel = StateObject(wrappedValue: MadridInGameViewModel(email: email, environment: environment))
+    public init(email: String, environment: String, logoMIG: UIImage, openCompetitions: Bool ) {
+        _viewModel = StateObject(wrappedValue: MadridInGameViewModel(email: email, environment: environment, openCompetitions: openCompetitions))
         self.logoMIG = logoMIG
     }
     

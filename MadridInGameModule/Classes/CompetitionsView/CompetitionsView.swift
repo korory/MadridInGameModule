@@ -39,7 +39,12 @@ extension CompetitionsView {
     }
     
     private var dropdownSplitSelectorComponent: some View {
-        let options = viewModel.initAllSeasons().map { DropdownSingleSelectionModel(title: $0.year, isOptionSelected: false) }
+        let currentYear = Calendar.current.component(.year, from: Date())
+
+        let options = viewModel.initAllSeasons().map { season -> DropdownSingleSelectionModel in
+            let isSelected = season.year == String(currentYear)
+            return DropdownSingleSelectionModel(title: season.year, isOptionSelected: isSelected)
+        }
         
         return DropdownSingleSelectionComponentView(options: options, textTop: "Temporada", onOptionSelected: { optionSelected in
             self.viewModel.seasonSelected = SeasonsModel(year: optionSelected.title, isOptionSelected: optionSelected.isOptionSelected)
