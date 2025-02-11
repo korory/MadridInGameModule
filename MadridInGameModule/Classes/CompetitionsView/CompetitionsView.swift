@@ -31,7 +31,7 @@ struct CompetitionsView: View {
 extension CompetitionsView {
     private var titleBanner: some View {
         Text("COMPETICIONES")
-            .font(.customFont(size: 24))
+            //.font(.customFont(size: 24))
             //.font(.title)
             //.fontWeight(.bold)
             .foregroundColor(.white)
