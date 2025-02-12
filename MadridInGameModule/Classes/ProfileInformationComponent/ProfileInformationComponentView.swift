@@ -23,9 +23,8 @@ struct ProfileInformationComponentView: View {
     
     var body: some View {
         ZStack {
-            Color.black
-                .opacity(0.7)
-                .ignoresSafeArea(edges: .all)
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea(.all)
             
             VStack(spacing: 40) {
                 ScrollView {

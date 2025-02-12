@@ -14,8 +14,8 @@ struct ReservationFlowView: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             // Fondo negro
-            Color.black
-                .ignoresSafeArea(edges: .all)
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea(.all)
             
             VStack {
                 

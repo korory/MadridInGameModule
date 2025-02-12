@@ -12,15 +12,24 @@ struct CompetitionsView: View {
     
     var body: some View {
         ZStack {
-            Color.black
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             ScrollView {
                 VStack (alignment: .leading){
                     titleBanner
-                    dropdownTitle
                     dropdownSplitSelectorComponent
-                    leaguesInformation
+                    if !viewModel.compatitionInformation.isEmpty {
+                        leaguesInformation
+                    }
                     Spacer()
+                }
+                .onAppear {
+                    let currentYear = Calendar.current.component(.year, from: Date())
+                    
+                    if viewModel.seasonSelected == nil, let allSeasons = viewModel.initAllSeasons().first(where: { $0.year == String(currentYear) }) {
+                        viewModel.seasonSelected = SeasonsModel(year: allSeasons.year, isOptionSelected: true)
+                        viewModel.getSeasonInformation()
+                    }
                 }
             }
         }
@@ -30,35 +39,32 @@ struct CompetitionsView: View {
 extension CompetitionsView {
     private var titleBanner: some View {
         Text("COMPETICIONES")
-            .font(.largeTitle)
-            .fontWeight(.bold)
+            .font(.custom("Madridingamefont-Regular", size: 24))
             .foregroundColor(.white)
-            .shadow(color: Color.black.opacity(0.5), radius: 5)
-            .padding(.leading, 10)
-            .padding(.bottom, 5)
-    }
-    
-    private var dropdownTitle: some View {
-        VStack (alignment: .leading, spacing: 28){
-            TextWithUnderlineComponent(title: "Season", underlineColor: Color.cyan)
-                .padding(.leading, 15)
-        }
+            .padding(.leading, 20)
+            .padding(.bottom, 7)
+            .padding(.top, 5)
     }
     
     private var dropdownSplitSelectorComponent: some View {
-        let options = viewModel.competitionsInformation.seasons.map { DropdownSingleSelectionModel(title: $0.year, isOptionSelected: viewModel.markFirstOptionDefault(title: $0.year)) }
+        let currentYear = Calendar.current.component(.year, from: Date())
         
-        return DropdownSingleSelectionComponentView(options: options, onOptionSelected: { optionSelected in
-            if let selectedModel = viewModel.competitionsInformation.seasons.first(where: { $0.year == optionSelected.title }) {
-                self.viewModel.seasonSelected = selectedModel
-            }
+        let options = viewModel.initAllSeasons().map { season -> DropdownSingleSelectionModel in
+            let isSelected = season.year == String(currentYear)
+            return DropdownSingleSelectionModel(title: season.year, isOptionSelected: isSelected)
+        }
+        
+        return DropdownSingleSelectionComponentView(options: options, textTop: "Temporada", onOptionSelected: { optionSelected in
+            self.viewModel.seasonSelected = SeasonsModel(year: optionSelected.title, isOptionSelected: optionSelected.isOptionSelected)
+            viewModel.getSeasonInformation()
         })
-        .padding()
+        .padding(.leading, 10)
+        .padding(.trailing, 10)
     }
     
     private var leaguesInformation: some View {
         VStack(spacing: 10) {
-            ForEach(viewModel.seasonSelected.mundialLeague, id: \.id) { competitonInformation in
+            ForEach(viewModel.getAllInformationLeagues()) { competitonInformation in
                 VStack {
                     CompatitionsCarouselComponentView(leagueInformation: competitonInformation)
                         .padding()

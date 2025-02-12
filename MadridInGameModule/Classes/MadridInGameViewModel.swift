@@ -6,23 +6,38 @@
 //
 
 import SwiftUI
+import FontBlaster
 
 class MadridInGameViewModel: ObservableObject {
     @Published var selectedTab: Int = 0
     @Published var isLoading: Bool = true
     @Published var user: UserModel?
     @Published var errorMessage: String?
+    @Published var openCompetitions: Bool
+
     
     private let email: String
     private let userManager = UserManager.shared
     private let environmentManager: EnvironmentManager
     
-    init(email: String, environment: String) {
+    init(email: String, environment: String, openCompetitions: Bool) {
         self.email = email
         self.environmentManager = EnvironmentManager(environment: environment)
+        self.openCompetitions = openCompetitions
+        
+        if self.openCompetitions {
+            self.selectTab(2)
+        }
         
         Task.detached { [envManager = self.environmentManager] in
             await DirectusService.shared.configure(with: envManager)
+        }
+        FontManager().loadCustomFonts()
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            if let window = windowScene.windows.first {
+                window.overrideUserInterfaceStyle = .dark
+            }
         }
     }
     
@@ -52,4 +67,19 @@ class MadridInGameViewModel: ObservableObject {
     func getUserTeams() -> [TeamModelReal] {
         return userManager.getUser()?.teams ?? []
     }
+    
+//    func loadCustomFonts() {
+//        guard let fontURL = Bundle.frameworkBundle?.url(forResource: "Madrid_in_game_font", withExtension: "otf") else {
+//            print("Fuente no encontrada")
+//            return
+//        }
+//        
+//        do {
+//            try FontBlaster.blast(fonts: [fontURL])
+//            print("Fuente cargada correctamente")
+//        } catch {
+//            print("Error al cargar la fuente: \(error)")
+//        }
+//    }
+
 }

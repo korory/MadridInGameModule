@@ -19,16 +19,30 @@ enum competitionType {
     case rocketLeague
 }
 struct CompetitionsModel {
-    var seasons: [SeasonsModel]
+    var seasons: [SeasonsModelMock]
+}
+
+struct SeasonsModelMock {
+    var id = UUID()
+    var year: String
+    var mundialLeague: [LeagueModelMock]
 }
 
 struct SeasonsModel {
     var id = UUID()
     var year: String
-    var mundialLeague: [LeagueModel]
+    let isOptionSelected: Bool
 }
 
-struct LeagueModel {
+struct LeagueModel: Identifiable {
+    var id = UUID()
+    var title: String
+    var seriesTitle: String
+    var description: String
+    var allCompetitions: [CompetitionData]
+}
+
+struct LeagueModelMock {
     var id = UUID()
     var title: String
     var seriesTitle: String

@@ -103,10 +103,10 @@ let mockOneNewEmpty = NewsModel(title: "", description: "", image: imageDefaultP
 
 let mockCompetitions = CompetitionsModel(
     seasons: [
-        SeasonsModel(
+        SeasonsModelMock(
             year: "2024",
             mundialLeague: [
-                LeagueModel(
+                LeagueModelMock(
                     title: "Liga Municipal",
                     seriesTitle: "Esports Series Madrid",
                     description: "Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid . Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo.",
@@ -155,7 +155,7 @@ let mockCompetitions = CompetitionsModel(
                         )
                     ]
                 ),
-                LeagueModel(
+                LeagueModelMock(
                     title: "Liga Municipal Junior",
                     seriesTitle: "Esports Series Madrid",
                     description: "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League.",
@@ -176,7 +176,7 @@ let mockCompetitions = CompetitionsModel(
                         )
                     ]
                 ),
-                LeagueModel(
+                LeagueModelMock(
                     title: "Circuito Tormenta",
                     seriesTitle: "Esports Series Madrid",
                     description: "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgaran puntos para el ranking general del Circuito de Tormenta del Split correspondiente.",
@@ -197,7 +197,7 @@ let mockCompetitions = CompetitionsModel(
                         )
                     ]
                 ),
-                LeagueModel(
+                LeagueModelMock(
                     title: "Otras competiciones",
                     seriesTitle: "Esports Series Madrid",
                     description: "",
@@ -220,10 +220,10 @@ let mockCompetitions = CompetitionsModel(
                 )
             ]
         ),
-        SeasonsModel(
+        SeasonsModelMock(
             year: "2023",
             mundialLeague: [
-                LeagueModel(
+                LeagueModelMock(
                     title: "Liga Municipal",
                     seriesTitle: "Esports Series Madrid",
                     description: "Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid . Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo.",
@@ -244,7 +244,7 @@ let mockCompetitions = CompetitionsModel(
                         )
                     ]
                 ),
-                LeagueModel(
+                LeagueModelMock(
                     title: "Liga Municipal Junior",
                     seriesTitle: "Esports Series Madrid",
                     description: "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League.",
@@ -265,7 +265,7 @@ let mockCompetitions = CompetitionsModel(
                         )
                     ]
                 ),
-                LeagueModel(
+                LeagueModelMock(
                     title: "Circuito Tormenta",
                     seriesTitle: "Esports Series Madrid",
                     description: "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgaran puntos para el ranking general del Circuito de Tormenta del Split correspondiente.",
@@ -286,7 +286,7 @@ let mockCompetitions = CompetitionsModel(
                         )
                     ]
                 ),
-                LeagueModel(
+                LeagueModelMock(
                     title: "Otras competiciones",
                     seriesTitle: "Esports Series Madrid",
                     description: "",
@@ -309,10 +309,10 @@ let mockCompetitions = CompetitionsModel(
                 )
             ]
         ),
-        SeasonsModel(
+        SeasonsModelMock(
             year: "2022",
             mundialLeague: [
-                LeagueModel(
+                LeagueModelMock(
                     title: "Liga Municipal",
                     seriesTitle: "Esports Series Madrid",
                     description: "Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid . Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo.",
@@ -347,7 +347,7 @@ let mockCompetitions = CompetitionsModel(
                         )
                     ]
                 ),
-                LeagueModel(
+                LeagueModelMock(
                     title: "Liga Municipal Junior",
                     seriesTitle: "Esports Series Madrid",
                     description: "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League.",
@@ -368,7 +368,7 @@ let mockCompetitions = CompetitionsModel(
                         )
                     ]
                 ),
-                LeagueModel(
+                LeagueModelMock(
                     title: "Circuito Tormenta",
                     seriesTitle: "Esports Series Madrid",
                     description: "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgaran puntos para el ranking general del Circuito de Tormenta del Split correspondiente.",
@@ -389,7 +389,7 @@ let mockCompetitions = CompetitionsModel(
                         )
                     ]
                 ),
-                LeagueModel(
+                LeagueModelMock(
                     title: "Otras competiciones",
                     seriesTitle: "Esports Series Madrid",
                     description: "",

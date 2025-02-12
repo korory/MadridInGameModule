@@ -7,14 +7,15 @@ public struct MadridInGameModule: View {
     @StateObject private var viewModel: MadridInGameViewModel
     private let logoMIG: UIImage
     
-    public init(email: String, environment: String, logoMIG: UIImage) {
-        _viewModel = StateObject(wrappedValue: MadridInGameViewModel(email: email, environment: environment))
+    public init(email: String, environment: String, logoMIG: UIImage, openCompetitions: Bool ) {
+        _viewModel = StateObject(wrappedValue: MadridInGameViewModel(email: email, environment: environment, openCompetitions: openCompetitions))
         self.logoMIG = logoMIG
     }
     
     public var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.black.opacity(0.9)]), startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea(.all)
             
             if viewModel.isLoading {
                 LoadingView(logoMIG: logoMIG)
@@ -62,7 +63,7 @@ public struct MadridInGameModule: View {
                 TeamsScreenView()
             } else {
                 NavigationView {
-                    CompetitionsView(viewModel: CompetitionsViewModel(competitionsInformation: mockCompetitions))
+                    CompetitionsView(viewModel: CompetitionsViewModel())
                 }
             }
         }

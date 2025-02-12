@@ -22,6 +22,11 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     @Published var individualReservations: [IndividualReservationModel] = []
     @Published var userManager = UserManager.shared
     
+    @Published var isCalendarVisible: Bool = true
+    @Published var isTrainingsVisible: Bool = true
+    @Published var calendarArrowRotation: Double = 0
+    @Published var trainingArrowRotation: Double = 0
+    
     private let reservationService = ReservationService()
     private let selectedTeam: TeamModelReal?
     

@@ -12,6 +12,12 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '16.0'
   s.source_files = 'MadridInGameModule/Classes/**/*.{swift}'
+  
+  s.resource_bundles = {
+    'MadridInGameModule' => ['MadridInGameModule/Classes/**/*.{ttf,otf}']
+  }
+  
+  s.dependency 'FontBlaster', '~> 5.3.0'
 
 end
 
