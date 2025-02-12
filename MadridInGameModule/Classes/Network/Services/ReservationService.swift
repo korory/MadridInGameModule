@@ -40,10 +40,6 @@ struct TeamReservation: Codable, Identifiable {
     }
 }
 
-struct ReservationResponse: Codable {
-    let data: [Reservation]
-}
-
 struct IndividualReservationResponse: Codable {
     let data: [IndividualReservation]
 }
@@ -194,93 +190,9 @@ class ReservationService {
         }
     }
     
-//    func getReservations(completion: @escaping (Result<[Reservation], Error>) -> Void) {
-//        guard let url = URL(string: "https://premig.randomkesports.com/cms/items/gaming_space_reserves") else { return }
-//        
-//        /*var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
-//         components.queryItems = [
-//         URLQueryItem(name: "fields", value: "id,status,slot,date,user,times"),
-//         URLQueryItem(name: "filter[status][_neq]", value: "cancelled"),
-//         URLQueryItem(name: "filter[date][_gte]", value: "$NOW") // Reservas futuras
-//         ]
-//         
-//         var request = URLRequest(url: components.url!)*/
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//        request.setValue(token, forHTTPHeaderField: "Authorization")
-//        
-//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//            if let error = error {
-//                completion(.failure(error))
-//                return
-//            }
-//            
-//            guard let data = data else {
-//                completion(.failure(NSError(domain: "No Data", code: 0, userInfo: nil)))
-//                return
-//            }
-//            
-//            do {
-//                let decodedResponse = try JSONDecoder().decode(ReservationResponse.self, from: data)
-//                completion(.success(decodedResponse.data))
-//            } catch {
-//                completion(.failure(error))
-//            }
-//        }
-//        task.resume()
-//    }
-//
-    
-//    func getReservesByTeam(teamId: String, completion: @escaping (Result<[TeamReservation], Error>) -> Void) {
-//        let parameters: [String: String] = [
-//            "fields": "id,date,slot.*,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
-//            "filter[team][_eq]": teamId,
-//            "filter[status][_neq]": "cancelled",
-//            "sort[]": "date"
-//        ]
-//        
-//        Task {
-//            do {
-//                let response: TeamReservationResponse = try await DirectusService.shared.request(
-//                    endpoint: "gaming_space_reserves",
-//                    method: .GET,
-//                    parameters: parameters
-//                )
-//                
-//                completion(.success(response.data))
-//            } catch {
-//                completion(.failure(error))
-//            }
-//        }
-//    }
-//    
-//    func getReservesByTeamAndUser(teamId: String, userId: String, completion: @escaping (Result<[TeamReservation], Error>) -> Void) {
-//        let parameters: [String: String] = [
-//            "fields": "id,date,slot.*,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
-//            "filter[team][_eq]": teamId,
-//            "filter[status][_neq]": "cancelled",
-//            "filter[user][_eq]": userId,
-//            "sort[]": "date"
-//        ]
-//        
-//        Task {
-//            do {
-//                let response: TeamReservationResponse = try await DirectusService.shared.request(
-//                    endpoint: "gaming_space_reserves",
-//                    method: .GET,
-//                    parameters: parameters
-//                )
-//                
-//                completion(.success(response.data))
-//            } catch {
-//                completion(.failure(error))
-//            }
-//        }
-//    }
-    
     func getAllTrainnings(teamId: String, userId: String, completion: @escaping (Result<[EventModel], Error>) -> Void) {
         let parameters: [String: String] = [
-            "fields": "id, status, start_date, time, players, type, reserves, notes",
+            "fields": "id, status, start_date, time, players.users_id.id, players.users_id.avatar, players.users_id.email, players.users_id.first_name, type, reserves.*, reserves.team.name, reserves.team.picture, reserves.times.gaming_space_times_id.time, notes",
             "filter[team][_eq]": teamId,
         ]
         
@@ -323,120 +235,6 @@ class ReservationService {
             }
         }
     }
-
-    
-//    func getReservesByTeam1(teamId: String, completion: @escaping (Result<[TeamReservation], Error>) -> Void) {
-//        
-//        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
-//        components.queryItems = [
-//            URLQueryItem(name: "fields", value: "id,date,slot.*,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value"),
-//            URLQueryItem(name: "filter[team][_eq]", value: teamId),
-//            URLQueryItem(name: "filter[status][_neq]", value: "cancelled"),
-//            //URLQueryItem(name: "filter[date][_gte]", value: "$NOW"),
-//            URLQueryItem(name: "sort[]", value: "date")
-//        ]
-//        
-//        var request = URLRequest(url: components.url!)
-//        request.httpMethod = "GET"
-//        request.setValue(token, forHTTPHeaderField: "Authorization")
-//        
-//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//            if let error = error {
-//                completion(.failure(error))
-//                return
-//            }
-//            
-//            guard let data = data else {
-//                completion(.failure(NSError(domain: "No Data", code: 0, userInfo: nil)))
-//                return
-//            }
-//            
-//            do {
-//                let decoder = JSONDecoder()
-//                let decodedResponse = try decoder.decode(TeamReservationResponse.self, from: data)
-//                completion(.success(decodedResponse.data))
-//            } catch {
-//                completion(.failure(error))
-//            }
-//        }
-//        task.resume()
-//    }
-    
-//    func getReservesByTeamAndUser(teamId: String, userId: String, completion: @escaping (Result<[TeamReservation], Error>) -> Void) {
-//        
-//        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
-//        components.queryItems = [
-//            URLQueryItem(name: "fields", value: "id,date,slot.*,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value"),
-//            URLQueryItem(name: "filter[team][_eq]", value: teamId),
-//            URLQueryItem(name: "filter[status][_neq]", value: "cancelled"),
-//            URLQueryItem(name: "filter[user][_eq]", value: userId),
-//            //URLQueryItem(name: "filter[date][_gte]", value: "$NOW"),
-//            URLQueryItem(name: "sort[]", value: "date")
-//        ]
-//        
-//        var request = URLRequest(url: components.url!)
-//        request.httpMethod = "GET"
-//        request.setValue(token, forHTTPHeaderField: "Authorization")
-//        
-//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//            if let error = error {
-//                completion(.failure(error))
-//                return
-//            }
-//            
-//            guard let data = data else {
-//                completion(.failure(NSError(domain: "No Data", code: 0, userInfo: nil)))
-//                return
-//            }
-//            
-//            do {
-//                let decoder = JSONDecoder()
-//                let decodedResponse = try decoder.decode(TeamReservationResponse.self, from: data)
-//                completion(.success(decodedResponse.data))
-//            } catch {
-//                completion(.failure(error))
-//            }
-//        }
-//        task.resume()
-//    }
-//    
-//    func getReservesByUser(userId: String, completion: @escaping (Result<[Reservation], Error>) -> Void) {
-//        let url = baseURL
-//        
-//        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
-//        components.queryItems = [
-//            URLQueryItem(name: "fields", value: "id,date,slot.*,qrImage,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value"),
-//            URLQueryItem(name: "filter[user][_eq]", value: userId),
-//            URLQueryItem(name: "filter[status][_neq]", value: "cancelled"),
-//            URLQueryItem(name: "filter[date][_gte]", value: "$NOW"),
-//            URLQueryItem(name: "filter[team][_null]", value: "true"),
-//            URLQueryItem(name: "sort[]", value: "date")
-//        ]
-//        
-//        var request = URLRequest(url: components.url!)
-//        request.httpMethod = "GET"
-//        request.setValue(token, forHTTPHeaderField: "Authorization")
-//        
-//        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//            if let error = error {
-//                completion(.failure(error))
-//                return
-//            }
-//            
-//            guard let data = data else {
-//                completion(.failure(NSError(domain: "No Data", code: 0, userInfo: nil)))
-//                return
-//            }
-//            
-//            do {
-//                let decodedResponse = try JSONDecoder().decode(ReservationResponse.self, from: data)
-//                completion(.success(decodedResponse.data))
-//            } catch {
-//                completion(.failure(error))
-//            }
-//        }
-//        task.resume()
-//    }
     
     func deleteReservation(id: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         let deleteURL = baseURL.appendingPathComponent("\(id)")

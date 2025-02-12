@@ -22,14 +22,14 @@ class PlayersTeamComponentViewModel: ObservableObject {
 
         self.teamName = team.name ?? ""
         guard let users = team.users else { return }
-        self.teamPlayers = users.compactMap { userInfo in
-            let user = userInfo.userId
-            return PlayerModel(
-                id: user.id,
-                name: user.username,
-                image: UIImage(), roleAssign: userInfo.role?.name ?? "Sin rol"
-            )
-        }
+//        self.teamPlayers = users.compactMap { userInfo in
+//            let user = userInfo.userId
+//            return PlayerModel(
+//                id: user.id,
+//                name: user.username,
+//                image: UIImage(), roleAssign: userInfo.role?.name ?? "Sin rol"
+//            )
+//        }
         self.rolesAvailable = team.users?.compactMap { ($0.role?.name ?? "") } ?? []
     }
 }

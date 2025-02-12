@@ -16,29 +16,49 @@ enum TeamReservationCellComponentOptionSelected {
 import SwiftUI
 
 class TeamReservationCellComponentViewModel: ObservableObject {
-    @Published var reservation: TeamReservation
+    @Published var reservation: EventModel
     
-    init(reservation: TeamReservation) {
+    init(reservation: EventModel) {
         self.reservation = reservation
     }
     
-    // Propiedad calculada para la imagen del sistema
-    var trainingLocationImage: String {
-        "desktopcomputer" // Ajusta según la lógica si hay más ubicaciones en el futuro
+    func getSystemImageNameOfReservationBasedOnType() -> String {
+        //If reserves is empty that means that the reserve is online
+        guard let reservationLocal = reservation.reserves else { return "desktopcomputer" }
+        
+        if reservationLocal.isEmpty {
+            return "desktopcomputer"
+        } else {
+            return "building"
+        }
     }
     
-    // Propiedad para obtener la fecha formateada
-    var formattedDate: String {
-        reservation.date.formatted(date: .numeric, time: .omitted)
+    func parseTimeDeleteSeconds() -> String {
+        let parts = reservation.time.split(separator: ":")
+        let hourWithoutSeconds = "\(parts[0]):\(parts[1])"
+
+        return hourWithoutSeconds
     }
     
-    // Propiedad para obtener las horas seleccionadas como texto
-    var formattedHours: String {
-        let hours = reservation.times.map { $0.time }
-        return hours.count > 1 ? "Horas: \(hours.joined(separator: ", "))" : "Hora: \(hours.first ?? "")"
+    func getAllPlayers() -> [PlayerUsersModel] {
+        guard let allPlayers = reservation.players else { return [] }
+        return allPlayers
     }
     
-    // Función para manejar las acciones del componente
+    func parseReservationDate() -> String {
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd"
+
+        if let date = inputFormatter.date(from: reservation.startDate) {
+            let outputFormatter = DateFormatter()
+            outputFormatter.dateFormat = "dd/MM/yyyy"
+            let formattedDate = outputFormatter.string(from: date)
+            return formattedDate
+        }
+        
+        return "No Fecha"
+    }
+    
     func performAction(_ optionSelected: TeamReservationCellComponentOptionSelected, action: (_ optionSelected: TeamReservationCellComponentOptionSelected) -> Void) {
         action(optionSelected)
     }

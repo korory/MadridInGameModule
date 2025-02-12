@@ -10,14 +10,12 @@ import SwiftUI
 struct SeeReservationsOrCreateTeamTrainingComponentView: View {
     @ObservedObject var viewModel: SeeReservationsOrCreateTeamTrainingViewModel
 
-    @State private var isLoading = true
-    
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             
-            if isLoading {
+            if viewModel.isLoading {
                 VStack {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
@@ -37,12 +35,7 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                     if viewModel.isTrainingsVisible {
                         ScrollView {
                             if !viewModel.isUserMode {
-                                if isLoading {
-                                    
-                                } else {
-                                    trainningTeamList
-                                }
-                                
+                                trainningTeamList
                             } else {
                                 //trainningIndividualList
                             }
@@ -87,17 +80,6 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
 //                }
 //                .transition(.scale)
 //                .zIndex(1)
-            }
-        }
-        .onAppear {
-            if (viewModel.isUserMode) {
-                viewModel.fetchTeamReservationsByUser {
-                    isLoading = false
-                }
-            } else {
-                viewModel.fetchTeamReservationsByTeam {
-                    isLoading = false
-                }
             }
         }
     }
@@ -153,7 +135,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                 
                 Image(systemName: "arrowtriangle.down.fill")
                     .rotationEffect(.degrees(viewModel.trainingArrowRotation))
-                    .animation(.easeInOut, value: viewModel.trainingArrowRotation)  // Animación suave para la rotación
+                    .animation(.easeInOut, value: viewModel.trainingArrowRotation)
                     .foregroundColor(.cyan)
                 
             }
@@ -162,7 +144,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             .onTapGesture {
                 withAnimation {
                     viewModel.isTrainingsVisible.toggle()
-                    viewModel.trainingArrowRotation += 180  // Cambia la rotación de la flecha de entrenamientos
+                    viewModel.trainingArrowRotation += 180
                 }
             }
         }
@@ -170,13 +152,13 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
     
     private var trainningTeamList: some View {
         VStack(spacing: 20) {
-            ForEach(viewModel.teamReservations, id: \.id) { reservation in
+            ForEach(viewModel.allReservations, id: \.id) { reservation in
                 TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation
                 )) { optionSelected in
                     viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)
                 }
             }
         }
-        .padding()
+        .padding(5)
     }
 }
