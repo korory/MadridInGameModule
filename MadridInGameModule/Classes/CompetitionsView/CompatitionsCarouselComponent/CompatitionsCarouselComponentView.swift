@@ -12,7 +12,7 @@ struct CompatitionsCarouselComponentView: View {
     
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
+            Color.clear
                 .ignoresSafeArea(.all)
             
             VStack (alignment: .leading, spacing: 20){
