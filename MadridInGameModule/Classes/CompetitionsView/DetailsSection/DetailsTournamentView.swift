@@ -14,7 +14,7 @@ struct DetailsTournamentView: View {
     
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black.opacity(0.7)]), startPoint: .top, endPoint: .bottom)
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.white.opacity(0.2), Color.white.opacity(0.4)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {

@@ -12,23 +12,20 @@ struct LoadingView: View {
 
     var body: some View {
         ZStack {
-            // Fondo con un gradiente sutil para dar más profundidad
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.gray.opacity(0.3)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
-                // Animación del logo
                 Image(uiImage: logoMIG)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 100, height: 50)
                 
                 ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: Color.purple)) // Color de progreso
-                    .scaleEffect(1.5) // Tamaño del indicador
+                    .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                    .scaleEffect(1.5)
 
-                // Un subtitulo o mensaje opcional
-                Text("Preparando tu experiencia...") // Mensaje adicional
+                Text("Preparando tu experiencia...")
                     .font(.headline)
                     .foregroundColor(.white)
                     .opacity(0.7)
@@ -37,21 +34,3 @@ struct LoadingView: View {
         }
     }
 }
-
-
-//struct LoadingView: View {
-//    var logoMIG: UIImage
-//    
-//    var body: some View {
-//        VStack(spacing: 2) {
-//            Image(uiImage: logoMIG)
-//                .resizable()
-//                .scaledToFit()
-//                .frame(width: 100, height: 80)
-//            ProgressView()
-//                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-//        }
-//        .background(Color.black)
-//    }
-//    
-//}

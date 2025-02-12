@@ -13,17 +13,21 @@ struct DropdownSingleSelectionCellComponent: View {
     let optionSelected: (String) -> Void
     
     var body: some View {
-        HStack (spacing: 20){
+        HStack(spacing: 20) {
             checkImageAndTitleComponent
         }
         .padding()
+        .contentShape(Rectangle()) // Hace que toda la celda sea interactuable
+        .onTapGesture {
+            optionSelected(title)
+        }
     }
 }
 
 extension DropdownSingleSelectionCellComponent {
     
     private var checkImageAndTitleComponent: some View {
-        HStack (spacing: 20){
+        HStack(spacing: 20) {
             Image(systemName: isSelected ? "checkmark" : "")
                 .resizable()
                 .frame(width: 10, height: 10)
@@ -32,12 +36,7 @@ extension DropdownSingleSelectionCellComponent {
             Text(title)
                 .font(.custom("Madridingamefont-Regular", size: 18))
 
-                //.font(.body)
-            
             Spacer()
-        }
-        .onTapGesture {
-            optionSelected(title)
         }
     }
 }

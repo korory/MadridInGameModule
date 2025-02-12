@@ -33,6 +33,12 @@ class MadridInGameViewModel: ObservableObject {
             await DirectusService.shared.configure(with: envManager)
         }
         FontManager().loadCustomFonts()
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            if let window = windowScene.windows.first {
+                window.overrideUserInterfaceStyle = .dark
+            }
+        }
     }
     
     func initializeModule() {
