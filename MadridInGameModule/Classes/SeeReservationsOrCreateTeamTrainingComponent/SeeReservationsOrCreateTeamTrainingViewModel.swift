@@ -8,11 +8,16 @@
 
 import SwiftUI
 
+struct MarkTrainnigDatesAndReservetions: Codable {
+    let date: Date
+    let individualReservation: Bool
+}
+
 class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     @Published var isDateSelected: Bool = false
     @Published var dateSelected: String = ""
     @Published var isUserMode: Bool = false
-    @Published var markedDates: [Date] = []
+    @Published var markedDates: [MarkTrainnigDatesAndReservetions] = []
     @Published var isEditTraning: Bool = false
     @Published var isRemoveTraning: Bool = false
     @Published var isCreateNewTraining: Bool = false
@@ -68,7 +73,7 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                 case .success(let reservations):
                     for reservation in reservations {
                         if let createDate = Utils.createDate(from: reservation.date) {
-                            self?.markedDates.append(createDate)
+                            self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, individualReservation: true))
                         }
                     }
                     print("Reservas obtenidas: \(reservations)")
@@ -96,7 +101,7 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                     for reservation in reservations {
                         if let createDate = Utils.createDate(from: reservation.startDate) {
                             self?.allReservations.append(reservation)
-                            self?.markedDates.append(createDate)
+                            self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, individualReservation: false))
                         }
                     }
                     completion()

@@ -85,7 +85,7 @@ extension IndividualReservationsComponentView {
     private var titleBanner: some View {
         HStack {
             Text("RESERVAS INDIVIDUALES")
-                .font(.title)
+                .font(.custom("Madridingamefont-Regular", size: 25))
                 .fontWeight(.bold)
                 .foregroundStyle(Color.white)
             Spacer()

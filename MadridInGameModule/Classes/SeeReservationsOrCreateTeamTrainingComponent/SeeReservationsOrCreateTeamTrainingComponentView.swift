@@ -20,9 +20,10 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
                         .scaleEffect(1.5)
+                        .padding()
                     
                     Text("Preparando tu calendario...")
-                        .font(.headline)
+                        .font(.custom("Madridingamefont-Regular", size: 15))
                         .foregroundColor(.white)
                         .opacity(0.7)
                 }
@@ -67,7 +68,7 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                         //TODO: Remove this to backend
                     }
                 }
-                .transition(.scale)
+                //.transition(.scale)
                 .zIndex(1)
                 
 //                CustomPopup(isPresented: Binding(
@@ -93,7 +94,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                 Spacer()
                 Image(systemName: "arrowtriangle.down.fill")
                     .rotationEffect(.degrees(viewModel.calendarArrowRotation))
-                    .animation(.easeInOut, value: viewModel.calendarArrowRotation)  // Animación suave para la rotación
+                    .animation(.easeInOut, value: viewModel.calendarArrowRotation)
                     .foregroundColor(.cyan)
             }
             .padding(.top, 5)
@@ -101,7 +102,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             .onTapGesture {
                 withAnimation {
                     viewModel.isCalendarVisible.toggle()
-                    viewModel.calendarArrowRotation += 180  // Cambia la rotación de la flecha al alternar visibilidad
+                    viewModel.calendarArrowRotation += 180
                 }
             }
             if viewModel.isCalendarVisible {

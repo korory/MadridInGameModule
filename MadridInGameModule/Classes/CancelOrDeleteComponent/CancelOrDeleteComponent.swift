@@ -14,7 +14,7 @@ struct CancelOrDeleteComponent: View {
     let aceptedAction: () -> Void
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 20){
+        VStack (alignment: .center, spacing: 20){
             titleBanner
             if !subtitle.isEmpty {
                 subtitleBanner
@@ -27,13 +27,13 @@ struct CancelOrDeleteComponent: View {
 extension CancelOrDeleteComponent {
     private var titleBanner: some View {
         Text(title)
-            .font(.largeTitle)
+            .font(.custom("Madridingamefont-Regular", size: 25))
             .foregroundStyle(Color.white)
     }
     
     private var subtitleBanner: some View {
         Text(subtitle)
-            .font(.body)
+            .font(.custom("Madridingamefont-Regular", size: 17))
             .foregroundStyle(Color.white)
     }
     
@@ -43,7 +43,7 @@ extension CancelOrDeleteComponent {
                          needsBackground: true,
                          backgroundColor: Color.cyan,
                          pressEnabled: true,
-                         widthButton: 180, heightButton: 50) {
+                         widthButton: 165, heightButton: 50) {
                 aceptedAction()
             }
                          .padding(.trailing, 10)
@@ -51,7 +51,7 @@ extension CancelOrDeleteComponent {
                          needsBackground: true,
                          backgroundColor: Color.cyan,
                          pressEnabled: true,
-                         widthButton: 180, heightButton: 50) {
+                         widthButton: 165, heightButton: 50) {
                 rejectedAction()
             }
         }
