@@ -18,7 +18,7 @@ struct EventModelResponse: Codable {
 }
 
 // MARK: - EventModel
-struct EventModel: Codable {
+struct EventModel: Identifiable, Codable {
     let id, notes: String?
     let players: [PlayerUsersModel]?
     let reserves: [Reserve]?

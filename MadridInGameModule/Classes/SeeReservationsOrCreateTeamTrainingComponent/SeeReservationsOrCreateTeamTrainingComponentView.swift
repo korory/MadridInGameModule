@@ -45,17 +45,20 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                 }
                 .padding(.leading, 10)
                 .padding(.trailing, 10)
-                
-                
-                CustomPopup(isPresented: Binding(
-                    get: { viewModel.isEditTraning },
-                    set: { viewModel.isEditTraning = $0 }
-                )) {
-                    //EditTrainingComponentView(reservationModel: viewModel.teamReservationCellInformation)
-                    EmptyView()
+                .sheet(item: $viewModel.teamSelectedInformation) { reservation in
+                    ReservationCardComponent(viewModel: ReservationCardViewModel(reservation: reservation))
+                        .zIndex(1)
                 }
-                .transition(.scale)
-                .zIndex(1)
+                
+//                CustomPopup(isPresented: Binding(
+//                    get: { viewModel.isEditTraning },
+//                    set: { viewModel.isEditTraning = $0 }
+//                )) {
+//                    //EditTrainingComponentView(reservationModel: viewModel.teamReservationCellInformation)
+//                    EmptyView()
+//                }
+//                .transition(.scale)
+//                .zIndex(1)
                 
                 CustomPopup(isPresented: Binding(
                     get: { viewModel.isRemoveTraning },

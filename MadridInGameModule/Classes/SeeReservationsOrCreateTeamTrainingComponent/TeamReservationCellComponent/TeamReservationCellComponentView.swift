@@ -127,11 +127,12 @@ extension TeamReservationCellComponentView {
                                     }
                                 }
                             } else {
-                                Image(systemName: "photo")
+                                Image(systemName: "person.circle")
                                     .resizable()
-                                    .cornerRadius(15)
-                                    .frame(width: 280, height: 470)
-                                    .foregroundColor(.gray)
+                                    .scaledToFit()
+                                    .frame(width: 35, height: 35)
+                                    .clipShape(Circle())
+                                    .foregroundColor(.white)
                             }
                         }
                     }
@@ -184,27 +185,27 @@ extension TeamReservationCellComponentView {
                         .scaledToFit()
                         .frame(height: 15)
                         .foregroundColor(.cyan)
-                    Text("detalles")
+                    Text("Ver reserva")
                         .font(.custom("Madridingamefont-Regular", size: 14))
                         .foregroundColor(.cyan)
                 }
             }
             Spacer()
-            Button {
-                action(.editTraining)
-            } label: {
-                HStack {
-                    Image(systemName: "pencil")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 12)
-                        .foregroundColor(.red)
-                    Text("Editar")
-                        .font(.custom("Madridingamefont-Regular", size: 14))
-                        .foregroundColor(.red)
-                }
-            }
-            Spacer()
+//            Button {
+//                action(.editTraining)
+//            } label: {
+//                HStack {
+//                    Image(systemName: "pencil")
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(height: 12)
+//                        .foregroundColor(.red)
+//                    Text("Editar")
+//                        .font(.custom("Madridingamefont-Regular", size: 14))
+//                        .foregroundColor(.red)
+//                }
+//            }
+//            Spacer()
         }
         .padding(.top, 10)
     }

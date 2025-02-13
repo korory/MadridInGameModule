@@ -22,7 +22,7 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     @Published var isRemoveTraning: Bool = false
     @Published var isCreateNewTraining: Bool = false
     
-    @Published var teamReservationCellInformation: TeamReservation?
+    //@Published var teamReservationCellInformation: TeamReservation?
     @Published var allReservations: [EventModel] = []
     @Published var teamSelectedInformation: EventModel?
 
@@ -120,23 +120,26 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     }
     
     // Handle training cell options like removing or editing a reservation
-    func handleTrainingOptionSelected(option: TrainingCellOption, reservation: TeamReservationModel) {
+    func handleTrainingOptionSelected(option: TrainingCellOption, reservation: EventModel) {
         switch option {
         case .removeCell:
             // Handle the removal logic here
-            print("Remove training for \(reservation.dateSelected)")
+            print("Remove training for \(reservation)")
             //teamReservations.removeAll { $0.date.formatted() == reservation.dateSelected }
         case .editTraining:
             // Handle the edit logic
-            print("Edit training for \(reservation.dateSelected)")
+            print("Edit training for \(reservation)")
         case .seeDetails:
             // Handle showing details
-            print("See details for \(reservation.dateSelected)")
+            print("See training for \(reservation)")
+            self.teamSelectedInformation = reservation
+            //ReservationCardComponent(reservation: reservation)
+            //print("See details for \(reservation.dateSelected)")
         }
     }
     
     func trainingTeamListCellPressed (teamSelectedInformation: EventModel, optionSelected: TeamReservationCellComponentOptionSelected) {
-        self.teamSelectedInformation = teamSelectedInformation
+       // self.teamSelectedInformation = teamSelectedInformation
         
         switch optionSelected {
         case .removeCell:
@@ -146,6 +149,8 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
             //print("Edit Training for \(teamSelectedInformation.dateSelected)")
             self.isEditTraning = true
         case .seeDetails:
+            print("See training for \(teamSelectedInformation)")
+            self.teamSelectedInformation = teamSelectedInformation
             //print("See Details for \(teamSelectedInformation.dateSelected)")
             break
         }
