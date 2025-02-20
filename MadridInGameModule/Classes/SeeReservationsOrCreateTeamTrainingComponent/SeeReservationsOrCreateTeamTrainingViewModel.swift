@@ -24,7 +24,10 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     
     //@Published var teamReservationCellInformation: TeamReservation?
     @Published var allReservations: [EventModel] = []
+    @Published var allIndividualReservations: [IndividualReservation] = []
     @Published var teamSelectedInformation: EventModel?
+    @Published var individualSelectedInformation: IndividualReservation?
+
 
     //@Published var individualReservations: [IndividualReservationModel] = []
     @Published var userManager = UserManager.shared
@@ -58,29 +61,69 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     }
     
     func fetchTeamReservationsByUser(completion: @escaping () -> Void) {
-        guard let userId = userManager.getUser()?.id,
-              let getAllTeams = userManager.getUser()?.teams else { return }
+        guard let user = userManager.getUser() else { return }
         
-        for team in getAllTeams {
-            self.reservationsService(team: team, userId: userId) {
-                completion()
+        let userId = user.id
+        let allTeams = user.teams
+        
+        let dispatchGroup = DispatchGroup()
+        
+        for team in allTeams {
+            dispatchGroup.enter()
+            reservationsService(team: team, userId: userId) {
+                dispatchGroup.leave()
             }
         }
         
+        dispatchGroup.enter()
         reservationService.getReservesByUser(userId: userId) { [weak self] result in
             DispatchQueue.main.async {
+                defer { dispatchGroup.leave() } // Se asegura de salir del grupo al finalizar
+
                 switch result {
                 case .success(let reservations):
-                    for reservation in reservations {
+                    let innerDispatchGroup = DispatchGroup()
+
+                    for var reservation in reservations {
+                        innerDispatchGroup.enter()
+                        
+                        self?.reservationService.getReservesSlotByUser(space: reservation.slot.space) { [weak self] result in
+                            DispatchQueue.main.async {
+                                switch result {
+                                case .success(let gameSpaces):
+                                    if let createDate = Utils.createDate(from: reservation.date) {
+                                        self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, individualReservation: true))
+                                        reservation.gamingSpaces = gameSpaces
+                                        self?.allIndividualReservations.append(reservation)
+                                    }
+                                    
+                                case .failure(let error):
+                                    print("Error al obtener reservas: \(error)")
+                                }
+                                innerDispatchGroup.leave()
+                            }
+                        }
+
                         if let createDate = Utils.createDate(from: reservation.date) {
-                            self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, individualReservation: true))
+                            DispatchQueue.main.async {
+                                self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, individualReservation: true))
+                            }
                         }
                     }
-                    print("Reservas obtenidas: \(reservations)")
+                    
+                    // Esperamos que todas las llamadas internas terminen
+                    innerDispatchGroup.notify(queue: .main) {
+                        print("Reservas obtenidas: \(reservations)")
+                    }
+
                 case .failure(let error):
                     print("Error al obtener reservas: \(error)")
                 }
             }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            completion()
         }
     }
     
@@ -139,18 +182,33 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     }
     
     func trainingTeamListCellPressed (teamSelectedInformation: EventModel, optionSelected: TeamReservationCellComponentOptionSelected) {
-       // self.teamSelectedInformation = teamSelectedInformation
-        
         switch optionSelected {
         case .removeCell:
             //print("Remove Cell for \(teamSelectedInformation.dateSelected)")
             self.isRemoveTraning = true
-        case .editTraining:
-            //print("Edit Training for \(teamSelectedInformation.dateSelected)")
-            self.isEditTraning = true
+//        case .editTraining:
+//            //print("Edit Training for \(teamSelectedInformation.dateSelected)")
+//            self.isEditTraning = true
         case .seeDetails:
             print("See training for \(teamSelectedInformation)")
             self.teamSelectedInformation = teamSelectedInformation
+            //print("See Details for \(teamSelectedInformation.dateSelected)")
+            break
+        }
+    }
+    
+    func trainingIndividualListCellPressed (individualSelectedInformation: IndividualReservation, optionSelected: TeamReservationCellComponentOptionSelected) {
+        switch optionSelected {
+        case .removeCell:
+            //print("Remove Cell for \(teamSelectedInformation.dateSelected)")
+            self.isRemoveTraning = true
+//        case .editTraining:
+//            //print("Edit Training for \(teamSelectedInformation.dateSelected)")
+//            self.isEditTraning = true
+        case .seeDetails:
+            print("See individual training for \(individualSelectedInformation)")
+            self.individualSelectedInformation = individualSelectedInformation
+            //self.teamSelectedInformation = teamSelectedInformation
             //print("See Details for \(teamSelectedInformation.dateSelected)")
             break
         }

@@ -21,48 +21,6 @@ struct TeamReservationCellComponentView: View {
 }
 
 extension TeamReservationCellComponentView {
-    // Icono y fecha de la reserva
-//    private var iconAndDateComponent: some View {
-//        HStack {
-//            Image(systemName: viewModel.getSystemImageNameOfReservationBasedOnType())
-//                .resizable()
-//                .scaledToFit()
-//                .frame(width: 20, height: 20)
-//                .foregroundStyle(Color.gray)
-//                .padding(.trailing, 2)
-//            
-//            Text(viewModel.reservation.startDate)
-//                .font(.custom("Madridingamefont-Regular", size: 15))
-//                .foregroundStyle(Color.white)
-//        }
-//    }
-
-//    // Botón para eliminar la reserva
-//    private var removeReservationButton: some View {
-//        Button {
-//            action(.removeCell)
-//        } label: {
-//            Image(systemName: "trash")
-//                .resizable()
-//                .scaledToFit()
-//                .frame(width: 20, height: 20)
-//                .foregroundStyle(Color.red)
-//        }
-//    }
-
-//    // Información del slot asociado a la reserva
-//    private var slotInfoComponent: some View {
-//        HStack() {
-//            Text("Slot:")
-//                .font(.subheadline)
-//                .foregroundColor(Color.cyan.opacity(0.8))
-//                .fontWeight(.semibold)
-//            
-//            Text(viewModel.parseTimeDeleteSeconds())
-//                .font(.custom("Madridingamefont-Regular", size: 15))
-//                .foregroundColor(Color.gray)
-//        }
-//    }
     
     private var iconDateAndRemoveBannerComponent: some View {
         HStack (spacing: 10){

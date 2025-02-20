@@ -10,7 +10,7 @@ import SwiftUI
 enum TeamReservationCellComponentOptionSelected {
     case removeCell
     case seeDetails
-    case editTraining
+    //case editTraining
 }
 
 import SwiftUI

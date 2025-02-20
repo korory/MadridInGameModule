@@ -27,7 +27,7 @@ extension DashboardScreenView {
                         .tag(TabBarDashboardBottom.calendar)
 
                     
-                    IndividualReservationsComponentView(viewModel: IndividualReservationComponentViewModel(reservationModel: mockIndividualReservation))
+                    IndividualReservationsComponentView(viewModel: IndividualReservationComponentViewModel())
                         .tabItem {
                             Label("Reservas", systemImage: "calendar.badge.checkmark")
                         }

@@ -46,7 +46,7 @@ class SpaceService {
             do {
                 let decodedResponse = try JSONDecoder().decode(SpaceResponse.self, from: data)
                 let spaces = decodedResponse.data.compactMap { item -> Space? in
-                    guard let translation = item.translations.first(where: { $0.languages_code == "es" }) else { return nil }
+                    guard let translation = item.translations.first(where: { $0.languagesCode == "es" }) else { return nil }
                     return Space(
                         id: item.id,
                         device: translation.device,
@@ -72,12 +72,4 @@ struct SpaceItem: Codable {
     let group: Bool
     let translations: [Translation]
     let slots: [Slot]
-}
-
-struct Translation: Codable {
-    let id: Int
-    let gaming_space_id: Int
-    let languages_code: String
-    let device: String
-    let description: String
 }

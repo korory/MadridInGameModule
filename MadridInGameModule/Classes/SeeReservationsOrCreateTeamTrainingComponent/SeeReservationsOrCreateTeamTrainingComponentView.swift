@@ -38,7 +38,7 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                             if !viewModel.isUserMode {
                                 trainningTeamList
                             } else {
-                                //trainningIndividualList
+                                trainningTeamList
                             }
                         }
                     }
@@ -47,6 +47,10 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                 .padding(.trailing, 10)
                 .sheet(item: $viewModel.teamSelectedInformation) { reservation in
                     ReservationCardComponent(viewModel: ReservationCardViewModel(reservation: reservation))
+                        .zIndex(1)
+                }
+                .sheet(item: $viewModel.individualSelectedInformation) { reservation in
+                    ReservationIndividualCardComponent(viewModel: ReservationIndividualCardViewModel(reservation: reservation))
                         .zIndex(1)
                 }
                 
@@ -67,7 +71,7 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                     CancelOrDeleteComponent(title: "CANCELAR RESERVA", subtitle: "¿Quieres cancelar este entrenamiento?") {
                         self.viewModel.isRemoveTraning = false
                     } aceptedAction: {
-                        self.viewModel.isRemoveTraning = false
+                        self.viewModel.isRemoveTraning = true
                         //TODO: Remove this to backend
                     }
                 }
@@ -155,13 +159,32 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
     }
     
     private var trainningTeamList: some View {
-        VStack(spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
+            
+            if !viewModel.allIndividualReservations.isEmpty {
+                Text("Reservas Individuales")
+                    .font(.custom("Madridingamefont-Regular", size: 13))
+                    .foregroundColor(.white)
+                    .opacity(0.7)
+                
+                ForEach(viewModel.allIndividualReservations, id: \.id) { individualReservation in
+                    IndividualReservationsCellComponent(viewModel: IndividualReservationsCellViewModel(reservation: individualReservation)) { optionSelected in
+                        viewModel.trainingIndividualListCellPressed(individualSelectedInformation: individualReservation, optionSelected: optionSelected)
+                    }
+                }
+            }
+            Text("Reservas De Equipo")
+                .font(.custom("Madridingamefont-Regular", size: 13))
+                .foregroundColor(.white)
+                .opacity(0.7)
+
             ForEach(viewModel.allReservations, id: \.id) { reservation in
                 TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation
                 )) { optionSelected in
                     viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)
                 }
             }
+            
         }
         .padding(5)
     }

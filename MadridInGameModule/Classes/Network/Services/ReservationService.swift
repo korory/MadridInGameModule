@@ -44,7 +44,7 @@ struct IndividualReservationResponse: Codable {
     let data: [IndividualReservation]
 }
 
-struct IndividualReservation: Codable {
+struct IndividualReservation: Identifiable, Codable {
     let id: Int?
     let status: String?
     let slot: Slot
@@ -54,14 +54,39 @@ struct IndividualReservation: Codable {
     let training: String?
     let qrImage: String?
     let qrValue: String?
-    var times: [GamingTime]?
+    var times: [Time] = []
+    var gamingSpaces: [GamingSpace] = []
     //let peripheralLoans: [Int]?
     
     enum CodingKeys: String, CodingKey {
-        case id, status, slot, date, user, team, training, qrImage, qrValue
+        case id, status, slot, date, user, team, training, qrImage, qrValue, times
         //case peripheralLoans = "peripheral_loans"
     }
 }
+
+struct GamingSpaceResponseData: Codable {
+    let data: [GamingSpace]
+}
+
+struct GamingSpace: Codable {
+    let id: Int
+    let translations: [Translation]
+}
+
+struct Translation: Codable {
+    let description: String
+    let device: String
+    let gamingSpaceId: Int
+    let id: Int
+    let languagesCode: String
+
+    enum CodingKeys: String, CodingKey {
+        case description, device, id
+        case gamingSpaceId = "gaming_space_id"
+        case languagesCode = "languages_code"
+    }
+}
+
 
 struct Reservation: Codable {
     let id: Int?
@@ -213,7 +238,7 @@ class ReservationService {
 
     func getReservesByUser(userId: String, completion: @escaping (Result<[IndividualReservation], Error>) -> Void) {
         let parameters: [String: String] = [
-            "fields": "id,date,slot.*,qrImage,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
+            "fields": "id, date, slot.*, qrImage, times.gaming_space_times_id.time",
             "filter[user][_eq]": userId,
             "filter[status][_neq]": "cancelled",
             "filter[date][_gte]": "$NOW",
@@ -225,6 +250,27 @@ class ReservationService {
             do {
                 let response: IndividualReservationResponse = try await DirectusService.shared.request(
                     endpoint: "gaming_space_reserves",
+                    method: .GET,
+                    parameters: parameters
+                )
+                
+                completion(.success(response.data))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func getReservesSlotByUser(space: Int?, completion: @escaping (Result<[GamingSpace], Error>) -> Void) {
+        let parameters: [String: String] = [
+            "fields": "id, translations.*",
+            "filter[id][_eq]": String(space ?? 0),
+        ]
+        
+        Task {
+            do {
+                let response: GamingSpaceResponseData = try await DirectusService.shared.request(
+                    endpoint: "gaming_space",
                     method: .GET,
                     parameters: parameters
                 )
