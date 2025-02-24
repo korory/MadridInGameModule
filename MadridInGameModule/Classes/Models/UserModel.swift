@@ -5,22 +5,27 @@
 //  Created by Arnau Rivas Rivas on 4/2/25.
 //
 
+struct UserModelResponse: Codable {
+    let data : UserModel
+}
+
 struct UserModel: Codable {
-    let id: String
-    let status: String
-    let username: String
-    let email: String
+    let id: String?
+    let status: String?
+    let username: String?
+    let email: String?
     let dni: String?
     let token: String?
-    let firstName: String
-    let lastName: String
+    let firstName: String?
+    let lastName: String?
     let avatar: String?
-    let reservesAllowed: Int
+    let reservesAllowed: Int?
     let phone: String?
-    let trainings: [Int]
-    let gamingSpaceReserves: [Int]
-    let invitations: [Int]
-    var teams: [TeamModelReal] = []
+    let trainings: [Int]?
+    let gamingSpaceReserves: [Int]?
+    let invitations: [Int]?
+    var teamsResponse: [TeamModelReal] = []
+    var teams: [Int] = []
     var selectedTeam: TeamModelReal?
     var trainningsComplete: [TrainningsModel] = []
     var gammingSpacesComplete: [LoanModel] = []

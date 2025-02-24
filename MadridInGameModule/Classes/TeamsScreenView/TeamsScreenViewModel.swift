@@ -26,7 +26,7 @@ class TeamsScreenViewModel: ObservableObject {
     }
     
     func getAllTeams() -> [TeamModelReal] {
-        return userManager.getUser()?.teams ?? []
+        return userManager.getUser()?.teamsResponse ?? []
     }
     
     func setTeamSelected(team: TeamModelReal) {

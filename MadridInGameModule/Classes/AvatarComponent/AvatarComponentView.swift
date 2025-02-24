@@ -69,6 +69,7 @@ struct AvatarComponentView: View {
     @StateObject var viewModel = AvatarViewModel()
     
     var externalImage: UIImage?
+    var enablePress: Bool
     var imageSelected: (UIImage) -> Void
     
     var body: some View {
@@ -88,7 +89,9 @@ struct AvatarComponentView: View {
             }
         }
         .onTapGesture {
-            viewModel.showActionSheet = true
+            if (enablePress) {
+                viewModel.showActionSheet = true
+            }
         }
         .actionSheet(isPresented: $viewModel.showActionSheet) {
             ActionSheet(
@@ -120,9 +123,9 @@ extension AvatarComponentView {
     }
 }
 
-#Preview {
-    AvatarComponentView(imageSelected: { image in }) // Ejemplo de imagen externa
-}
+//#Preview {
+//    AvatarComponentView(imageSelected: { image in }) // Ejemplo de imagen externa
+//}
 
 
 struct ImagePicker: UIViewControllerRepresentable {
@@ -165,6 +168,6 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
 }
 
-#Preview {
-    AvatarComponentView(imageSelected: { image in })
-}
+//#Preview {
+//    AvatarComponentView(imageSelected: { image in })
+//}

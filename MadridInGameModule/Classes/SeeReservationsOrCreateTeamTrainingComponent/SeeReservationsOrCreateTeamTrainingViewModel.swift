@@ -10,7 +10,8 @@ import SwiftUI
 
 struct MarkTrainnigDatesAndReservetions: Codable {
     let date: Date
-    let individualReservation: Bool
+    var individualReservation: Bool = false
+    var blockedDays: Bool = false
 }
 
 class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
@@ -39,6 +40,9 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     
     @Published var isLoading = true
     
+    @Published var showToastDeleteSuccess = false
+    @Published var showToastDeleteFailure = false
+    
     private let reservationService = ReservationService()
     private let selectedTeam: TeamModelReal?
     
@@ -58,25 +62,27 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                 self.isLoading = false
             }
         }
+        
+        getBlockedDays()
     }
     
     func fetchTeamReservationsByUser(completion: @escaping () -> Void) {
         guard let user = userManager.getUser() else { return }
         
         let userId = user.id
-        let allTeams = user.teams
+        let allTeams = user.teamsResponse
         
         let dispatchGroup = DispatchGroup()
         
         for team in allTeams {
             dispatchGroup.enter()
-            reservationsService(team: team, userId: userId) {
+            reservationsService(team: team, userId: userId ?? "") {
                 dispatchGroup.leave()
             }
         }
         
         dispatchGroup.enter()
-        reservationService.getReservesByUser(userId: userId) { [weak self] result in
+        reservationService.getReservesByUser(userId: userId ?? "") { [weak self] result in
             DispatchQueue.main.async {
                 defer { dispatchGroup.leave() } // Se asegura de salir del grupo al finalizar
 
@@ -144,12 +150,30 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                     for reservation in reservations {
                         if let createDate = Utils.createDate(from: reservation.startDate) {
                             self?.allReservations.append(reservation)
-                            self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, individualReservation: false))
+                            self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate))
                         }
                     }
                     completion()
                 case .failure(let error):
                     print("Error al obtener reservas de equipo: \(error)")
+                }
+            }
+        }
+    }
+    
+    func getBlockedDays() {
+        reservationService.getAllBlockedDays { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let blockedDays):
+                    for blockDay in blockedDays {
+                        guard let blockDate = blockDay.date else { continue }
+                        if let createDate = Utils.createDate(from: blockDate) {
+                            self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, blockedDays: true))
+                        }
+                    }
+                case .failure(let error):
+                    print("Error al obtener los dias bloqueados: \(error)")
                 }
             }
         }
@@ -213,6 +237,30 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
             break
         }
     }
+    
+    func deleteReservation() {
+        guard let id = individualSelectedInformation?.id else { return }
+        self.isLoading = true
+            reservationService.deleteReservation(id: id) { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    switch result {
+                    case .success:
+                        print("Success")
+                        self?.allIndividualReservations.removeAll()
+                        self?.allReservations.removeAll()
+                        self?.showToastDeleteSuccess = true
+                        self?.loadAllData()
+                        //self?.cancelReservation.toggle()
+                    case .failure(let error):
+                        self?.isLoading = false
+                        self?.showToastDeleteFailure = true
+                        print("Error al eliminar la reserva: \(error.localizedDescription)")
+                        //self?.cancelReservation.toggle()
+                    }
+                }
+            }
+        }
 }
 
 enum TrainingCellOption {

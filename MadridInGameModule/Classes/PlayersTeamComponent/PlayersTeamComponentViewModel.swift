@@ -15,7 +15,7 @@ class PlayersTeamComponentViewModel: ObservableObject {
     @Published var errorMessage: String? = nil
 
     init(user: UserModel?) {
-        guard let user = user, let team = user.teams.first else {
+        guard let user = user, let team = user.teamsResponse.first else {
             self.errorMessage = "El usuario no pertenece a ningún equipo"
             return
         }

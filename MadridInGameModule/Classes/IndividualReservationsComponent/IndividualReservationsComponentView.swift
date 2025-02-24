@@ -16,6 +16,28 @@ struct IndividualReservationsComponentView: View {
                 LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea(.all)
                 
+                if viewModel.showToastSuccess {
+                    ToastMessage(message: "¡Reserva Realizada!", duration: 2, success: true) {
+                        self.viewModel.showToastSuccess = false
+                    }
+                    .zIndex(1)
+                } else if viewModel.showToastFailure {
+                    ToastMessage(message: "Problema al crear una reserva", duration: 2, success: false) {
+                        self.viewModel.showToastFailure = false
+                    }
+                    .zIndex(1)
+                } else if viewModel.showToastDeleteSuccess {
+                    ToastMessage(message: "Reserva Eliminada", duration: 2, success: true) {
+                        self.viewModel.showToastDeleteSuccess = false
+                    }
+                    .zIndex(1)
+                } else if viewModel.showToastDeleteFailure {
+                    ToastMessage(message: "Problema al eliminar una reserva", duration: 2, success: false) {
+                        self.viewModel.showToastDeleteFailure = false
+                    }
+                    .zIndex(1)
+                }
+                
                 if viewModel.isLoading {
                     VStack {
                         ProgressView()
@@ -45,17 +67,13 @@ struct IndividualReservationsComponentView: View {
                     set: { viewModel.cancelReservation = $0 }
                 )) {
                     Group {
-                        if let reservation = viewModel.selectedReservation {
-                            CancelOrDeleteComponent(
-                                title: "CANCELAR RESERVA",
-                                subtitle: "¿Quieres cancelar la reserva del día \(reservation.date.formatted(date: .numeric, time: .omitted))?"
-                            ) {
-                                viewModel.cancelReservation = false
-                            } aceptedAction: {
-                                //viewModel.deleteReservation()
-                            }
-                        } else {
-                            EmptyView()
+                        CancelOrDeleteComponent(
+                            title: "CANCELAR RESERVA",
+                            subtitle: "¿Quieres cancelar esta reserva?"
+                        ) {
+                            viewModel.cancelReservation = false
+                        } aceptedAction: {
+                            viewModel.deleteReservation()
                         }
                     }
                 }
@@ -78,11 +96,14 @@ struct IndividualReservationsComponentView: View {
             ReservationFlowView(
                 isPresented: $viewModel.isReservationFlowPresented,
                 viewModel: ReservationFlowViewModel(onReservationSuccess: {
+                    viewModel.allIndividualReservations.removeAll()
                     viewModel.fetchReservations {
                         viewModel.isLoading = false
                     }
+                    viewModel.showToastSuccess = true
                     viewModel.isReservationFlowPresented = false
                 }, onReservationFail: {
+                    viewModel.showToastFailure = true
                     viewModel.isReservationFlowPresented = false
                 })
             )
@@ -115,28 +136,9 @@ extension IndividualReservationsComponentView {
                     .frame(width: 28, height: 28)
                     .foregroundColor(.cyan)
             }
-
+            
         }
     }
-    
-    //    private var trainningTeamList: some View {
-    //        ScrollView {
-    //            VStack(alignment: .leading, spacing: 20) {
-    //                if !viewModel.allIndividualReservations.isEmpty {
-    //                    ForEach(viewModel.allIndividualReservations, id: \.id) { individualReservation in
-    //                        IndividualReservationsCellComponent(viewModel: IndividualReservationsCellViewModel(reservation: individualReservation)) { optionSelected in
-    //                            //                        viewModel.trainingIndividualListCellPressed(individualSelectedInformation: individualReservation, optionSelected: optionSelected)
-    //                        }
-    //                    }
-    //                }
-    //
-    //            }
-    //            .padding(5)
-    //        }
-    //        .refreshable {
-    //            await viewModel.getAndRefreshReservationsData()
-    //        }
-    //    }
     
     private var trainningTeamList: some View {
         ScrollView {

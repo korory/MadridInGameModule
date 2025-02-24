@@ -15,6 +15,18 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             
+            if viewModel.showToastDeleteSuccess {
+                ToastMessage(message: "Reserva Eliminada", duration: 2, success: true) {
+                    self.viewModel.showToastDeleteSuccess = false
+                }
+                .zIndex(1)
+            } else if viewModel.showToastDeleteFailure {
+                ToastMessage(message: "Problema al eliminar una reserva", duration: 2, success: false) {
+                    self.viewModel.showToastDeleteFailure = false
+                }
+                .zIndex(1)
+            }
+            
             if viewModel.isLoading {
                 VStack {
                     ProgressView()
@@ -71,7 +83,8 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                     CancelOrDeleteComponent(title: "CANCELAR RESERVA", subtitle: "¿Quieres cancelar este entrenamiento?") {
                         self.viewModel.isRemoveTraning = false
                     } aceptedAction: {
-                        self.viewModel.isRemoveTraning = true
+                        self.viewModel.isRemoveTraning = false
+                        self.viewModel.deleteReservation()
                         //TODO: Remove this to backend
                     }
                 }

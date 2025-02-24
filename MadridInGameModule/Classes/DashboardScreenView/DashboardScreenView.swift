@@ -40,7 +40,7 @@ extension DashboardScreenView {
                         .tag(TabBarDashboardBottom.teams)
 
                     
-                    ProfileInformationComponentView(user: UserManager.shared.getUser())
+                    ProfileInformationComponentView()
                         .tabItem {
                             Label("Sobre Mi", systemImage: "person.circle")
                         }

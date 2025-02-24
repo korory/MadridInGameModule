@@ -243,11 +243,12 @@ extension ReservationCardComponent {
                                             .frame(width: 35, height: 35)
                                             .clipShape(Circle())
                                     case .failure:
-                                        Image(systemName: "photo")
+                                        Image(systemName: "person.circle")
                                             .resizable()
                                             .cornerRadius(15)
-                                            .frame(width: 280, height: 470)
-                                            .foregroundColor(.gray)
+                                            .frame(width: 35, height: 35)
+                                            .clipShape(Circle())
+                                            .foregroundColor(.white)
                                     @unknown default:
                                         EmptyView()
                                     }

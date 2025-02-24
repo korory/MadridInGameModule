@@ -1,42 +1,43 @@
 import SwiftUI
 
 struct ProfileInformationComponentView: View {
-    @State private var firstName: String = ""
-    @State private var lastName: String = ""
-    @State private var dni: String = ""
-    @State private var email: String = ""
-    @State private var username: String = ""
-    @State private var phone: String = ""
-    @State private var avatar: UIImage? = UIImage()
+    @StateObject private var viewModel: ProfileInformationViewModel
     
-    var user: UserModel?
-    
-    init(user: UserModel?) {
-        self.user = user
-        _firstName = State(initialValue: user?.firstName ?? "")
-        _lastName = State(initialValue: user?.lastName ?? "")
-        _dni = State(initialValue: user?.dni ?? "")
-        _email = State(initialValue: user?.email ?? "")
-        _username = State(initialValue: user?.username ?? "")
-        _phone = State(initialValue: user?.phone ?? "")
+    init() {
+        _viewModel = StateObject(wrappedValue: ProfileInformationViewModel())
     }
     
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             
-            VStack(spacing: 40) {
+            VStack(spacing: 10) {
                 ScrollView {
                     titleComponent
                     componentAvatarSelector
                     formComponent
-                    buttonsDiscardSaveComponent
+                }
+                .padding()
+                
+                editButton
+                    .padding(.bottom, 10)
+            }
+            .onDisappear(perform: {
+                self.viewModel.isEditing = false
+            })
+            .padding(.top, 10)
+            
+            if viewModel.showToastSuccess {
+                ToastMessage(message: "¡Perfil Actualizado!", duration: 2, success: true) {
+                    self.viewModel.showToastSuccess = false
+                }
+            } else if viewModel.showToastFailure {
+                ToastMessage(message: "Problema al actualizar perfil", duration: 2, success: false) {
+                    self.viewModel.showToastFailure = false
                 }
             }
-            .padding(.top, 10)
-            .padding(.leading, 10)
-            .padding(.trailing, 10)
+                
         }
     }
 }
@@ -45,71 +46,80 @@ extension ProfileInformationComponentView {
     private var titleComponent: some View {
         HStack {
             Text("SOBRE MÍ")
-                .font(.title)
-                .bold()
-                .foregroundStyle(Color.white)
+                .font(.custom("Madridingamefont-Regular", size: 20))
+                .foregroundColor(.white)
+                .padding(.top, 4)
             Spacer()
         }
     }
     
     private var formComponent: some View {
         VStack(alignment: .leading, spacing: 20) {
-            FloatingTextField(text: firstName, placeholderText: "Nombre")
-            FloatingTextField(text: lastName, placeholderText: "Apellidos")
-            FloatingTextField(text: dni, placeholderText: "DNI")
-            FloatingTextField(text: email, placeholderText: "Email")
-            FloatingTextField(text: username, placeholderText: "Nick")
-            FloatingTextField(text: phone, placeholderText: "Teléfono (Opcional)")
+            if viewModel.isEditing {
+                FloatingTextField(text: viewModel.firstName, placeholderText: "Nombre")
+                FloatingTextField(text: viewModel.lastName, placeholderText: "Apellidos")
+                FloatingTextField(text: viewModel.dni, placeholderText: "DNI")
+                FloatingTextField(text: viewModel.email, placeholderText: "Email")
+                FloatingTextField(text: viewModel.username, placeholderText: "Nick")
+                FloatingTextField(text: viewModel.phone, placeholderText: "Teléfono (Opcional)")
+            } else {
+                ProfileInfoView(text: viewModel.firstName, label: "Nombre")
+                ProfileInfoView(text: viewModel.lastName, label: "Apellidos")
+                ProfileInfoView(text: viewModel.dni, label: "DNI")
+                ProfileInfoView(text: viewModel.email, label: "Email")
+                ProfileInfoView(text: viewModel.username, label: "Nick")
+                ProfileInfoView(text: viewModel.phone, label: "Teléfono")
+            }
         }
         .padding(.bottom, 20)
     }
     
     private var componentAvatarSelector: some View {
-        AvatarComponentView(imageSelected: { image in
-            avatar = image
+        AvatarComponentView(enablePress: viewModel.isEditing, imageSelected: { image in
+            viewModel.updateAvatar(image)
         })
         .padding(.bottom, 20)
     }
     
-    private var buttonsDiscardSaveComponent: some View {
-        HStack(spacing: 10) {
-            CustomButton(text: "Descartar",
-                         needsBackground: false,
-                         backgroundColor: Color.cyan,
-                         pressEnabled: true,
-                         widthButton: 170, heightButton: 40) {
-                discardChanges()
-            }
-            .padding(.trailing, 10)
-            
-            CustomButton(text: "Guardar",
-                         needsBackground: true,
-                         backgroundColor: Color.cyan,
-                         pressEnabled: true,
-                         widthButton: 170, heightButton: 40) {
-                saveChanges()
+    private var editButton: some View {
+        HStack {
+            if !viewModel.isEditing {
+                CustomButton(text: "Editar", needsBackground: true, backgroundColor: .cyan, pressEnabled: true, widthButton: 250, heightButton: 20) {
+                    viewModel.toggleEditing()
+                }
+                .padding(.bottom, 10)
+            } else {
+                HStack {
+                    CustomButton(text: "Descartar", needsBackground: false, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
+                        viewModel.discardChanges()
+                    }
+                    
+                    CustomButton(text: "Guardar", needsBackground: true, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
+                        viewModel.saveChanges()
+                    }
+                }
+                .padding(.horizontal)
             }
         }
+        .padding(.bottom, 10)
     }
+}
+
+struct ProfileInfoView: View {
+    var text: String
+    var label: String
     
-    private func discardChanges() {
-        firstName = user?.firstName ?? ""
-        lastName = user?.lastName ?? ""
-        dni = user?.dni ?? ""
-        email = user?.email ?? ""
-        username = user?.username ?? ""
-        phone = user?.phone ?? ""
-        avatar = nil
-    }
-    
-    private func saveChanges() {
-        // Lógica para guardar los datos
-        print("Cambios guardados:")
-        print("Nombre: \(firstName)")
-        print("Apellidos: \(lastName)")
-        print("DNI: \(dni)")
-        print("Email: \(email)")
-        print("Nick: \(username)")
-        print("Teléfono: \(phone)")
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.custom("Madridingamefont-Regular", size: 14))
+                .foregroundColor(.gray.opacity(1.0))
+            Spacer()
+            Text(text)
+                .font(.custom("Madridingamefont-Regular", size: 14))
+                .foregroundColor(.white)
+        }
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.15)))
     }
 }

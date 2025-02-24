@@ -21,6 +21,10 @@ class IndividualReservationComponentViewModel: ObservableObject {
     @Published var noReservationAllowed: Bool = false
 
     @Published var isLoading: Bool = true
+    @Published var showToastSuccess: Bool = false
+    @Published var showToastFailure: Bool = false
+    @Published var showToastDeleteSuccess: Bool = false
+    @Published var showToastDeleteFailure: Bool = false
 
     private let reservationService = ReservationService()
 
@@ -36,7 +40,7 @@ class IndividualReservationComponentViewModel: ObservableObject {
         
         guard let user = userManager.getUser() else { return }
 
-        let userId = user.id
+        guard let userId = user.id else { return }
         
         let dispatchGroup = DispatchGroup()
 
@@ -56,7 +60,7 @@ class IndividualReservationComponentViewModel: ObservableObject {
                             DispatchQueue.main.async {
                                 switch result {
                                 case .success(let gameSpaces):
-                                    if let createDate = Utils.createDate(from: reservation.date) {
+                                    if Utils.createDate(from: reservation.date) != nil {
                                         reservation.gamingSpaces = gameSpaces
                                         self?.allIndividualReservations.append(reservation)
                                     }
@@ -120,7 +124,8 @@ class IndividualReservationComponentViewModel: ObservableObject {
         switch optionSelected {
         case .removeCell:
             self.individualSelectedInformation = individualSelectedInformation
-            self.isRemoveTraning = true
+            //self.isRemoveTraning = true
+            self.cancelReservation = true
         case .seeDetails:
             print("See individual training for \(individualSelectedInformation)")
             self.individualSelectedInformation = individualSelectedInformation
@@ -129,24 +134,28 @@ class IndividualReservationComponentViewModel: ObservableObject {
         }
     }
     
-//    func deleteReservation() {
-//        guard let reservation = selectedReservation, let id = reservation.id else { return }
-//        
-//            isLoading = true
-//            reservationService.deleteReservation(id: id) { [weak self] result in
-//                DispatchQueue.main.async {
-//                    self?.isLoading = false
-//                    switch result {
-//                    case .success:
-//                        print("Success")
-//                        //self?.fetchReservations()
-//                        //self?.cancelReservation.toggle()
-//                        //self?.reservations.removeAll { $0.id == reservation.id }
-//                    case .failure(let error):
-//                        print("Error al eliminar la reserva: \(error.localizedDescription)")
-//                        //self?.cancelReservation.toggle()
-//                    }
-//                }
-//            }
-//        }
+    func deleteReservation() {
+        guard let id = individualSelectedInformation?.id else { return }
+        self.isLoading = true
+            reservationService.deleteReservation(id: id) { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    switch result {
+                    case .success:
+                        print("Success")
+                        self?.allIndividualReservations.removeAll()
+                        self?.showToastDeleteSuccess = true
+                        self?.fetchReservations {
+                            self?.isLoading = false
+                        }
+                        self?.cancelReservation.toggle()
+                    case .failure(let error):
+                        self?.isLoading = false
+                        self?.showToastDeleteFailure = true
+                        print("Error al eliminar la reserva: \(error.localizedDescription)")
+                        self?.cancelReservation.toggle()
+                    }
+                }
+            }
+        }
 }

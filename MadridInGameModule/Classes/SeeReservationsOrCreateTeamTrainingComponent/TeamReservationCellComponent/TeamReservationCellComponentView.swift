@@ -75,10 +75,12 @@ extension TeamReservationCellComponentView {
                                             .frame(width: 35, height: 35)
                                             .clipShape(Circle())
                                     case .failure:
-                                        Image(systemName: "photo")
+                                        Image(systemName: "person.circle")
                                             .resizable()
                                             .cornerRadius(15)
-                                            .frame(width: 280, height: 470)
+                                            .frame(width: 35, height: 35)
+                                            .clipShape(Circle())
+                        
                                             .foregroundColor(.gray)
                                     @unknown default:
                                         EmptyView()

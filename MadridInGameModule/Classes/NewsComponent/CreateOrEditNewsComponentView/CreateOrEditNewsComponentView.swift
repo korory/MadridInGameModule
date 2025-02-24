@@ -52,7 +52,7 @@ extension CreateOrEditNewsComponentView {
     }
     
     private var selectImageComponent: some View {
-        AvatarComponentView(imageSelected: { imageSelected in
+        AvatarComponentView(enablePress: true, imageSelected: { imageSelected in
             newsInformation?.image = imageSelected
         })
     }

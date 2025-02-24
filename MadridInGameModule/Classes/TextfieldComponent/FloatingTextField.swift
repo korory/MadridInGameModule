@@ -45,8 +45,10 @@ struct FloatingTextField: View {
                 }
             }
             .padding()
+            .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.15)
+                                                               ))
         }
-        .padding()
+        .padding(.bottom, 10)
         .frame(height: isDescripcionTextfield ? 150 : 50)
         
         if let errorMessage = errorMessage {
@@ -92,7 +94,7 @@ extension FloatingTextField {
     
     private var textEditorComponent: some View {
         TextEditor(text: $text)
-            //.colorMultiply(Color.black.opacity(0.7))
+        //.colorMultiply(Color.black.opacity(0.7))
             .foregroundStyle(Color.white)
             .font(.headline)
             .padding(.top, 10)

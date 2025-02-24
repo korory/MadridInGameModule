@@ -50,6 +50,28 @@ struct Reserve: Codable {
     }
 }
 
+struct ReserveResponseModel: Codable {
+    let data: ReserveResponse
+}
+
+struct ReserveResponse: Codable {
+    let date: String?
+    let id: Int?
+    let peripheralLoans: [PeripheralLoan]?
+    let qrImage, qrValue: String?
+    let slot: Int?
+    let status: String?
+    let team: String?
+    let times: [Int]?
+    let training, user: String?
+
+    enum CodingKeys: String, CodingKey {
+        case date, id
+        case peripheralLoans = "peripheral_loans"
+        case qrImage, qrValue, slot, status, team, times, training, user
+    }
+}
+
 struct PlayerUsersModel: Identifiable, Codable {
     let id = UUID()
     let userId: PlayerModel?
