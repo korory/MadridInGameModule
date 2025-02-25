@@ -48,10 +48,10 @@ class UserManager {
                 if let users = response["data"], var user = users.first {
                     self.user = user
 
-                    fetchTeamsByUser(userId: user.id) { result in
+                    fetchTeamsByUser(userId: user.id ?? "") { result in
                         switch result {
                         case .success(let teams):
-                            user.teams = teams
+                            user.teamsResponse = teams
                             self.user = user
                             completion(.success(()))
                         case .failure(let error):

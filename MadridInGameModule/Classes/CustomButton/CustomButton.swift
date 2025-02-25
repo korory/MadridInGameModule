@@ -24,7 +24,7 @@ struct CustomButton: View {
             }
         }) {
             Text(text)
-                .font(.headline)
+                .font(.custom("Madridingamefont-Regular", size: 17))
                 .foregroundStyle(needsBackground ?? false ? .black : .white)
                 .padding()
                 .frame(maxWidth: .infinity)

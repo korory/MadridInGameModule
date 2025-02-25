@@ -5,6 +5,7 @@ import SwiftUI
 
 public struct MadridInGameModule: View {
     @StateObject private var viewModel: MadridInGameViewModel
+
     private let logoMIG: UIImage
     
     public init(email: String, environment: String, logoMIG: UIImage, openCompetitions: Bool ) {

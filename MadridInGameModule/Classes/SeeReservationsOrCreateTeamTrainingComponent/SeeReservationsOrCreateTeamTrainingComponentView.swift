@@ -10,21 +10,32 @@ import SwiftUI
 struct SeeReservationsOrCreateTeamTrainingComponentView: View {
     @ObservedObject var viewModel: SeeReservationsOrCreateTeamTrainingViewModel
 
-    @State private var isLoading = true
-    
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
+            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             
-            if isLoading {
+            if viewModel.showToastDeleteSuccess {
+                ToastMessage(message: "Reserva Eliminada", duration: 2, success: true) {
+                    self.viewModel.showToastDeleteSuccess = false
+                }
+                .zIndex(1)
+            } else if viewModel.showToastDeleteFailure {
+                ToastMessage(message: "Problema al eliminar una reserva", duration: 2, success: false) {
+                    self.viewModel.showToastDeleteFailure = false
+                }
+                .zIndex(1)
+            }
+            
+            if viewModel.isLoading {
                 VStack {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
                         .scaleEffect(1.5)
+                        .padding()
                     
                     Text("Preparando tu calendario...")
-                        .font(.headline)
+                        .font(.custom("Madridingamefont-Regular", size: 15))
                         .foregroundColor(.white)
                         .opacity(0.7)
                 }
@@ -37,31 +48,33 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                     if viewModel.isTrainingsVisible {
                         ScrollView {
                             if !viewModel.isUserMode {
-                                if isLoading {
-                                    
-                                } else {
-                                    trainningTeamList
-                                }
-                                
+                                trainningTeamList
                             } else {
-                                //trainningIndividualList
+                                trainningTeamList
                             }
                         }
                     }
                 }
                 .padding(.leading, 10)
                 .padding(.trailing, 10)
-                
-                
-                CustomPopup(isPresented: Binding(
-                    get: { viewModel.isEditTraning },
-                    set: { viewModel.isEditTraning = $0 }
-                )) {
-                    //EditTrainingComponentView(reservationModel: viewModel.teamReservationCellInformation)
-                    EmptyView()
+                .sheet(item: $viewModel.teamSelectedInformation) { reservation in
+                    ReservationCardComponent(viewModel: ReservationCardViewModel(reservation: reservation))
+                        .zIndex(1)
                 }
-                .transition(.scale)
-                .zIndex(1)
+                .sheet(item: $viewModel.individualSelectedInformation) { reservation in
+                    ReservationIndividualCardComponent(viewModel: ReservationIndividualCardViewModel(reservation: reservation))
+                        .zIndex(1)
+                }
+                
+//                CustomPopup(isPresented: Binding(
+//                    get: { viewModel.isEditTraning },
+//                    set: { viewModel.isEditTraning = $0 }
+//                )) {
+//                    //EditTrainingComponentView(reservationModel: viewModel.teamReservationCellInformation)
+//                    EmptyView()
+//                }
+//                .transition(.scale)
+//                .zIndex(1)
                 
                 CustomPopup(isPresented: Binding(
                     get: { viewModel.isRemoveTraning },
@@ -71,10 +84,11 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                         self.viewModel.isRemoveTraning = false
                     } aceptedAction: {
                         self.viewModel.isRemoveTraning = false
+                        self.viewModel.deleteReservation()
                         //TODO: Remove this to backend
                     }
                 }
-                .transition(.scale)
+                //.transition(.scale)
                 .zIndex(1)
                 
 //                CustomPopup(isPresented: Binding(
@@ -89,17 +103,6 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
 //                .zIndex(1)
             }
         }
-        .onAppear {
-            if (viewModel.isUserMode) {
-                viewModel.fetchTeamReservationsByUser {
-                    isLoading = false
-                }
-            } else {
-                viewModel.fetchTeamReservationsByTeam {
-                    isLoading = false
-                }
-            }
-        }
     }
 }
 
@@ -111,7 +114,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                 Spacer()
                 Image(systemName: "arrowtriangle.down.fill")
                     .rotationEffect(.degrees(viewModel.calendarArrowRotation))
-                    .animation(.easeInOut, value: viewModel.calendarArrowRotation)  // Animación suave para la rotación
+                    .animation(.easeInOut, value: viewModel.calendarArrowRotation)
                     .foregroundColor(.cyan)
             }
             .padding(.top, 5)
@@ -119,7 +122,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             .onTapGesture {
                 withAnimation {
                     viewModel.isCalendarVisible.toggle()
-                    viewModel.calendarArrowRotation += 180  // Cambia la rotación de la flecha al alternar visibilidad
+                    viewModel.calendarArrowRotation += 180
                 }
             }
             if viewModel.isCalendarVisible {
@@ -153,7 +156,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                 
                 Image(systemName: "arrowtriangle.down.fill")
                     .rotationEffect(.degrees(viewModel.trainingArrowRotation))
-                    .animation(.easeInOut, value: viewModel.trainingArrowRotation)  // Animación suave para la rotación
+                    .animation(.easeInOut, value: viewModel.trainingArrowRotation)
                     .foregroundColor(.cyan)
                 
             }
@@ -162,21 +165,40 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             .onTapGesture {
                 withAnimation {
                     viewModel.isTrainingsVisible.toggle()
-                    viewModel.trainingArrowRotation += 180  // Cambia la rotación de la flecha de entrenamientos
+                    viewModel.trainingArrowRotation += 180
                 }
             }
         }
     }
     
     private var trainningTeamList: some View {
-        VStack(spacing: 20) {
-            ForEach(viewModel.teamReservations, id: \.id) { reservation in
+        VStack(alignment: .leading, spacing: 20) {
+            
+            if !viewModel.allIndividualReservations.isEmpty {
+                Text("Reservas Individuales")
+                    .font(.custom("Madridingamefont-Regular", size: 13))
+                    .foregroundColor(.white)
+                    .opacity(0.7)
+                
+                ForEach(viewModel.allIndividualReservations, id: \.id) { individualReservation in
+                    IndividualReservationsCellComponent(viewModel: IndividualReservationsCellViewModel(reservation: individualReservation)) { optionSelected in
+                        viewModel.trainingIndividualListCellPressed(individualSelectedInformation: individualReservation, optionSelected: optionSelected)
+                    }
+                }
+            }
+            Text("Reservas De Equipo")
+                .font(.custom("Madridingamefont-Regular", size: 13))
+                .foregroundColor(.white)
+                .opacity(0.7)
+
+            ForEach(viewModel.allReservations, id: \.id) { reservation in
                 TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation
                 )) { optionSelected in
                     viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)
                 }
             }
+            
         }
-        .padding()
+        .padding(5)
     }
 }

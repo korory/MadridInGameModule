@@ -48,7 +48,7 @@ extension TeamsCreateOrEditNewTeamComponentView {
     }
     
     private var componentAvatarSelector: some View {
-        AvatarComponentView(externalImage: team?.image, imageSelected: { imageSelection in
+        AvatarComponentView(externalImage: team?.image, enablePress: true, imageSelected: { imageSelection in
             self.team?.image = imageSelection
         })
         .padding(.bottom, 20)

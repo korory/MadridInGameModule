@@ -12,36 +12,58 @@ struct ReservationFlowView: View {
     @ObservedObject var viewModel: ReservationFlowViewModel
     
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .top) {
             // Fondo negro
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             
             VStack {
-                
-                // Indicador de progreso
                 HStack {
-                    ForEach(0..<3) { index in
-                        Circle()
-                            .fill(index == viewModel.currentStep ? Color.white : Color.clear)
-                            .frame(width: 10, height: 10)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 1)
-                            )
+                    Button(action: {
+                        if viewModel.currentStep > 0 {
+                            viewModel.currentStep -= 1
+                        }
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                    
+                    Spacer()
+                    
+                    HStack {
+                        ForEach(0..<3) { index in
+                            Circle()
+                                .fill(index == viewModel.currentStep ? Color.white : Color.clear)
+                                .frame(width: 10, height: 10)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 1)
+                                )
+                        }
+                    }
+                    .padding(.top, 16)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        isPresented = false
+                    }) {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.white)
+                            .padding()
                     }
                 }
-                .padding(.top, 16)
+                .padding(.horizontal)
+                .padding(.top, 5)
                 
                 Text("Reservar espacio")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding(.top, 8)
-                            .padding(.bottom, 16)
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.top, 8)
+                    .padding(.bottom, 16)
                 
                 TabView(selection: $viewModel.currentStep) {
-                    //SelectPlayerView(currentStep: $viewModel.currentStep)
-                        //.tag(0)
                     SelectDateView(currentStep: $viewModel.currentStep, viewModel: viewModel)
                         .tag(0)
                     SelectSlotView(currentStep: $viewModel.currentStep, viewModel: viewModel)
@@ -53,65 +75,54 @@ struct ReservationFlowView: View {
                 
                 Spacer()
             }
-            
-            Button(action: {
-                isPresented = false
-            }) {
-                Image(systemName: "xmark")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(.clear)
-            }
-            .padding(.top, 5)
-            .padding(.trailing, 5)
         }
     }
 }
 
 // Pantalla 1: Selección de Jugador
-struct SelectPlayerView: View {
-    @Binding var currentStep: Int
-    @State private var selectedPlayer: String = "Jugador1"
-    @State private var players: [String] = ["Jugador1", "Jugador2", "Jugador3"]
-    
-    var body: some View {
-        VStack(spacing: 24) {
-            Text("Seleccionar Jugador")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-            
-            Picker("Selecciona un jugador", selection: $selectedPlayer) {
-                ForEach(players, id: \.self) { player in
-                    Text(player).tag(player)
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.gray, lineWidth: 1)
-            )
-            .padding(.horizontal, 16)
-            
-            Spacer()
-            
-            // Botón "Siguiente"
-            Button(action: {
-                currentStep += 1
-            }) {
-                Text("Siguiente")
-                    .font(.system(size: 18, weight: .bold))
-                    .frame(maxWidth: .infinity, maxHeight: 44)
-                    .background(Color.gray.opacity(0.8))
-                    .foregroundColor(.black)
-                    .cornerRadius(100)
-                    .padding(.horizontal, 48)
-            }
-        }
-        .padding()
-    }
-}
+//struct SelectPlayerView: View {
+//    @Binding var currentStep: Int
+//    @State private var selectedPlayer: String = "Jugador1"
+//    @State private var players: [String] = ["Jugador1", "Jugador2", "Jugador3"]
+//    
+//    var body: some View {
+//        VStack(spacing: 24) {
+//            Text("Seleccionar Jugador")
+//                .font(.system(size: 24, weight: .bold))
+//                .foregroundColor(.white)
+//            
+//            Picker("Selecciona un jugador", selection: $selectedPlayer) {
+//                ForEach(players, id: \.self) { player in
+//                    Text(player).tag(player)
+//                }
+//            }
+//            .pickerStyle(MenuPickerStyle())
+//            .frame(maxWidth: .infinity, alignment: .leading)
+//            .padding()
+//            .background(
+//                RoundedRectangle(cornerRadius: 8)
+//                    .stroke(Color.gray, lineWidth: 1)
+//            )
+//            .padding(.horizontal, 16)
+//            
+//            Spacer()
+//            
+//            // Botón "Siguiente"
+//            Button(action: {
+//                currentStep += 1
+//            }) {
+//                Text("Siguiente")
+//                    .font(.system(size: 18, weight: .bold))
+//                    .frame(maxWidth: .infinity, maxHeight: 44)
+//                    .background(Color.gray.opacity(0.8))
+//                    .foregroundColor(.black)
+//                    .cornerRadius(100)
+//                    .padding(.horizontal, 48)
+//            }
+//        }
+//        .padding()
+//    }
+//}
 
 // Pantalla 2: Selección de Fecha
 struct SelectDateView: View {
@@ -125,21 +136,25 @@ struct SelectDateView: View {
                 .foregroundColor(.white)
                 .padding(.bottom, 20)
             
-            if viewModel.availableDates.isEmpty && viewModel.blockedDates.isEmpty {
-                ProgressView("Cargando fechas disponibles...")
-                    .foregroundColor(.white)
-                    .padding()
-                    .onAppear {
-                        viewModel.fetchBlockedDates()
-                    }
+            if viewModel.markedDates.isEmpty { //&& viewModel.blockedDates.isEmpty {
+                VStack {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                        .scaleEffect(1.5)
+                        .padding()
+                    
+                    Text("Cargando fechas disponibles...")
+                        .font(.custom("Madridingamefont-Regular", size: 15))
+                        .foregroundColor(.white)
+                        .opacity(0.7)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onAppear {
+                    viewModel.getBlockedDays()
+                }
             } else {
-                CustomReservationCalendarView(
-                    canUserInteract: true,
-                    markedDates: viewModel.availableDates.compactMap { viewModel.dateFormatter.date(from: $0) },
-                    blockedDates: viewModel.blockedDates.compactMap { viewModel.dateFormatter.date(from: $0) }
-                ) { selectedDate in
-                    viewModel.selectedDate = convertToDate(from: selectedDate)
-                    viewModel.currentStep += 1 // Avanza al siguiente paso
+                CustomCalendarView(canUserInteract: true, markedDates: viewModel.markedDates) { stringDate in
+                    viewModel.checkSelectedDate(stringDate)
                 }
                 .frame(height: 350)
             }
@@ -147,12 +162,6 @@ struct SelectDateView: View {
             Spacer()
         }
         .padding()
-    }
-    
-    func convertToDate(from dateString: String) -> Date? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy" // Formato de la fecha seleccionada
-        return formatter.date(from: dateString)
     }
 }
 
@@ -175,12 +184,21 @@ struct SelectSlotView: View {
                 .padding(.bottom, 20)
             
             if viewModel.availableSlots.isEmpty {
-                ProgressView("Cargando horarios disponibles...")
-                    .foregroundColor(.white)
-                    .padding()
-                    .onAppear {
-                        viewModel.fetchAvailableSlots(for: calculateDayValue(for: viewModel.selectedDate?.formatted() ?? "01/01/2029"))
-                    }
+                VStack {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                        .scaleEffect(1.5)
+                        .padding()
+                    
+                    Text("Cargando horarios disponibles...")
+                        .font(.custom("Madridingamefont-Regular", size: 15))
+                        .foregroundColor(.white)
+                        .opacity(0.7)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onAppear {
+                    viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate?.formatted() ?? "01/01/2029"))
+                }
             } else {
                 ScrollView {
                     LazyVGrid(
@@ -240,15 +258,6 @@ struct SelectSlotView: View {
         }
         .disabled(!isEnabled) // Deshabilita el botón si no está habilitado
     }
-    
-    private func calculateDayValue(for date: String) -> Int {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
-        guard let date = formatter.date(from: date) else { return 0 }
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: date) // Domingo es 1
-        return weekday - 1 // Convertir al formato requerido (Lunes = 1, Domingo = 7)
-    }
 }
 
 struct SelectSpaceView: View {
@@ -263,12 +272,22 @@ struct SelectSpaceView: View {
                 .padding(.bottom, 20)
             
             if viewModel.availableSpaces.isEmpty {
-                ProgressView("Cargando espacios disponibles...")
-                    .foregroundColor(.white)
-                    .padding()
-                    .onAppear {
-                        viewModel.fetchAvailableSpaces()
-                    }
+                VStack {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                        .scaleEffect(1.5)
+                        .padding()
+                    
+                    Text("Cargando espacios disponibles...")
+                        .font(.custom("Madridingamefont-Regular", size: 15))
+                        .foregroundColor(.white)
+                        .opacity(0.7)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onAppear {
+                    viewModel.fetchAvailableSpaces()
+                }
+                    
             } else {
                 ScrollView {
                     LazyVGrid(

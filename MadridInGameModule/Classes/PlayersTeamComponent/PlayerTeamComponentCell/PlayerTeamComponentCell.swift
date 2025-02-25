@@ -25,11 +25,11 @@ struct PlayerTeamComponentCell: View {
     }
     
     func checkManagerRole() -> Bool { // If player role is Manager we not enable to change this role
-        return playerInformation.roleAssign == "Manager"
+        return false //playerInformation.roleAssign == "Manager"
     }
     
     func checkSelectedRole(role: String) -> Bool {
-        return role == playerInformation.roleAssign
+        return false //role == playerInformation.roleAssign
     }
 }
 
@@ -37,12 +37,12 @@ extension PlayerTeamComponentCell {
     
     private var avatarAndNamePlayerComponent: some View {
         HStack (spacing: 10){
-            Image(uiImage: playerInformation.image)
-                .resizable()
-                .foregroundStyle(Color.white)
-                .frame(width: 70, height: 70)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.gray, lineWidth: 4))
+//            Image(uiImage: playerInformation.image)
+//                .resizable()
+//                .foregroundStyle(Color.white)
+//                .frame(width: 70, height: 70)
+//                .clipShape(Circle())
+//                .overlay(Circle().stroke(Color.gray, lineWidth: 4))
             
             let displayName = playerInformation.name.count > 8 ? "\(playerInformation.name.prefix(8))..." : playerInformation.name
             

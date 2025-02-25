@@ -65,7 +65,7 @@ class MadridInGameViewModel: ObservableObject {
     }
     
     func getUserTeams() -> [TeamModelReal] {
-        return userManager.getUser()?.teams ?? []
+        return userManager.getUser()?.teamsResponse ?? []
     }
     
 //    func loadCustomFonts() {

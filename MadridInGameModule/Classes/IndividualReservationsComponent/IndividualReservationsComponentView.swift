@@ -9,7 +9,6 @@ import SwiftUI
 
 struct IndividualReservationsComponentView: View {
     @StateObject var viewModel: IndividualReservationComponentViewModel
-    @State private var isReservationFlowPresented = false
     
     var body: some View {
         VStack {
@@ -17,67 +16,105 @@ struct IndividualReservationsComponentView: View {
                 LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea(.all)
                 
-                VStack (spacing: 20){
-                    titleBanner
-                    reservationsListComponent
-                    Spacer()
-                    reservationButton
+                if viewModel.showToastSuccess {
+                    ToastMessage(message: "¡Reserva Realizada!", duration: 2, success: true) {
+                        self.viewModel.showToastSuccess = false
+                    }
+                    .zIndex(1)
+                } else if viewModel.showToastFailure {
+                    ToastMessage(message: "Problema al crear una reserva", duration: 2, success: false) {
+                        self.viewModel.showToastFailure = false
+                    }
+                    .zIndex(1)
+                } else if viewModel.showToastDeleteSuccess {
+                    ToastMessage(message: "Reserva Eliminada", duration: 2, success: true) {
+                        self.viewModel.showToastDeleteSuccess = false
+                    }
+                    .zIndex(1)
+                } else if viewModel.showToastDeleteFailure {
+                    ToastMessage(message: "Problema al eliminar una reserva", duration: 2, success: false) {
+                        self.viewModel.showToastDeleteFailure = false
+                    }
+                    .zIndex(1)
                 }
-                .padding()
+                
+                if viewModel.isLoading {
+                    VStack {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                            .scaleEffect(1.5)
+                            .padding()
+                        
+                        Text("Obteniendo tus reservas...")
+                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .foregroundColor(.white)
+                            .opacity(0.7)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    
+                } else {
+                    VStack (spacing: 10){
+                        titleBanner
+                        trainningTeamList
+                        Spacer()
+                        reservationButton
+                    }
+                    .padding()
+                }
                 
                 CustomPopup(isPresented: Binding(
-                    get: { viewModel.createReservation },
-                    set: { viewModel.createReservation = $0 }
+                    get: { viewModel.cancelReservation },
+                    set: { viewModel.cancelReservation = $0 }
                 )) {
-                    ReservationComponentView()
-                }
-                .transition(.scale)
-                .zIndex(1)
-                .padding(.leading, 20)
-                .padding(.trailing, 20)
-                
-                CustomPopup(isPresented: Binding(
-                    get: { viewModel.seeReservation },
-                    set: { viewModel.seeReservation = $0 }
-                )) {
-                    ReservationQRView(dateSelected: viewModel.reservationModel.dateSelected, hoursSelected: viewModel.reservationModel.hoursSelected, consoleSelected: viewModel.reservationModel.consoleSelected, code: "786") {
-                        self.viewModel.seeReservation = false
+                    Group {
+                        CancelOrDeleteComponent(
+                            title: "CANCELAR RESERVA",
+                            subtitle: "¿Quieres cancelar esta reserva?"
+                        ) {
+                            viewModel.cancelReservation = false
+                        } aceptedAction: {
+                            viewModel.deleteReservation()
+                        }
                     }
                 }
                 .transition(.scale)
                 .zIndex(1)
                 
-                CustomPopup(isPresented: $viewModel.cancelReservation) {
-                    Group {
-                        if let reservation = viewModel.selectedReservation {
-                            CancelOrDeleteComponent(
-                                title: "CANCELAR RESERVA",
-                                subtitle: "¿Quieres cancelar la reserva del día \(reservation.date.formatted(date: .numeric, time: .omitted))?"
-                            ) {
-                                viewModel.cancelReservation = false
-                            } aceptedAction: {
-                                viewModel.deleteReservation()
-                            }
-                        } else {
-                            EmptyView()
-                        }
+                CustomPopup(isPresented: $viewModel.noReservationAllowed) {
+                    VStack (spacing: 10){
+                        Text("Se ha alcanzado el máximo de reservas solicitadas")
+                            .font(.custom("Madridingamefont-Regular", size: 17))
+                            .foregroundColor(.white)
+                            .padding()
                     }
                 }
                 .transition(.scale)
                 .zIndex(1)
             }
         }
-        .sheet(isPresented: $isReservationFlowPresented) {
+        .sheet(isPresented: $viewModel.isReservationFlowPresented) {
             ReservationFlowView(
-                            isPresented: $isReservationFlowPresented,
-                            viewModel: ReservationFlowViewModel(onReservationSuccess: {
-                                viewModel.fetchReservations()
-                                isReservationFlowPresented = false
-                            }, onReservationFail: {
-                                isReservationFlowPresented = false
-                            })
-                        )
-                }
+                isPresented: $viewModel.isReservationFlowPresented,
+                viewModel: ReservationFlowViewModel(onReservationSuccess: {
+                    viewModel.allIndividualReservations.removeAll()
+                    viewModel.fetchReservations {
+                        viewModel.isLoading = false
+                    }
+                    viewModel.showToastSuccess = true
+                    viewModel.isReservationFlowPresented = false
+                }, onReservationFail: {
+                    viewModel.showToastFailure = true
+                    viewModel.isReservationFlowPresented = false
+                })
+            )
+        }
+        .sheet(isPresented: $viewModel.isSelectTraning) {
+            ReservationIndividualCardComponent(viewModel: ReservationIndividualCardViewModel(reservation: self.viewModel.getIndividualReservation()))
+                .zIndex(1)
+        }
+        .onAppear {
+            self.viewModel.getAndRefreshReservationsData()
+        }
     }
 }
 
@@ -85,40 +122,51 @@ extension IndividualReservationsComponentView {
     private var titleBanner: some View {
         HStack {
             Text("RESERVAS INDIVIDUALES")
-                .font(.title)
+                .font(.custom("Madridingamefont-Regular", size: 20))
                 .fontWeight(.bold)
                 .foregroundStyle(Color.white)
             Spacer()
+            
+            Button {
+                self.viewModel.getAndRefreshReservationsData()
+            } label: {
+                Image(systemName: "arrow.clockwise.circle.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 28, height: 28)
+                    .foregroundColor(.cyan)
+            }
+            
         }
     }
     
-    private var reservationsListComponent: some View {
-            ScrollView {
-                VStack(spacing: 10) {
-                    ForEach(viewModel.reservations, id: \.id) { reservation in
-                        IndividualReservationsCellComponent(
-                            reservation: reservation) { optionPressed, reservation in
-                            switch optionPressed {
-                                                    case .cancelReservation:
-                                                        viewModel.isCancelReservationButtonPressed(for: reservation)
-                                                    case .seeReservation:
-                                                        viewModel.isSeeReservationButtonPressed()
-                                                    }
-                        }
+    private var trainningTeamList: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                ForEach(viewModel.allIndividualReservations, id: \.id) { individualReservation in
+                    IndividualReservationsCellComponent(
+                        viewModel: IndividualReservationsCellViewModel(reservation: individualReservation)
+                    ) { optionSelected in
+                        viewModel.trainingIndividualListCellPressed(individualSelectedInformation: individualReservation, optionSelected: optionSelected)
                     }
                 }
             }
-            .padding()
+            .padding(5)
         }
+    }
+    
     
     private var reservationButton: some View {
         CustomButton(text: "Reservar",
                      needsBackground: true,
-                     backgroundColor: Color.cyan,
+                     backgroundColor: viewModel.allIndividualReservations.count < 3 ? Color.cyan : Color.gray,
                      pressEnabled: true,
                      widthButton: 280, heightButton: 50) {
-            //viewModel.isCreateReservationButtonPressed()
-            self.isReservationFlowPresented = true
+            if viewModel.allIndividualReservations.count < 3 {
+                self.viewModel.isReservationFlowPresented = true
+            } else {
+                self.viewModel.noReservationAllowed = true
+            }
         }
     }
 }
