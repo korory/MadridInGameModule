@@ -52,8 +52,8 @@ extension TeamReservationCellComponentView {
     }
     
     private var showReservationLocarion: some View {
-        Text(viewModel.getReservationSite())
-            .font(.custom("Madridingamefont-Regular", size: 14))
+        Text(viewModel.getTeamName() + " - " + viewModel.getReservationSite())
+            .font(.custom("Madridingamefont-Regular", size: 12))
             .foregroundStyle(Color.white.opacity(0.8))
     }
     

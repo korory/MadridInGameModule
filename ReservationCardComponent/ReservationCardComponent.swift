@@ -154,9 +154,22 @@ extension ReservationCardComponent {
                 AsyncImage(url: URL(string: "\(viewModel.environmentManager.getBaseURL())/assets/\(qrImage)")) { phase in
                     switch phase {
                     case .empty:
-                        ProgressView()
-                            .frame(width: 50, height: 50)
-                            .tint(.purple)
+                        VStack {
+                            Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 50)
+                            
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+                                .scaleEffect(1.5)
+                                .padding()
+                            
+                            Text("Cargando QR....")
+                                .font(.custom("Madridingamefont-Regular", size: 15))
+                                .foregroundColor(.white)
+                                .opacity(0.7)
+                        }
                     case .success(let image):
                         image
                             .resizable()
@@ -195,9 +208,22 @@ extension ReservationCardComponent {
             AsyncImage(url: URL(string: "https://webesports.madridingame.es/_next/static/media/reserve-rules.e49650ad.png")) { phase in
                 switch phase {
                 case .empty:
-                    ProgressView()
-                        .frame(width: 50, height: 50)
-                        .tint(.purple)
+                    VStack {
+                        Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 50)
+                        
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+                            .scaleEffect(1.5)
+                            .padding()
+                        
+                        Text("Cargando Normas de Uso....")
+                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .foregroundColor(.white)
+                            .opacity(0.7)
+                    }
                 case .success(let image):
                     image
                         .resizable()

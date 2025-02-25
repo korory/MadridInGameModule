@@ -22,12 +22,13 @@ struct EventModel: Identifiable, Codable {
     let id, notes: String?
     let players: [PlayerUsersModel]?
     let reserves: [Reserve]?
+    var teamName: String?
     let startDate, status, time, type: String
 
     enum CodingKeys: String, CodingKey {
         case id, notes, players, reserves
         case startDate = "start_date"
-        case status, time, type
+        case status, time, type, teamName
     }
 }
 

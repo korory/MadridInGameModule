@@ -17,6 +17,7 @@ struct SelectTeamsCellComponent: View {
                 teamImage
                 titleSubtitle
                 Spacer()
+                arrowPress
             }
         }
         .background(Color.black.opacity(0.9))
@@ -90,5 +91,15 @@ extension SelectTeamsCellComponent {
                 .foregroundColor(.white)
                 .padding(.leading, 8)
         }
+    }
+    
+    private var arrowPress: some View {
+        Image(systemName: "chevron.right") // Flecha que indica interacción
+            .resizable()
+            .frame(width: 5, height: 10)
+            .foregroundColor(.white)
+            .padding(.leading, 10)
+            .padding(.trailing, 10)
+
     }
 }
