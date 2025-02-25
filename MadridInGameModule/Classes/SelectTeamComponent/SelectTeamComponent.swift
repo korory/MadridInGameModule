@@ -28,13 +28,25 @@ struct SelectTeamComponent: View {
                     .padding(.bottom, 15)
                     .padding(.top, 20)
                 
+                RoundedRectangle(cornerRadius: 10.0)
+                    .frame(height: 2)
+                    .foregroundStyle(.white.opacity(0.1))
+                
                 ScrollView {
                     VStack(spacing: 15) {
                         ForEach(allTeams, id: \.id) { team in
-                            SelectTeamsCellComponent(team: team) { teamSelected in
-                                onTeamSelected(teamSelected)
+                            VStack {
+                                SelectTeamsCellComponent(team: team) { teamSelected in
+                                    onTeamSelected(teamSelected)
+                                }
+                                .padding(.leading, 10)
+                                
+                                RoundedRectangle(cornerRadius: 10.0)
+                                    .frame(height: 2)
+                                    .foregroundStyle(.white.opacity(0.1))
+                                    .padding(.leading, 10)
+                                    .padding(.trailing, 10)
                             }
-                            .padding(.leading, 10)
                         }
                     }
                     

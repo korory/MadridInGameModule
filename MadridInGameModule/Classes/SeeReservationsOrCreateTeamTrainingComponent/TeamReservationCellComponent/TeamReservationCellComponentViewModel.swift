@@ -25,6 +25,10 @@ class TeamReservationCellComponentViewModel: ObservableObject {
         self.showDeleteOption = showDeleteOption
     }
     
+    func getTeamName() -> String {
+        return self.reservation.teamName ?? ""
+    }
+    
     func getSystemImageNameOfReservationBasedOnType() -> String {
         //If reserves is empty that means that the reserve is online
         guard let reservationLocal = reservation.reserves else { return "desktopcomputer" }

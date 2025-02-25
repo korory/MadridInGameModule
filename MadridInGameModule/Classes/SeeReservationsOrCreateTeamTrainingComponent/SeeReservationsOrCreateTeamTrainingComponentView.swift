@@ -63,15 +63,20 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
     private var calendarComponent: some View {
         VStack (alignment: .center){
             HStack {
-                TextWithUnderlineComponent(title: viewModel.isUserMode ? "Calendario" : "Calendario Entrenamientos", underlineColor: Color.cyan)
+                if !viewModel.isUserMode {
+                    loadTeamImage
+                }
+                TextWithUnderlineComponent(title: viewModel.isUserMode ? "Calendario" : "Calendario", underlineColor: Color.cyan)
+                    .padding(.top, viewModel.isUserMode ? 10 : 0)
+                    .padding(.leading, viewModel.isUserMode ? 5 : 0)
                 Spacer()
                 Image(systemName: "arrowtriangle.down.fill")
                     .rotationEffect(.degrees(viewModel.calendarArrowRotation))
                     .animation(.easeInOut, value: viewModel.calendarArrowRotation)
                     .foregroundColor(.cyan)
             }
-            .padding(.top, 5)
-            .padding(.bottom, 25)
+            //.padding(.top, 5)
+            .padding(.bottom, 5)
             .onTapGesture {
                 withAnimation {
                     viewModel.isCalendarVisible.toggle()
@@ -79,11 +84,10 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                 }
             }
             if viewModel.isCalendarVisible {
-                CustomCalendarView(canUserInteract: !viewModel.isUserMode, markedDates: viewModel.markedDates) { stringDate in
+                CustomCalendarView(canUserInteract: false, markedDates: viewModel.markedDates) { stringDate in
                     viewModel.dateSelected = stringDate
                     viewModel.isDateSelected = true
                 }
-                .frame(height: 270)
             }
         }
     }
@@ -92,6 +96,8 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
         VStack {
             HStack (spacing: 8){
                 TextWithUnderlineComponent(title: viewModel.isDateSelected ? "Entrenamientos" : "Próximos entrenamientos", underlineColor: Color.cyan)
+                    .padding(.top, viewModel.isUserMode ? 10 : 0)
+                    .padding(.leading, viewModel.isUserMode ? 5 : 0)
                 
                 Spacer ()
                 
@@ -120,6 +126,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                     .font(.custom("Madridingamefont-Regular", size: 13))
                     .foregroundColor(.white)
                     .opacity(0.7)
+                    .padding(.leading, 2)
                 
                 ForEach(viewModel.allIndividualReservations, id: \.id) { individualReservation in
                     IndividualReservationsCellComponent(viewModel: IndividualReservationsCellViewModel(reservation: individualReservation, showDeleteOption: false)) { optionSelected in
@@ -140,5 +147,37 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             
         }
         .padding(5)
+    }
+    
+    private var loadTeamImage: some View {
+        let environmentManager = EnvironmentManager()
+        
+        return AnyView(
+            AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(viewModel.getTeamPicture())")) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                        .frame(width: 10, height: 10)
+                        .padding(.leading, 5)
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 48, height: 48)
+                        .clipShape(Circle())
+                        .padding(.leading, 5)
+                case .failure:
+                    Image(systemName: "person.2.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 40, height: 40)
+                        .clipShape(Circle())
+                        .padding(.leading, 5)
+                @unknown default:
+                    EmptyView()
+                }
+            }
+        )
     }
 }

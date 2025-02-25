@@ -66,6 +66,14 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
         getBlockedDays()
     }
     
+    func getTeamPicture() -> String {
+        return selectedTeam?.picture ?? ""
+    }
+    
+    func getTeamName() -> String {
+        return selectedTeam?.name ?? ""
+    }
+    
     func fetchTeamReservationsByUser(completion: @escaping () -> Void) {
         guard let user = userManager.getUser() else { return }
         
@@ -147,8 +155,9 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let reservations):
-                    for reservation in reservations {
+                    for var reservation in reservations {
                         if let createDate = Utils.createDate(from: reservation.startDate) {
+                            reservation.teamName = team.name
                             self?.allReservations.append(reservation)
                             self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate))
                         }
