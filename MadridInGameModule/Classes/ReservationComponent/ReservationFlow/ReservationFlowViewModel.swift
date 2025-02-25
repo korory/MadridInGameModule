@@ -12,7 +12,7 @@ class ReservationFlowViewModel: ObservableObject {
     @Published var currentStep: Int = 0
     
     // Datos seleccionados en el flujo
-//    @Published var selectedPlayer: String? = nil
+    //    @Published var selectedPlayer: String? = nil
     @Published var selectedDate: Date?
     
     // Datos cargados desde el backend
@@ -27,10 +27,11 @@ class ReservationFlowViewModel: ObservableObject {
     @Published var availableSpaces: [Space] = []
     @Published var selectedSpace: Space?
     @Published var isLoading: Bool = false
+    @Published var isCreatingReservation: Bool = false
     @Published var reservationSuccess: Bool = false
     
     @Published var userManager = UserManager.shared
-
+    
     var onReservationSuccess: () -> Void
     var onReservationFail: () -> Void
     
@@ -43,7 +44,7 @@ class ReservationFlowViewModel: ObservableObject {
         
         self.onReservationSuccess = onReservationSuccess
         self.onReservationFail = onReservationFail
-                
+        
         self.getBlockedDays()
         
         self.fetchTeamReservationsByUser {
@@ -78,14 +79,14 @@ class ReservationFlowViewModel: ObservableObject {
         reservationService.getReservesByUser(userId: userId ?? "") { [weak self] result in
             DispatchQueue.main.async {
                 defer { dispatchGroup.leave() } // Se asegura de salir del grupo al finalizar
-
+                
                 switch result {
                 case .success(let reservations):
                     let innerDispatchGroup = DispatchGroup()
-
+                    
                     for reservation in reservations {
                         innerDispatchGroup.enter()
-
+                        
                         if let createDate = Utils.createDate(from: reservation.date) {
                             DispatchQueue.main.async {
                                 self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, individualReservation: true))
@@ -97,13 +98,13 @@ class ReservationFlowViewModel: ObservableObject {
                     innerDispatchGroup.notify(queue: .main) {
                         print("Reservas obtenidas: \(reservations)")
                     }
-
+                    
                 case .failure(let error):
                     print("Error al obtener reservas: \(error)")
                 }
             }
         }
-
+        
         dispatchGroup.notify(queue: .main) {
             completion()
         }
@@ -111,7 +112,7 @@ class ReservationFlowViewModel: ObservableObject {
     
     func getBlockedDays() {
         self.isLoading = true
-
+        
         reservationService.getAllBlockedDays { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
@@ -131,58 +132,19 @@ class ReservationFlowViewModel: ObservableObject {
     
     func checkSelectedDate(_ stringDate: String) {
         self.selectedDate = convertToDate(from: stringDate)
-
+        
         if let matchingDate = self.markedDates.first(where: { $0.date == selectedDate }) {
             if matchingDate.blockedDays { return }
         }
-
+        
         self.currentStep += 1
     }
-
     
     func convertToDate(from dateString: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy" // Formato de la fecha seleccionada
         return formatter.date(from: dateString)
     }
-    
-//    private func calculateAvailableDates() {
-////        let today = Date()
-////        let calendar = Calendar.current
-////        
-////        var dates: [String] = []
-////        for offset in 0..<30 { // Calculamos los próximos 30 días
-////            if let date = calendar.date(byAdding: .day, value: offset, to: today) {
-////                let formattedDate = DateFormatter.apiDateFormatter.string(from: date)
-////                if !blockedDates.contains(formattedDate) {
-////                    dates.append(formattedDate)
-////                }
-////            }
-////        }
-////        availableDates = dates
-//    }
-    
-//    func fetchAvailableSlots(for dayValue: Int) {
-//        WeekTimeService.shared.fetchWeekTimeByDay(dayValue: dayValue) { [weak self] result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let slots):
-//                    for slot in slots {
-//                        
-//                        //guard let slotTime = slot.times else {continue}
-//                        
-//                        for time in slot.times {
-//                            self?.availableSlots.append(time.gamingSpaceTime)
-//                        }
-//                    }
-//                    //self?.availableSlots = slots
-//                    self?.updateEnabledSlots()
-//                case .failure(let error):
-//                    print("Error fetching slots: \(error)")
-//                }
-//            }
-//        }
-//    }
     
     func fetchAvailableSlots(for dayValue: Int) {
         WeekTimeService.shared.fetchWeekTimeByDay(dayValue: dayValue) { [weak self] result in
@@ -219,7 +181,7 @@ class ReservationFlowViewModel: ObservableObject {
             }
         }
     }
-
+    
     
     func updateEnabledSlots() {
         guard !selectedSlots.isEmpty else {
@@ -273,7 +235,7 @@ class ReservationFlowViewModel: ObservableObject {
                             slots: space.slots)
                         
                         self?.availableSpaces.append(space)
-
+                        
                     }
                     
                 case .failure(let error):
@@ -310,12 +272,10 @@ class ReservationFlowViewModel: ObservableObject {
             return
         }
         
-        // Crear el objeto de reserva
-        //let times = selectedSlots.map { $0.id }
         let times = selectedSlots
-//
+        
         let reservation = Reservation(
-            id: 0, // El backend genera el ID
+            id: 0,
             status: "active",
             slot: space.slots.first ?? Slot(id: 0, position: "", space: 0),
             date: date,
@@ -327,24 +287,97 @@ class ReservationFlowViewModel: ObservableObject {
             times: times,
             peripheralLoans: []
         )
-//        
-//        // Enviar la reserva al backend
-        self.isLoading = true
+
+        self.isCreatingReservation = true
         reservationService.createReservation(reservation: reservation) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
-                case .success:
-                    self?.reservationSuccess = true
-                    self?.onReservationSuccess()
-                    
+                case .success (let reservation):
+                    self?.updateReservationWithQR(reservationInfo: reservation)
                     print("Reserva creada exitosamente")
                 case .failure(let error):
+                    self?.isCreatingReservation = false
                     self?.reservationSuccess = false
                     self?.onReservationFail()
                     print("Error al crear la reserva: \(error.localizedDescription)")
                 }
             }
+        }
+    }
+    
+    func updateReservationWithQR(reservationInfo: ReserveResponse) {
+        
+        guard let reservationId = reservationInfo.id,
+              let qrValue = reservationInfo.qrValue else { return }
+        
+        guard let date = selectedDate,
+              let space = selectedSpace,
+              let userId = userManager.getUser()?.id,
+              !selectedSlots.isEmpty else {
+            print("Datos incompletos para crear la reserva")
+            return
+        }
+        
+        let times = selectedSlots
+        
+        if let qrImage = QRCodeGenerator.generateQRCode(with: qrValue) {
+            UploadImageService().uploadImage(image: qrImage, fileName: "\(qrValue).jpg" ,completion: { result in
+                switch result {
+                case .success(let response):
+                    print("Imagen subida con éxito: \(response)")
+                    
+                    if let data = response.data(using: .utf8) {
+                        do {
+                            let decodedResponse = try JSONDecoder().decode(SendImageResponse.self, from: data)
+                            let fileId = decodedResponse.data.id
+                            print("Imagen subida con éxito. ID: \(fileId)")
+                            
+                            
+                            let reservation = Reservation(
+                                id: 0, // El backend genera el ID
+                                status: "active",
+                                slot: space.slots.first ?? Slot(id: 0, position: "", space: 0),
+                                date: date,
+                                user: userId,
+                                team: nil,
+                                training: nil,
+                                qrImage: fileId,
+                                qrValue: qrValue,
+                                times: times,
+                                peripheralLoans: []
+                            )
+                            
+                            self.reservationService.updateExistingReservation(reservationId: reservationId, qrImage: fileId, reservation: reservation) { [weak self] result in
+                                DispatchQueue.main.async {
+                                    self?.isLoading = false
+                                    switch result {
+                                    case .success:
+                                        self?.isCreatingReservation = true
+                                        print("Reserva creada exitosamente")
+                                        self?.reservationSuccess = true
+                                        self?.onReservationSuccess()
+
+                                    case .failure(let error):
+                                        self?.isCreatingReservation = true
+                                        print("Error al crear la reserva: \(error.localizedDescription)")
+                                        self?.reservationSuccess = false
+                                        self?.onReservationFail()
+                                    }
+                                }
+                            }
+                            
+                        } catch {
+                            print("Error al decodificar JSON: \(error)")
+                        }
+                    }
+                case .failure(let error):
+                    print("Error al subir la imagen: \(error.localizedDescription)")
+                    self.isCreatingReservation = true
+                    self.reservationSuccess = false
+                    self.onReservationFail()
+                }
+            })
         }
     }
 }

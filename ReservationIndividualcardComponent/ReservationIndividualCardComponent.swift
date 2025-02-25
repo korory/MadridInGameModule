@@ -154,13 +154,28 @@ extension ReservationIndividualCardComponent {
     private func imageReservationQr(_ imageSize: CGFloat) -> some View {
         let qrValue = viewModel.reservation.qrImage;
         
+        let environmentManager = EnvironmentManager()
+        
         return AnyView(
-            AsyncImage(url: URL(string: "https://premig.randomkesports.com/cms/assets/\(qrValue ?? "")")) { phase in
+            AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(qrValue ?? "")")) { phase in
                 switch phase {
                 case .empty:
-                    ProgressView()
-                        .frame(width: 50, height: 50)
-                        .tint(.purple)
+                    VStack {
+                        Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 50)
+                        
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+                            .scaleEffect(1.5)
+                            .padding()
+                        
+                        Text("Cargando QR....")
+                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .foregroundColor(.white)
+                            .opacity(0.7)
+                    }
                 case .success(let image):
                     image
                         .resizable()
@@ -182,13 +197,27 @@ extension ReservationIndividualCardComponent {
     }
     
     private func imageNormasUso(_ imageSize: CGFloat) -> some View {
+        
         return AnyView(
-            AsyncImage(url: URL(string: "https://premig.randomkesports.com/_next/static/media/reserve-rules.e49650ad.png")) { phase in
+            AsyncImage(url: URL(string: "https://webesports.madridingame.es/_next/static/media/reserve-rules.e49650ad.png")) { phase in
                 switch phase {
                 case .empty:
-                    ProgressView()
-                        .frame(width: 50, height: 50)
-                        .tint(.purple)
+                    VStack {
+                        Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 50)
+                        
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+                            .scaleEffect(1.5)
+                            .padding()
+                        
+                        Text("Cargando Normas de Uso....")
+                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .foregroundColor(.white)
+                            .opacity(0.7)
+                    }
                 case .success(let image):
                     image
                         .resizable()

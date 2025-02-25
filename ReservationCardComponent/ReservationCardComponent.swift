@@ -151,7 +151,7 @@ extension ReservationCardComponent {
     private func imageReservationQr(_ imageSize: CGFloat) -> some View {
         if let qrImage = viewModel.reservation.reserves?.first?.qrImage {
             return AnyView(
-                AsyncImage(url: URL(string: "https://premig.randomkesports.com/cms/assets/\(qrImage)")) { phase in
+                AsyncImage(url: URL(string: "\(viewModel.environmentManager.getBaseURL())/assets/\(qrImage)")) { phase in
                     switch phase {
                     case .empty:
                         ProgressView()
@@ -192,7 +192,7 @@ extension ReservationCardComponent {
     
     private func imageNormasUso(_ imageSize: CGFloat) -> some View {
         return AnyView(
-            AsyncImage(url: URL(string: "https://premig.randomkesports.com/_next/static/media/reserve-rules.e49650ad.png")) { phase in
+            AsyncImage(url: URL(string: "https://webesports.madridingame.es/_next/static/media/reserve-rules.e49650ad.png")) { phase in
                 switch phase {
                 case .empty:
                     ProgressView()
@@ -230,7 +230,7 @@ extension ReservationCardComponent {
                     ForEach(viewModel.getAllPlayers()) { player in
                         VStack {
                             if let avatar = player.userId?.avatar, !avatar.isEmpty {
-                                AsyncImage(url: URL(string: "https://premig.randomkesports.com/cms/assets/\(avatar)")) { phase in
+                                AsyncImage(url: URL(string: "\(viewModel.environmentManager.getBaseURL())/assets/\(avatar)")) { phase in
                                     switch phase {
                                     case .empty:
                                         ProgressView()

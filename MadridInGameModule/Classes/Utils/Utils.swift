@@ -48,3 +48,35 @@ extension String {
         return attr?.string ?? self
     }
 }
+
+extension UserDefaults {
+    private static let logoMIGKey = "logoMIGKey"
+    private static let qrMiddleLogo = "qrMiddleLogo"
+
+    static func saveLogoMIG(_ image: UIImage) {
+        if let data = image.pngData() {
+            UserDefaults.standard.set(data, forKey: logoMIGKey)
+        }
+    }
+    
+    static func getLogoMIG() -> UIImage? {
+        if let data = UserDefaults.standard.data(forKey: logoMIGKey) {
+            return UIImage(data: data)
+        }
+        return nil
+    }
+    
+    static func saveQrMiddleLogo(_ image: UIImage) {
+        if let data = image.pngData() {
+            UserDefaults.standard.set(data, forKey: qrMiddleLogo)
+        }
+    }
+    
+    static func getQRMiddleLogo() -> UIImage? {
+        if let data = UserDefaults.standard.data(forKey: qrMiddleLogo) {
+            return UIImage(data: data)
+        }
+        return nil
+    }
+}
+

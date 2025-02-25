@@ -33,11 +33,11 @@ extension DashboardScreenView {
                         }
                         .tag(TabBarDashboardBottom.reservation)
                     
-                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: true, allTeams: []))
-                        .tabItem {
-                            Label("Equipos", systemImage: "person.3.fill")
-                        }
-                        .tag(TabBarDashboardBottom.teams)
+//                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: true, allTeams: []))
+//                        .tabItem {
+//                            Label("Equipos", systemImage: "person.3.fill")
+//                        }
+//                        .tag(TabBarDashboardBottom.teams)
 
                     
                     ProfileInformationComponentView()

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TeamsScreenView: View {
     @StateObject private var viewModel = TeamsScreenViewModel()
+    @State private var changeButtonPressed: Bool = false
     
     var body: some View {
         VStack {
@@ -49,11 +50,22 @@ extension TeamsScreenView {
                         .tag(TabBarTeamsBottom.team
                         )
                     
-                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: false, allTeams: []))
-                        .tabItem {
-                            Label("Equipo", systemImage: "person.3.fill")
-                        }
-                        .tag(TabBarTeamsBottom.players)
+//                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: false, allTeams: []))
+//                        .tabItem {
+//                            Label("Equipo", systemImage: "person.3.fill")
+//                        }
+//                        .tag(TabBarTeamsBottom.players)
+                        SelectTeamComponent(allTeams: viewModel.getAllTeams(),
+                                            onTeamSelected: { team in
+                            self.viewModel.setTeamSelected(team: team)
+                            self.viewModel.optionTabSelected = .trainning
+                            self.viewModel.selectedTab = TabBarTeamsBottom.trainning
+                        })
+                            .tabItem {
+                                Label("Cambio Equipo", systemImage: "arrow.left.arrow.right")
+                            }
+                            .tag(TabBarTeamsBottom.changeTeam)
+                    
                 }
                 .accentColor(.cyan)
                 //.padding(.top)

@@ -18,8 +18,17 @@ class DashboardScreenViewModel: ObservableObject {
     @Published var selectedTab: TabBarDashboardBottom = .calendar
     @Published var optionTabSelected: TabBarDashboardBottom? = .calendar
     @Published var userManager = UserManager.shared
+    @Published var environmentManager = EnvironmentManager()
 
     init() {
         optionTabSelected = .calendar
+    }
+    
+    func getProfileImageCode() -> String {
+        return userManager.getUser()?.avatar ?? ""
+    }
+    
+    func returnURLToAvatar() -> String {
+        return  "\(self.environmentManager.getBaseURL())/assets/\(self.getProfileImageCode())"
     }
 }

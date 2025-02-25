@@ -12,8 +12,7 @@ struct PlayersTeamComponentView: View {
                 .ignoresSafeArea(.all)
             
             if viewModel.isLoading {
-                ProgressView("Cargando equipo...")
-                    .foregroundColor(.white)
+                LoadingView(message: "Cargando equipo...")
             } else if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
                     .font(.headline)

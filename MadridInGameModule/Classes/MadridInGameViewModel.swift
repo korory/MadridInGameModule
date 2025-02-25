@@ -15,14 +15,13 @@ class MadridInGameViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var openCompetitions: Bool
 
-    
     private let email: String
     private let userManager = UserManager.shared
     private let environmentManager: EnvironmentManager
     
-    init(email: String, environment: String, openCompetitions: Bool) {
+    init(email: String, isPro: Bool, openCompetitions: Bool) {
         self.email = email
-        self.environmentManager = EnvironmentManager(environment: environment)
+        self.environmentManager = EnvironmentManager(isPro: isPro)
         self.openCompetitions = openCompetitions
         
         if self.openCompetitions {

@@ -39,18 +39,7 @@ struct IndividualReservationsComponentView: View {
                 }
                 
                 if viewModel.isLoading {
-                    VStack {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
-                            .scaleEffect(1.5)
-                            .padding()
-                        
-                        Text("Obteniendo tus reservas...")
-                            .font(.custom("Madridingamefont-Regular", size: 15))
-                            .foregroundColor(.white)
-                            .opacity(0.7)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    LoadingView(message: "Obteniendo tus reservas...")
                     
                 } else {
                     VStack (spacing: 10){
@@ -145,7 +134,7 @@ extension IndividualReservationsComponentView {
             VStack(alignment: .leading, spacing: 20) {
                 ForEach(viewModel.allIndividualReservations, id: \.id) { individualReservation in
                     IndividualReservationsCellComponent(
-                        viewModel: IndividualReservationsCellViewModel(reservation: individualReservation)
+                        viewModel: IndividualReservationsCellViewModel(reservation: individualReservation, showDeleteOption: true)
                     ) { optionSelected in
                         viewModel.trainingIndividualListCellPressed(individualSelectedInformation: individualReservation, optionSelected: optionSelected)
                     }

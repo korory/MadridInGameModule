@@ -13,6 +13,7 @@ class ReservationCardViewModel: ObservableObject {
     @Published var rotationY: Double = 0
     @Published var isFlipped: Bool = false
     @Published var originalBrightness: CGFloat = UIScreen.main.brightness
+    @Published var environmentManager = EnvironmentManager()
 
     init(reservation: EventModel) {
         self.reservation = reservation
