@@ -12,6 +12,7 @@ enum TabBarTeamsBottom: Hashable {
     case news
     case team
     case players
+    case changeTeam
 }
 
 class TeamsScreenViewModel: ObservableObject {
@@ -23,6 +24,12 @@ class TeamsScreenViewModel: ObservableObject {
 
     init() {
         optionTabSelected = .trainning
+    }
+    
+    func resetTeamSelected() {
+        optionTabSelected = .trainning
+        self.selectedTeam = nil
+        self.teamSelected = false
     }
     
     func getAllTeams() -> [TeamModelReal] {

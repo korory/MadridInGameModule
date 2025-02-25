@@ -137,10 +137,26 @@ struct SelectDateView: View {
                 .padding(.bottom, 20)
             
             if viewModel.markedDates.isEmpty { //&& viewModel.blockedDates.isEmpty {
-                LoadingView(message: "Cargando fechas disponibles...")
-                    .onAppear {
-                        viewModel.getBlockedDays()
-                    }
+                VStack {
+                    Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 50)
+                    
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                        .scaleEffect(1.5)
+                        .padding()
+                    
+                    Text("Cargando fechas disponibles...")
+                        .font(.custom("Madridingamefont-Regular", size: 15))
+                        .foregroundColor(.white)
+                        .opacity(0.7)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onAppear {
+                    viewModel.getBlockedDays()
+                }
             } else {
                 CustomCalendarView(canUserInteract: true, markedDates: viewModel.markedDates) { stringDate in
                     viewModel.checkSelectedDate(stringDate)
@@ -173,10 +189,26 @@ struct SelectSlotView: View {
                 .padding(.bottom, 20)
             
             if viewModel.availableSlots.isEmpty {
-                LoadingView(message: "Cargando horarios disponibles...")
-                    .onAppear {
-                        viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate?.formatted() ?? "01/01/2029"))
-                    }
+                VStack {
+                    Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 50)
+                    
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                        .scaleEffect(1.5)
+                        .padding()
+                    
+                    Text("Cargando horarios disponibles...")
+                        .font(.custom("Madridingamefont-Regular", size: 15))
+                        .foregroundColor(.white)
+                        .opacity(0.7)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onAppear {
+                    viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate?.formatted() ?? "01/01/2029"))
+                }
             } else {
                 ScrollView {
                     LazyVGrid(
@@ -243,49 +275,85 @@ struct SelectSpaceView: View {
     @ObservedObject var viewModel: ReservationFlowViewModel
     
     var body: some View {
-        VStack {
-            Text("Selecciona un espacio")
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.bottom, 20)
-            
-            if viewModel.availableSpaces.isEmpty {
-                LoadingView(message: "Cargando espacios disponibles...")
+        if (viewModel.isCreatingReservation){
+            VStack {
+                Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 50)
+                
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                    .scaleEffect(1.5)
+                    .padding()
+                
+                Text("Creando la reserva...")
+                    .font(.custom("Madridingamefont-Regular", size: 15))
+                    .foregroundColor(.white)
+                    .opacity(0.7)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            VStack {
+                Text("Selecciona un espacio")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.bottom, 20)
+                
+                if viewModel.availableSpaces.isEmpty {
+                    VStack {
+                        Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 50)
+                        
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                            .scaleEffect(1.5)
+                            .padding()
+                        
+                        Text("Cargando espacios disponibles...")
+                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .foregroundColor(.white)
+                            .opacity(0.7)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .onAppear {
                         viewModel.fetchAvailableSpaces()
                     }
                     
-            } else {
-                ScrollView {
-                    LazyVGrid(
-                        columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
-                        spacing: 20
-                    ) {
-                        ForEach(viewModel.availableSpaces) { space in
-                            spaceButton(for: space)
+                } else {
+                    ScrollView {
+                        LazyVGrid(
+                            columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
+                            spacing: 20
+                        ) {
+                            ForEach(viewModel.availableSpaces) { space in
+                                spaceButton(for: space)
+                            }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                 }
+                
+                Spacer()
+                
+                // Botón "Reservar"
+                Button(action: {
+                    viewModel.createReservation()
+                }) {
+                    Text("Reservar")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil ? Color.gray : Color.cyan)
+                        .foregroundColor(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil ? Color.white.opacity(0.5) : .white)
+                        .cornerRadius(18)
+                }
+                .disabled(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil || viewModel.isLoading)
+                .padding(.horizontal)
             }
-            
-            Spacer()
-            
-            // Botón "Reservar"
-            Button(action: {
-                viewModel.createReservation()
-            }) {
-                Text("Reservar")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil ? Color.gray : Color.cyan)
-                    .foregroundColor(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil ? Color.white.opacity(0.5) : .white)
-                    .cornerRadius(18)
-            }
-            .disabled(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil || viewModel.isLoading)
-            .padding(.horizontal)
+            .padding()
         }
-        .padding()
     }
     
     private func spaceButton(for space: Space) -> some View {

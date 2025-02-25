@@ -6,8 +6,9 @@ import SwiftUI
 public struct MadridInGameModule: View {
     @StateObject private var viewModel: MadridInGameViewModel
     
-    public init(email: String, isPro: Bool, logoMIG: UIImage, openCompetitions: Bool ) {
+    public init(email: String, isPro: Bool, logoMIG: UIImage, qrMiddleLogo: UIImage, openCompetitions: Bool ) {
         UserDefaults.saveLogoMIG(logoMIG)
+        UserDefaults.saveQrMiddleLogo(qrMiddleLogo)
 
         _viewModel = StateObject(wrappedValue: MadridInGameViewModel(email: email, isPro: isPro, openCompetitions: openCompetitions))
     }

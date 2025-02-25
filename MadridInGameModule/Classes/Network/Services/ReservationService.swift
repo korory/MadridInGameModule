@@ -20,24 +20,6 @@ struct TeamReservation: Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id, date, slot, times
     }
-    
-//    init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        id = try container.decode(Int.self, forKey: .id)
-//        slot = try container.decode(Slot.self, forKey: .slot)
-//        
-//        // Decodificar y convertir `date`
-//        let dateString = try container.decode(String.self, forKey: .date)
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "yyyy-MM-dd"
-//        guard let parsedDate = formatter.date(from: dateString) else {
-//            throw DecodingError.dataCorruptedError(forKey: .date, in: container, debugDescription: "Invalid date format")
-//        }
-//        date = parsedDate
-//        
-//        let timesContainer = try container.decode([[String: GamingSpaceTime]].self, forKey: .times)
-//        times = timesContainer.compactMap { $0["gaming_space_times_id"] }
-//    }
 }
 
 struct IndividualReservationResponse: Codable {
@@ -105,58 +87,6 @@ struct Reservation: Codable {
         case id, status, slot, date, user, team, training, qrImage, qrValue, times
         case peripheralLoans = "peripheral_loans"
     }
-    
-//    init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        id = try container.decodeIfPresent(Int.self, forKey: .id)
-//        status = try container.decodeIfPresent(String.self, forKey: .status)
-//        slot = try container.decode(Slot.self, forKey: .slot)
-//        user = try container.decodeIfPresent(String.self, forKey: .user)
-//        team = try container.decodeIfPresent(String.self, forKey: .team)
-//        training = try container.decodeIfPresent(String.self, forKey: .training)
-//        qrImage = try container.decodeIfPresent(String.self, forKey: .qrImage)
-//        qrValue = try container.decodeIfPresent(String.self, forKey: .qrValue)
-//        //times = try container.decode([GamingSpaceTime].self, forKey: .times)
-//        peripheralLoans = try container.decodeIfPresent([Int].self, forKey: .peripheralLoans)
-//        
-//        let dateString = try container.decode(String.self, forKey: .date)
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "yyyy-MM-dd"
-//        guard let parsedDate = formatter.date(from: dateString) else {
-//            throw DecodingError.dataCorruptedError(forKey: .date, in: container, debugDescription: "Formato de fecha inválido")
-//        }
-//        date = parsedDate
-//        
-//        let timesContainer = try container.decode([[String: GamingSpaceTime]].self, forKey: .times)
-//                times = timesContainer.compactMap { $0["gaming_space_times_id"] }
-//    }
-    
-//    init(
-//        id: Int,
-//        status: String? = nil,
-//        slot: Slot,
-//        date: Date,
-//        user: String? = nil,
-//        team: String? = nil,
-//        training: String? = nil,
-//        qrImage: String? = nil,
-//        qrValue: String? = nil,
-//        times: [GamingSpaceTime] = [],
-//        peripheralLoans: [Int] = []
-//    ) {
-//        self.id = id
-//        self.status = status
-//        self.slot = slot
-//        self.date = date
-//        self.user = user
-//        self.team = team
-//        self.training = training
-//        self.qrImage = qrImage
-//        self.qrValue = qrValue
-//        self.times = times
-//        self.peripheralLoans = peripheralLoans
-//    }
-    
 }
 
 class ReservationService {
@@ -203,6 +133,47 @@ class ReservationService {
             }
     }
     
+    func updateExistingReservation(reservationId: Int, qrImage: String, reservation: Reservation, completion: @escaping (Result<ReserveResponse, Error>) -> Void) {
+        
+        // Configurar el codificador para fechas
+        let encoder = JSONEncoder()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd" // Formato esperado para la fecha
+        encoder.dateEncodingStrategy = .formatted(dateFormatter)
+
+        // Crear el diccionario con los datos de la reserva
+        var reservationDict: [String: Any] = [
+            "qrImage": qrImage,
+        ]
+        
+        let timesMapped = reservation.times.map { ["gaming_space_times_id": ["id": $0.id]] }
+        reservationDict["times"] = timesMapped
+
+        // Endpoint para actualizar la reserva específica
+        let endpoint = "gaming_space_reserves/\(reservationId)"
+
+        Task {
+            do {
+                let reserveResponseModel: ReserveResponseModel = try await DirectusService.shared.sendRequest(
+                    endpoint: endpoint,
+                    method: .PATCH,
+                    body: reservationDict
+                )
+                
+                if reserveResponseModel.data.id != 0 {
+                    print("Reserva actualizada con éxito: \(reserveResponseModel.data)")
+                    completion(.success(reserveResponseModel.data))
+                } else {
+                    print("Error: No se recibieron datos válidos.")
+                    completion(.failure(NSError(domain: "com.example.error", code: 0, userInfo: [NSLocalizedDescriptionKey: "No se recibieron datos válidos."])))
+                }
+            } catch {
+                print("Error al actualizar la reserva: \(error)")
+                completion(.failure(error))
+            }
+        }
+    }
+
     func getAllTrainnings(teamId: String, userId: String, completion: @escaping (Result<[EventModel], Error>) -> Void) {
         let parameters: [String: String] = [
             "fields": "id, status, start_date, time, players.users_id.id, players.users_id.avatar, players.users_id.email, players.users_id.first_name, type, reserves.*, reserves.team.name, reserves.team.picture, reserves.times.gaming_space_times_id.time, notes",
