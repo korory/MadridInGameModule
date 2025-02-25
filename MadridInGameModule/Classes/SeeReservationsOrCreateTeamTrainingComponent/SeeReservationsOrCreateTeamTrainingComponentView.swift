@@ -28,18 +28,7 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
             }
             
             if viewModel.isLoading {
-                VStack {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
-                        .scaleEffect(1.5)
-                        .padding()
-                    
-                    Text("Preparando tu calendario...")
-                        .font(.custom("Madridingamefont-Regular", size: 15))
-                        .foregroundColor(.white)
-                        .opacity(0.7)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                LoadingView(message: "Preparando tu calendario...")
                 
             } else {
                 VStack (alignment: .leading) {
@@ -65,42 +54,6 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                     ReservationIndividualCardComponent(viewModel: ReservationIndividualCardViewModel(reservation: reservation))
                         .zIndex(1)
                 }
-                
-//                CustomPopup(isPresented: Binding(
-//                    get: { viewModel.isEditTraning },
-//                    set: { viewModel.isEditTraning = $0 }
-//                )) {
-//                    //EditTrainingComponentView(reservationModel: viewModel.teamReservationCellInformation)
-//                    EmptyView()
-//                }
-//                .transition(.scale)
-//                .zIndex(1)
-                
-                CustomPopup(isPresented: Binding(
-                    get: { viewModel.isRemoveTraning },
-                    set: { viewModel.isRemoveTraning = $0 }
-                )) {
-                    CancelOrDeleteComponent(title: "CANCELAR RESERVA", subtitle: "¿Quieres cancelar este entrenamiento?") {
-                        self.viewModel.isRemoveTraning = false
-                    } aceptedAction: {
-                        self.viewModel.isRemoveTraning = false
-                        self.viewModel.deleteReservation()
-                        //TODO: Remove this to backend
-                    }
-                }
-                //.transition(.scale)
-                .zIndex(1)
-                
-//                CustomPopup(isPresented: Binding(
-//                    get: { viewModel.isCreateNewTraining },
-//                    set: { viewModel.isCreateNewTraining = $0 }
-//                )) {
-//                    CreateNewTrainingView(viewModel: CreateNewTrainingViewModel(dateSelected: viewModel.dateSelected, availableHoursReservation: ["14:00", "15:00", "16:00", "17:00", "18:00", "19:00"], availableConsoleReservation: ["PC", "Xbox", "PlayStation", "Tablet"])) {
-//                        self.viewModel.isCreateNewTraining = false
-//                    }
-//                }
-//                .transition(.scale)
-//                .zIndex(1)
             }
         }
     }
@@ -140,18 +93,6 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             HStack (spacing: 8){
                 TextWithUnderlineComponent(title: viewModel.isDateSelected ? "Entrenamientos" : "Próximos entrenamientos", underlineColor: Color.cyan)
                 
-//                if (viewModel.isDateSelected){
-//                    Button {
-//                        self.viewModel.isCreateNewTraining = true
-//                    } label: {
-//                            Image(systemName: "plus.circle.fill")
-//                                .resizable()
-//                                .frame(width: 20, height: 20)
-//                                .clipShape(Circle())
-//                                .foregroundStyle(Color.cyan)
-//                    }
-//                }
-                
                 Spacer ()
                 
                 Image(systemName: "arrowtriangle.down.fill")
@@ -181,7 +122,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                     .opacity(0.7)
                 
                 ForEach(viewModel.allIndividualReservations, id: \.id) { individualReservation in
-                    IndividualReservationsCellComponent(viewModel: IndividualReservationsCellViewModel(reservation: individualReservation)) { optionSelected in
+                    IndividualReservationsCellComponent(viewModel: IndividualReservationsCellViewModel(reservation: individualReservation, showDeleteOption: false)) { optionSelected in
                         viewModel.trainingIndividualListCellPressed(individualSelectedInformation: individualReservation, optionSelected: optionSelected)
                     }
                 }
@@ -192,8 +133,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                 .opacity(0.7)
 
             ForEach(viewModel.allReservations, id: \.id) { reservation in
-                TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation
-                )) { optionSelected in
+                TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation, showDeleteOption: false)) { optionSelected in
                     viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)
                 }
             }

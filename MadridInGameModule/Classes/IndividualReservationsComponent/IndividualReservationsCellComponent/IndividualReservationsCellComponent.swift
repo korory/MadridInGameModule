@@ -68,13 +68,15 @@ extension IndividualReservationsCellComponent {
             
             Spacer()
             
-            Button {
-                action(.removeCell)
-            } label: {
-                Image(systemName: "minus.circle")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundStyle(Color.red)
+            if viewModel.showDeleteOption {
+                Button {
+                    action(.removeCell)
+                } label: {
+                    Image(systemName: "minus.circle")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(Color.red)
+                }
             }
         }
     }

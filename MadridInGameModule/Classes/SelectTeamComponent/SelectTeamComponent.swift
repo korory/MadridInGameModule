@@ -26,30 +26,21 @@ struct SelectTeamComponent: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
                     .padding(.bottom, 15)
+                    .padding(.top, 20)
                 
                 ScrollView {
                     VStack(spacing: 15) {
                         ForEach(allTeams, id: \.id) { team in
-                            Button(action: {
-                                onTeamSelected(team)
-                            }) {
-                                Text(team.name ?? "Equipo sin nombre")
-                                    .font(.custom("Madridingamefont-Regular", size: 15))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.cyan)
-                                    .cornerRadius(12)
-                                    .shadow(color: Color.cyan.opacity(0.5), radius: 5, x: 0, y: 3)
-                                    .padding(.horizontal, 30)
+                            SelectTeamsCellComponent(team: team) { teamSelected in
+                                onTeamSelected(teamSelected)
                             }
-                            .buttonStyle(ScaleButtonStyle())
+                            .padding(.leading, 10)
                         }
                     }
                     
                 }
-                .frame(height: 280)
                 .scrollIndicators(.visible)
+                .padding(.top, 10)
                 
                 Spacer()
             }

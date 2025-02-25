@@ -137,21 +137,10 @@ struct SelectDateView: View {
                 .padding(.bottom, 20)
             
             if viewModel.markedDates.isEmpty { //&& viewModel.blockedDates.isEmpty {
-                VStack {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
-                        .scaleEffect(1.5)
-                        .padding()
-                    
-                    Text("Cargando fechas disponibles...")
-                        .font(.custom("Madridingamefont-Regular", size: 15))
-                        .foregroundColor(.white)
-                        .opacity(0.7)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .onAppear {
-                    viewModel.getBlockedDays()
-                }
+                LoadingView(message: "Cargando fechas disponibles...")
+                    .onAppear {
+                        viewModel.getBlockedDays()
+                    }
             } else {
                 CustomCalendarView(canUserInteract: true, markedDates: viewModel.markedDates) { stringDate in
                     viewModel.checkSelectedDate(stringDate)
@@ -184,21 +173,10 @@ struct SelectSlotView: View {
                 .padding(.bottom, 20)
             
             if viewModel.availableSlots.isEmpty {
-                VStack {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
-                        .scaleEffect(1.5)
-                        .padding()
-                    
-                    Text("Cargando horarios disponibles...")
-                        .font(.custom("Madridingamefont-Regular", size: 15))
-                        .foregroundColor(.white)
-                        .opacity(0.7)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .onAppear {
-                    viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate?.formatted() ?? "01/01/2029"))
-                }
+                LoadingView(message: "Cargando horarios disponibles...")
+                    .onAppear {
+                        viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate?.formatted() ?? "01/01/2029"))
+                    }
             } else {
                 ScrollView {
                     LazyVGrid(
@@ -272,21 +250,10 @@ struct SelectSpaceView: View {
                 .padding(.bottom, 20)
             
             if viewModel.availableSpaces.isEmpty {
-                VStack {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
-                        .scaleEffect(1.5)
-                        .padding()
-                    
-                    Text("Cargando espacios disponibles...")
-                        .font(.custom("Madridingamefont-Regular", size: 15))
-                        .foregroundColor(.white)
-                        .opacity(0.7)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .onAppear {
-                    viewModel.fetchAvailableSpaces()
-                }
+                LoadingView(message: "Cargando espacios disponibles...")
+                    .onAppear {
+                        viewModel.fetchAvailableSpaces()
+                    }
                     
             } else {
                 ScrollView {

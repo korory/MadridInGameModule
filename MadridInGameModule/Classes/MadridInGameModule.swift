@@ -5,12 +5,11 @@ import SwiftUI
 
 public struct MadridInGameModule: View {
     @StateObject private var viewModel: MadridInGameViewModel
-
-    private let logoMIG: UIImage
     
-    public init(email: String, environment: String, logoMIG: UIImage, openCompetitions: Bool ) {
-        _viewModel = StateObject(wrappedValue: MadridInGameViewModel(email: email, environment: environment, openCompetitions: openCompetitions))
-        self.logoMIG = logoMIG
+    public init(email: String, isPro: Bool, logoMIG: UIImage, openCompetitions: Bool ) {
+        UserDefaults.saveLogoMIG(logoMIG)
+
+        _viewModel = StateObject(wrappedValue: MadridInGameViewModel(email: email, isPro: isPro, openCompetitions: openCompetitions))
     }
     
     public var body: some View {
@@ -19,7 +18,7 @@ public struct MadridInGameModule: View {
                 .ignoresSafeArea(.all)
             
             if viewModel.isLoading {
-                LoadingView(logoMIG: logoMIG)
+                LoadingView(message: "Preparando tu experiencia...")
             } else if let errorMessage = viewModel.errorMessage {
                 errorView(errorMessage)
             } else if let user = viewModel.user {

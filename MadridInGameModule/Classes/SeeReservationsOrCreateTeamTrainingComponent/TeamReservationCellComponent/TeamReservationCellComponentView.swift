@@ -7,6 +7,7 @@ struct TeamReservationCellComponentView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             iconDateAndRemoveBannerComponent
+            showReservationLocarion
             playersCarouselComponent
             if viewModel.reservation.notes != "" {
                 descriptionComponent
@@ -37,15 +38,23 @@ extension TeamReservationCellComponentView {
             
             Spacer()
             
-            Button {
-                action(.removeCell)
-            } label: {
-                Image(systemName: "minus.circle")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundStyle(Color.red)
+            if viewModel.showDeleteOption {
+                Button {
+                    action(.removeCell)
+                } label: {
+                    Image(systemName: "minus.circle")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(Color.red)
+                }
             }
         }
+    }
+    
+    private var showReservationLocarion: some View {
+        Text(viewModel.getReservationSite())
+            .font(.custom("Madridingamefont-Regular", size: 14))
+            .foregroundStyle(Color.white.opacity(0.8))
     }
     
     private var playersCarouselComponent: some View {
@@ -62,7 +71,7 @@ extension TeamReservationCellComponentView {
                     ForEach(viewModel.getAllPlayers()) { player in
                         VStack {
                             if let avatar = player.userId?.avatar, !avatar.isEmpty {
-                                AsyncImage(url: URL(string: "https://premig.randomkesports.com/cms/assets/\(avatar)")) { phase in
+                                AsyncImage(url: URL(string: "\(viewModel.environmentManager.getBaseURL())/assets/\(avatar)")) { phase in
                                     switch phase {
                                     case .empty:
                                         ProgressView()

@@ -48,3 +48,21 @@ extension String {
         return attr?.string ?? self
     }
 }
+
+extension UserDefaults {
+    private static let logoMIGKey = "logoMIGKey"
+    
+    static func saveLogoMIG(_ image: UIImage) {
+        if let data = image.pngData() {
+            UserDefaults.standard.set(data, forKey: logoMIGKey)
+        }
+    }
+    
+    static func getLogoMIG() -> UIImage? {
+        if let data = UserDefaults.standard.data(forKey: logoMIGKey) {
+            return UIImage(data: data)
+        }
+        return nil
+    }
+}
+

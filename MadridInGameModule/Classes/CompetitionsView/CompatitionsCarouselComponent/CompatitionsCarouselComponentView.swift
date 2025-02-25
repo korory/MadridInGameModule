@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CompatitionsCarouselComponentView: View {
     let leagueInformation: LeagueModel
+    let environmentManager = EnvironmentManager()
     
     var body: some View {
         ZStack {
@@ -52,7 +53,7 @@ extension CompatitionsCarouselComponentView {
                 ForEach(leagueInformation.allCompetitions) { competitonInformation in
                     VStack {
                         NavigationLink(destination: CompatitionsDetailViewComponentView(viewModel: CompetitionsDetailViewModel(competitionsInformation: competitonInformation))) {
-                            AsyncImage(url: URL(string: "https://premig.randomkesports.com/cms/assets/\(competitonInformation.game?.image ?? "")")) { phase in
+                            AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(competitonInformation.game?.image ?? "")")) { phase in
                                 switch phase {
                                 case .empty:
                                     ProgressView()

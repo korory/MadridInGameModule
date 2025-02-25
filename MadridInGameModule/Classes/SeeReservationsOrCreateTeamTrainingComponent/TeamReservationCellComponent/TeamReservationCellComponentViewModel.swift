@@ -17,9 +17,12 @@ import SwiftUI
 
 class TeamReservationCellComponentViewModel: ObservableObject {
     @Published var reservation: EventModel
+    @Published var environmentManager = EnvironmentManager()
+    var showDeleteOption: Bool
     
-    init(reservation: EventModel) {
+    init(reservation: EventModel, showDeleteOption: Bool) {
         self.reservation = reservation
+        self.showDeleteOption = showDeleteOption
     }
     
     func getSystemImageNameOfReservationBasedOnType() -> String {
@@ -30,6 +33,17 @@ class TeamReservationCellComponentViewModel: ObservableObject {
             return "desktopcomputer"
         } else {
             return "building"
+        }
+    }
+    
+    func getReservationSite() -> String {
+        //If reserves is empty that means that the reserve is online
+        guard let reservationLocal = reservation.reserves else { return "VIRTUAL" }
+        
+        if reservationLocal.isEmpty {
+            return "VIRTUAL"
+        } else {
+            return "ESPORTS CENTER"
         }
     }
     

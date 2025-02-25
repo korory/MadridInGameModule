@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct LoadingView: View {
-    var logoMIG: UIImage
-
+    var message: String
+    
     var body: some View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.gray.opacity(0.3)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
-                Image(uiImage: logoMIG)
+                Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 100, height: 50)
@@ -25,7 +25,7 @@ struct LoadingView: View {
                     .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
                     .scaleEffect(1.5)
 
-                Text("Preparando tu experiencia...")
+                Text(message)
                     .font(.headline)
                     .foregroundColor(.white)
                     .opacity(0.7)

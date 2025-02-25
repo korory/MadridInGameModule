@@ -11,6 +11,7 @@ struct DetailSectionView: View {
     var title: String
     var content: String
     var image: String
+    var environmentManager = EnvironmentManager()
     
     var body: some View {
         ZStack {
@@ -18,7 +19,7 @@ struct DetailSectionView: View {
                 .ignoresSafeArea(.all)
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
-                    AsyncImage(url: URL(string: "https://premig.randomkesports.com/cms/assets/\(image)")) { phase in
+                    AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(image)")) { phase in
                         switch phase {
                         case .empty:
                             ProgressView()
