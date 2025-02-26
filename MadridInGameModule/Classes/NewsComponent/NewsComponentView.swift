@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NewsComponentView: View {
-    @StateObject var viewModel: NewsViewModel
+    @StateObject var viewModel = NewsViewModel()
     
     var body: some View {
         ZStack {
@@ -17,9 +17,6 @@ struct NewsComponentView: View {
             
             if viewModel.isLoading {
                 LoadingView(message: "Cargando Noticias....")
-                    .onAppear {
-                        viewModel.getAllNews()
-                    }
             } else {
                 VStack {
                     titleAndPlusButtonBanner
@@ -34,6 +31,9 @@ struct NewsComponentView: View {
                         .zIndex(1)
                         .presentationDetents([.medium, .large])
                 }
+//                .onAppear {
+//                    viewModel.getAllNews()
+//                }
                 .onDisappear {
                     self.viewModel.isLoading = false
                 }
@@ -107,16 +107,6 @@ extension NewsComponentView {
                     .frame(width: 28, height: 28)
                     .foregroundColor(.cyan)
             }
-//
-//            Button {
-//                self.viewModel.createNewNews = true
-//            } label: {
-//                Image(systemName: "plus.circle.fill")
-//                    .resizable()
-//                    .frame(width: 40, height: 40)
-//                    .clipShape(Circle())
-//                    .foregroundStyle(Color.cyan)
-//            }
         }
         .padding()
     }
@@ -134,14 +124,14 @@ extension NewsComponentView {
     
     private var allNewsListComponent: some View {
         ScrollView {
-            LazyVStack {
+            //LazyVStack {
                 ForEach(viewModel.allNews) { news in
                     NewsCellComponentView(viewModel: NewsCellViewModel(news: news)) { newsSelected in
                         self.viewModel.setNewsSelected(newsSelected)
                     }
                     .padding(.bottom, 5)
                 }
-            }
+            //}
         }
         .padding(.leading, 10)
         .padding(.trailing, 10)

@@ -36,11 +36,11 @@ struct CompetitionData: Codable , Identifiable{
 }
 
 struct SplitModel: Codable ,Identifiable {
-    let competition: String
-    let dateCreated: String
-    let id: Int
-    let name: String
-    let tournaments: [TournamentModel]
+    let competition: String?
+    let dateCreated: String?
+    let id: Int?
+    let name: String?
+    let tournaments: [TournamentModel]?
     
     enum CodingKeys: String, CodingKey {
         case competition
@@ -52,13 +52,13 @@ struct SplitModel: Codable ,Identifiable {
 }
 
 struct TournamentModel: Identifiable, Codable {
-    let id: Int
-    let name: String
-    let date: String
-    let dateCreated: String
-    let link: String
-    let split: Int
-    let status: String
+    let id: Int?
+    let name: String?
+    let date: String?
+    let dateCreated: String?
+    let link: String?
+    let split: Int?
+    let status: String?
     
     enum CodingKeys: String, CodingKey {
         case id

@@ -71,7 +71,7 @@ struct CompatitionsDetailViewComponentView: View {
     
     private var dropdownSplitSelectorComponent: some View {
         let options = viewModel.competitionsInformation.splits?.map { split in
-            DropdownSingleSelectionModel(title: split.name, isOptionSelected: ((viewModel.competitionsInformation.splits?.first) != nil))
+            DropdownSingleSelectionModel(title: split.name ?? "", isOptionSelected: ((viewModel.competitionsInformation.splits?.first) != nil))
         } ?? []
         
         return DropdownSingleSelectionComponentView(options: options, textTop: "Splits", onOptionSelected: { optionSelected in

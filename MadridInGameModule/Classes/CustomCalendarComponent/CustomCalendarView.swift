@@ -89,10 +89,6 @@ struct CustomCalendarView: View {
                                         Circle()
                                             .stroke(markedDate.blockedDays ?  Color(red: 1, green: 0.0, blue: 0.0) : markedDate.individualReservation ? Color(red: 0.0, green: 0.0, blue: 1) : Color.cyan, lineWidth: 2)
                                             .frame(width: 40, height: 40)
-                                            .background(
-                                                    Circle()
-                                                        .fill(markedDate.blockedDays ? Color.red : Color.clear)
-                                                )
                                     }
                                     
                                     // Cambia el fondo y el color del texto según si el día está habilitado

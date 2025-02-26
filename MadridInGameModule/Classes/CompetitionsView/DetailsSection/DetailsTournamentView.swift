@@ -49,7 +49,7 @@ struct DetailsTournamentView: View {
                         .padding(.top, 5)
                     
                     ForEach(content) { singleContent in
-                        TournamentCellView(date: singleContent.date, name: singleContent.name, statusString: singleContent.status)
+                        TournamentCellView(date: singleContent.date ?? "", name: singleContent.name ?? "", statusString: singleContent.status ?? "")
                     }
                     
                     Spacer()

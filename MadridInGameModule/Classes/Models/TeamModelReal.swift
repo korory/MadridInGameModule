@@ -27,7 +27,8 @@ struct TeamModelReal: Codable, Identifiable {
     }
 }
 
-struct TeamUser: Codable {
+struct TeamUser: Identifiable, Codable {
+    let id = UUID()
     let role: Role?
     let userId: UserId
 
@@ -38,12 +39,12 @@ struct TeamUser: Codable {
 }
 
 struct Role: Codable {
-    let id: String
     let name: String
 }
 
 struct UserId: Codable {
     let id: String
+    let avatar: String
     let username: String
 }
 

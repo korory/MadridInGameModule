@@ -8,73 +8,71 @@
 import SwiftUI
 
 struct PlayerTeamComponentCell: View {
-    let playerInformation: PlayerModel
-    let allRolesAvailable: [String]
-    
-    let removeAction: (PlayerModel) -> Void
+    let playerInformation: TeamUser
         
     var body: some View {
-        HStack {
-            avatarAndNamePlayerComponent
-            Spacer()
-            if !checkManagerRole() {
-                removePlayerButton
+        VStack {
+            HStack {
+                playerAvatarImage
+                playerUsernameAndRole
+                Spacer()
             }
         }
-        .padding(.leading, 5)
-    }
-    
-    func checkManagerRole() -> Bool { // If player role is Manager we not enable to change this role
-        return false //playerInformation.roleAssign == "Manager"
-    }
-    
-    func checkSelectedRole(role: String) -> Bool {
-        return false //role == playerInformation.roleAssign
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(20)
+        .shadow(radius: 2)
     }
 }
 
 extension PlayerTeamComponentCell {
     
-    private var avatarAndNamePlayerComponent: some View {
-        HStack (spacing: 10){
-//            Image(uiImage: playerInformation.image)
-//                .resizable()
-//                .foregroundStyle(Color.white)
-//                .frame(width: 70, height: 70)
-//                .clipShape(Circle())
-//                .overlay(Circle().stroke(Color.gray, lineWidth: 4))
-            
-            let displayName = playerInformation.name.count > 8 ? "\(playerInformation.name.prefix(8))..." : playerInformation.name
-            
-            VStack (alignment: .leading){
-                Text(displayName)
-                    .font(.body .weight(.bold))
-                    .foregroundStyle(Color.white)
-                    .padding(.trailing, 10)
-                
-                //dropdownSelectPlayerRolesComponent
-            }
+    private var playerAvatarImage: some View {
+        let environmentManager = EnvironmentManager()
+        
+            return AnyView(
+                AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(playerInformation.userId.avatar)")) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                            .frame(width: 50, height: 50)
+                            .tint(.purple)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 70, height: 70)
+                            .clipShape(Circle())
+                            .padding()
+                    case .failure:
+                        Image(systemName: "person.2.circle.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 70, height: 70)
+                            .clipShape(Circle())
+                            .padding()
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+                .padding(.leading, 10)
+                .padding(.trailing, 2)
+            )
         }
-    }
     
-//    private var dropdownSelectPlayerRolesComponent: some View {
-//        let options = allRolesAvailable.map { DropdownSingleSelectionModel(title: $0, isOptionSelected: checkSelectedRole(role: $0)) }
-//
-//        return DropdownSingleSelectionComponentView(options: options, userInteraction: !checkManagerRole()) { selection in
-//            print("czxcxz")
-//        }
-//    }
-    
-    private var removePlayerButton: some View {
-        Button {
-            removeAction(playerInformation)
-        } label: {
-            Image(systemName: "minus.circle")
-                .resizable()
-                .frame(width: 28, height: 28)
-                .foregroundStyle(Color.red)
+    private var playerUsernameAndRole: some View {
+        VStack (alignment: .leading, spacing: 10){
+            Text(playerInformation.userId.username)
+                .font(.custom("Madridingamefont-Regular", size: 17))
+                .foregroundColor(.white)
+                .padding(.leading, 8)
+            
+            Text(playerInformation.role?.name ?? "No Role")
+                .font(.system(size: 14))
+                .lineLimit(4)
+                .foregroundColor(.white)
+                .padding(.leading, 8)
         }
-        .padding(.leading, 10)
+        
     }
     
 }

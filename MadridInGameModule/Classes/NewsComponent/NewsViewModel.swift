@@ -22,6 +22,7 @@ class NewsViewModel: ObservableObject {
 
     init() {
         self.newsSelected = nil
+        self.getAllNews()
     }
     
     func getAllNews()  {
@@ -30,16 +31,16 @@ class NewsViewModel: ObservableObject {
         self.isLoading = true
         
         self.allNews.removeAll()
+        self.newsSelected = nil
+
         TeamNewsService().getTeamNews(teamId: selectedTeam.id) { [weak self] result in
             switch result {
             case .success(let news):
                 DispatchQueue.main.async {
-                    
                     for new in news {
                         self?.allNews.append(new)
                     }
                     self?.isLoading = false
-
                 }
             case .failure(let failure):
                 print(failure)
