@@ -37,38 +37,48 @@ extension TeamsScreenView {
                         }
                         .tag(TabBarTeamsBottom.trainning)
                     
-                    NewsComponentView(viewModel: NewsViewModel())
+                    NewsComponentView()
                         .tabItem {
                             Label("Noticias", systemImage: "newspaper.circle.fill")
                         }
                         .tag(TabBarTeamsBottom.news)
                     
-                    PlayersTeamComponentView(viewModel: PlayersTeamComponentViewModel(user: UserManager.shared.getUser()))
+                    PlayersTeamComponentView()
                         .tabItem {
                             Label("Jugadores", systemImage: "person.3.fill")
                         }
                         .tag(TabBarTeamsBottom.team
                         )
                     
-//                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: false, allTeams: []))
-//                        .tabItem {
-//                            Label("Equipo", systemImage: "person.3.fill")
-//                        }
-//                        .tag(TabBarTeamsBottom.players)
-                        SelectTeamComponent(allTeams: viewModel.getAllTeams(),
-                                            onTeamSelected: { team in
-                            self.viewModel.setTeamSelected(team: team)
+                    //                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: false, allTeams: []))
+                    //                        .tabItem {
+                    //                            Label("Equipo", systemImage: "person.3.fill")
+                    //                        }
+                    //                        .tag(TabBarTeamsBottom.players)
+                    //                        SelectTeamComponent(allTeams: viewModel.getAllTeams(),
+                    //                                            onTeamSelected: { team in
+                    //                            self.viewModel.setTeamSelected(team: team)
+                    //                            self.viewModel.optionTabSelected = .trainning
+                    //                            self.viewModel.selectedTab = TabBarTeamsBottom.trainning
+                    //                        })
+                    if viewModel.getAllTeams().count >= 2 {
+                        VStack {
+                        Text("Hola")
+                    }
+                        .onAppear(perform: {
+                            print("AAAAAA")
+                            self.viewModel.resetTeamSelected()
                             self.viewModel.optionTabSelected = .trainning
                             self.viewModel.selectedTab = TabBarTeamsBottom.trainning
+                            
                         })
-                            .tabItem {
-                                Label("Cambio Equipo", systemImage: "arrow.left.arrow.right")
-                            }
-                            .tag(TabBarTeamsBottom.changeTeam)
-                    
+                        .tabItem {
+                            Label("Cambio Equipo", systemImage: "arrow.left.arrow.right")
+                        }
+                        .tag(TabBarTeamsBottom.changeTeam)
+                }
                 }
                 .accentColor(.cyan)
-                //.padding(.top)
             } else {
                 Text("No hay información disponible.")
                     .foregroundColor(.white)

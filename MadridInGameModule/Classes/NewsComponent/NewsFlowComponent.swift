@@ -84,7 +84,7 @@ extension NewsFlowComponent {
                 case .empty:
                     VStack {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
                             .scaleEffect(1.5)
                             .padding()
                         
