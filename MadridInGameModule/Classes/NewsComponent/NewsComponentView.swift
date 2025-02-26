@@ -15,60 +15,76 @@ struct NewsComponentView: View {
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             
-            VStack {
-                titleAndPlusButtonBanner
-                if viewModel.allNews.isEmpty {
-                    noNewsComponent
-                } else {
-                    allNewsListComponent
+            if viewModel.isLoading {
+                LoadingView(message: "Cargando Noticias....")
+                    .onAppear {
+                        viewModel.getAllNews()
+                    }
+            } else {
+                VStack {
+                    titleAndPlusButtonBanner
+                    if viewModel.allNews.isEmpty {
+                        noNewsComponent
+                    } else {
+                        allNewsListComponent
+                    }
+                }
+                .sheet(isPresented: self.$viewModel.newSelected) {
+                    NewsFlowComponent(news: self.viewModel.newsSelected)
+                        .zIndex(1)
+                        .presentationDetents([.medium, .large])
+                }
+                .onDisappear {
+                    self.viewModel.isLoading = false
                 }
             }
             
-            CustomPopup(isPresented: Binding(
-                get: { viewModel.createNewNews },
-                set: { viewModel.createNewNews = $0 }
-            )) {
-                CreateOrEditNewsComponentView(createNew: true) {
-                    self.viewModel.createNewNews = false
-                } publishAction: { newModel in
-                    self.viewModel.createNewNews = false
-                    self.viewModel.allNews.append(newModel)
-                }
-                
-            }
-            .transition(.scale)
-            .zIndex(1)
             
-            CustomPopup(isPresented: Binding(
-                get: { viewModel.editNew },
-                set: { viewModel.editNew = $0 }
-            )) {
-                CreateOrEditNewsComponentView(createNew: false, newsInformation: viewModel.selectedNew) {
-                    self.viewModel.editNew = false
-                } publishAction: { newModel in
-                    self.viewModel.editNew = false
-                    self.viewModel.editNewsToArray(newSelected: newModel)
-                }
-                
-            }
-            .transition(.scale)
-            .zIndex(1)
-            
-            CustomPopup(isPresented: Binding(
-                get: { viewModel.deleteNews },
-                set: { viewModel.deleteNews = $0 }
-            )) {
-                CancelOrDeleteComponent(title: "ELIMINAR NOTICIA", subtitle: "¿Quieres eliminar la noticia titulada \(self.viewModel.selectedNew?.title ?? "")") {
-                    self.viewModel.deleteNews = false
-                } aceptedAction: {
-                    self.viewModel.deleteNewsToArray()
-                    self.viewModel.deleteNews = false
-                    //TODO: Delete reservation to the Backend
-                }
-                
-            }
-            .transition(.scale)
-            .zIndex(1)
+//            CustomPopup(isPresented: Binding(
+//                get: { viewModel.createNewNews },
+//                set: { viewModel.createNewNews = $0 }
+//            )) {
+//                CreateOrEditNewsComponentView(createNew: true) {
+//                    self.viewModel.createNewNews = false
+//                } publishAction: { newModel in
+//                    self.viewModel.createNewNews = false
+//                    self.viewModel.allNews.append(newModel)
+//                }
+//                
+//            }
+//            .transition(.scale)
+//            .zIndex(1)
+//            
+//            CustomPopup(isPresented: Binding(
+//                get: { viewModel.editNew },
+//                set: { viewModel.editNew = $0 }
+//            )) {
+//                CreateOrEditNewsComponentView(createNew: false, newsInformation: viewModel.selectedNew) {
+//                    self.viewModel.editNew = false
+//                } publishAction: { newModel in
+//                    self.viewModel.editNew = false
+//                    self.viewModel.editNewsToArray(newSelected: newModel)
+//                }
+//                
+//            }
+//            .transition(.scale)
+//            .zIndex(1)
+//            
+//            CustomPopup(isPresented: Binding(
+//                get: { viewModel.deleteNews },
+//                set: { viewModel.deleteNews = $0 }
+//            )) {
+//                CancelOrDeleteComponent(title: "ELIMINAR NOTICIA", subtitle: "¿Quieres eliminar la noticia titulada \(self.viewModel.selectedNew?.title ?? "")") {
+//                    self.viewModel.deleteNews = false
+//                } aceptedAction: {
+//                    self.viewModel.deleteNewsToArray()
+//                    self.viewModel.deleteNews = false
+//                    //TODO: Delete reservation to the Backend
+//                }
+//                
+//            }
+//            .transition(.scale)
+//            .zIndex(1)
         }
     }
 }
@@ -77,21 +93,30 @@ extension NewsComponentView {
     private var titleAndPlusButtonBanner: some View {
         HStack {
             Text("NOTICIAS")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+                .font(.custom("Madridingamefont-Regular", size: 25))
                 .foregroundStyle(Color.white)
             
             Spacer()
             
             Button {
-                self.viewModel.createNewNews = true
+                self.viewModel.getAllNews()
             } label: {
-                Image(systemName: "plus.circle.fill")
+                Image(systemName: "arrow.clockwise.circle.fill")
                     .resizable()
-                    .frame(width: 40, height: 40)
-                    .clipShape(Circle())
-                    .foregroundStyle(Color.cyan)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 28, height: 28)
+                    .foregroundColor(.cyan)
             }
+//
+//            Button {
+//                self.viewModel.createNewNews = true
+//            } label: {
+//                Image(systemName: "plus.circle.fill")
+//                    .resizable()
+//                    .frame(width: 40, height: 40)
+//                    .clipShape(Circle())
+//                    .foregroundStyle(Color.cyan)
+//            }
         }
         .padding()
     }
@@ -99,9 +124,10 @@ extension NewsComponentView {
     private var noNewsComponent: some View {
         VStack {
             Spacer()
-            Text("No hay noticias actualmente")
-                .font(.body)
+            Text("No hay noticias en este equipo actualmente")
+                .font(.custom("Madridingamefont-Regular", size: 15))
                 .foregroundStyle(Color.gray)
+                .padding()
             Spacer()
         }
     }
@@ -109,21 +135,15 @@ extension NewsComponentView {
     private var allNewsListComponent: some View {
         ScrollView {
             LazyVStack {
-                ForEach(viewModel.allNews, id: \.id) { news in
-                    NewsCellComponentView(news: news, editNews: { selectedNews in
-                        self.viewModel.selectedNew = selectedNews
-                        self.viewModel.editNew = true
-                    }) { selectedNews in
-                        self.viewModel.selectedNew = selectedNews
-                        self.viewModel.deleteNews = true
+                ForEach(viewModel.allNews) { news in
+                    NewsCellComponentView(viewModel: NewsCellViewModel(news: news)) { newsSelected in
+                        self.viewModel.setNewsSelected(newsSelected)
                     }
-                    
-                    RoundedRectangle(cornerRadius: 10)
-                        .frame(width: 400, height: 4)
-                        .foregroundStyle(Color.white.opacity(0.4))
+                    .padding(.bottom, 5)
                 }
             }
-            .padding()
         }
+        .padding(.leading, 10)
+        .padding(.trailing, 10)
     }
 }

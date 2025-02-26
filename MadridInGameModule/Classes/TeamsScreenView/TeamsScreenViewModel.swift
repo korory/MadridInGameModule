@@ -39,6 +39,12 @@ class TeamsScreenViewModel: ObservableObject {
     func setTeamSelected(team: TeamModelReal) {
         self.selectedTeam = team
         self.teamSelected = true
+        self.setSelectedTeam()
+    }
+    
+    func setSelectedTeam() {
+        guard let team = self.selectedTeam else { return }
+        self.userManager.setSelectedTeam(team)
     }
     
     func getTeamSelected() -> TeamModelReal {
