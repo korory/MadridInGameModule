@@ -16,26 +16,28 @@ class ProfileInformation {
             return
         }
         
-        let userParams: [String: String] = [
-            //"email": user.email as Any,
-            "username": user.username ?? "",
-//            "dni": user.dni as Any,
-//            "first_name": user.firstName as Any,
-//            "last_name": user.lastName as Any,
-            //"avatar": user.avatar as Any,
-            //"phone": user.phone as Any
+        let userParams: [String: Any] = [
+            "id" : user.id ?? "",
+            "username" : user.username ?? "",
+            "email" : user.email ?? "",
+            "dni" : user.dni ?? "",
+            "first_name" : user.firstName ?? "",
+            "avatar" : user.avatar ?? "",
+            "phone" : user.phone ?? "",
         ]
-
+        
         Task {
             do {
-                let updatedUser: [UserModelResponse] = try await DirectusService.shared.sendRequest(
+                let updatedUser: UserModel = try await DirectusService.shared.sendRequest(
                     endpoint: "users/\(userId)",
                     method: .PATCH,
                     body: userParams
                 )
                 print("Usuario actualizado: \(updatedUser)")
+                completion(.success(updatedUser)) // Devolver el usuario actualizado
             } catch {
                 print("Error al actualizar usuario: \(error)")
+                completion(.failure(error)) // Llamar el completion con el error
             }
         }
     }

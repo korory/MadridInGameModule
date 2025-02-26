@@ -34,7 +34,7 @@ class UserManager {
 
     private init() {}
     
-    func initializeUser(withEmail email: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    func initializeUser(withEmail email: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let parameters = ["filter[email][_eq]": email]
 
         Task {
@@ -79,9 +79,48 @@ class UserManager {
 //                    }
                     }
                 } else {
-                    completion(.failure(NSError(domain: "No User Found", code: 0, userInfo: nil)))
+                    //completion(.failure(NSError(domain: "No User Found", code: 0, userInfo: nil)))
+                    registerUserIntoDatabase(email: email, userName: userName) { result in
+                        DispatchQueue.main.async {
+                            switch result {
+                            case .success:
+                                completion(.success(()))
+                            case .failure(let error):
+                                completion(.failure(error))
+                            }
+                        }
+                    }
                 }
             } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func registerUserIntoDatabase(email: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        
+        let userParams: [String: Any] = [
+            "email" : email,
+            "username" : userName,
+            //"dni" : user.dni ?? "",
+            //            "first_name" : user.firstName ?? "",
+            //            "avatar" : user.avatar ?? "",
+            //            "phone" : user.phone ?? "",
+        ]
+        
+        Task {
+            do {
+                let updatedUser: UserModelResponse = try await DirectusService.shared.sendRequest(
+                    endpoint: "users",
+                    method: .POST,
+                    body: userParams
+                )
+                
+                print("Usuario actualizado: \(updatedUser)")
+                self.user = updatedUser.data
+                completion(.success(()))
+            } catch {
+                print("Error al actualizar usuario: \(error)")
                 completion(.failure(error))
             }
         }
