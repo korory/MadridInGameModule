@@ -22,29 +22,29 @@ struct TeamsComponentView: View {
             }
             .padding()
             
-            CustomPopup(isPresented: Binding(
-                get: { viewModel.createTeamButtonPressed },
-                set: { viewModel.createTeamButtonPressed = $0 }
-            )) {
-                TeamsCreateOrEditNewTeamComponentView(action: { teamSelected in
-                    self.viewModel.addTeamIntoTeamList(newTeam: teamSelected)
-                    self.viewModel.createTeamButtonPressed = false
-                })
-            }
-            .transition(.scale)
-            .zIndex(1)
-            
-            CustomPopup(isPresented: Binding(
-                get: { viewModel.isEditTeamPressed },
-                set: { viewModel.isEditTeamPressed = $0 }
-            )) {
-                TeamsCreateOrEditNewTeamComponentView(team: viewModel.allTeams?.first, editTeam: true, action: { teamSelected in
-                    self.viewModel.editInformationTeamExists(updateTeam: teamSelected)
-                    self.viewModel.isEditTeamPressed = false
-                })
-            }
-            .transition(.scale)
-            .zIndex(1)
+//            CustomPopup(isPresented: Binding(
+//                get: { viewModel.createTeamButtonPressed },
+//                set: { viewModel.createTeamButtonPressed = $0 }
+//            )) {
+//                TeamsCreateOrEditNewTeamComponentView(action: { teamSelected in
+//                    self.viewModel.addTeamIntoTeamList(newTeam: teamSelected)
+//                    self.viewModel.createTeamButtonPressed = false
+//                })
+//            }
+//            .transition(.scale)
+//            .zIndex(1)
+//            
+//            CustomPopup(isPresented: Binding(
+//                get: { viewModel.isEditTeamPressed },
+//                set: { viewModel.isEditTeamPressed = $0 }
+//            )) {
+//                TeamsCreateOrEditNewTeamComponentView(team: viewModel.allTeams?.first, editTeam: true, action: { teamSelected in
+//                    self.viewModel.editInformationTeamExists(updateTeam: teamSelected)
+//                    self.viewModel.isEditTeamPressed = false
+//                })
+//            }
+//            .transition(.scale)
+//            .zIndex(1)
             
             CustomPopup(isPresented: Binding(
                 get: { viewModel.applyForAdmisionButtonPressed },

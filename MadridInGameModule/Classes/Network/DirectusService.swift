@@ -71,8 +71,6 @@ actor DirectusService {
                let jsonString = String(data: jsonData, encoding: .utf8) {
                 print("Cuerpo de la petición JSON: \(jsonString)")
             }
-            request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
-            request.setValue("no-store", forHTTPHeaderField: "Pragma")
         }
         
 

@@ -16,11 +16,13 @@ class MadridInGameViewModel: ObservableObject {
     @Published var openCompetitions: Bool
 
     private let email: String
+    private let userName: String
     private let userManager = UserManager.shared
     private let environmentManager: EnvironmentManager
     
-    init(email: String, isPro: Bool, openCompetitions: Bool) {
+    init(email: String, username: String, isPro: Bool, openCompetitions: Bool) {
         self.email = email
+        self.userName = username
         self.environmentManager = EnvironmentManager(isPro: isPro)
         self.openCompetitions = openCompetitions
         
@@ -42,7 +44,7 @@ class MadridInGameViewModel: ObservableObject {
     
     func initializeModule() {
         //isLoading = true
-        userManager.initializeUser(withEmail: email) { [weak self] result in
+        userManager.initializeUser(withEmail: email, userName: userName) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 switch result {

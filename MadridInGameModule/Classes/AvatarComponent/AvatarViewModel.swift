@@ -10,11 +10,19 @@ import SwiftUI
 import PhotosUI
 
 class AvatarViewModel: ObservableObject {
+    @Published var imageId: String
     @Published var showImagePicker = false
     @Published var selectedImage: UIImage?
     @Published var isCamera = false
     @Published var showActionSheet = false
 
+    let environmentManager = EnvironmentManager()
+
+    init(selectedImage: UIImage?, imageId: String?) {
+        self.imageId = imageId ?? ""
+        self.selectedImage = selectedImage
+    }
+    
     func selectCamera() {
         isCamera = true
         showImagePicker = true
