@@ -45,7 +45,7 @@ class ProfileInformationViewModel: ObservableObject {
         username = user?.username ?? ""
         phone = user?.phone ?? ""
         avatar = user?.avatar
-        isEditing = false
+        toggleEditing()
     }
 
     func saveChanges() async {

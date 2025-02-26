@@ -19,8 +19,9 @@ class AvatarViewModel: ObservableObject {
     let environmentManager = EnvironmentManager()
 
     init(selectedImage: UIImage?, imageId: String?) {
-        self.imageId = imageId ?? ""
+        // Aquí ya no anulamos selectedImage, sino que lo asignamos si se pasa un valor
         self.selectedImage = selectedImage
+        self.imageId = imageId ?? ""
     }
     
     func selectCamera() {

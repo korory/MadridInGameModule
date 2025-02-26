@@ -57,26 +57,6 @@ class UserManager {
                         case .failure(let error):
                             completion(.failure(error))
                         }
-                        
-//                        self.fetchUserTrainings(userId: user.id) { result in
-//                            switch result {
-//                            case .success(let trainings):
-//                                self.user?.trainningsComplete = trainings
-//                                //completion(.success(()))
-//                            case .failure(let error):
-//                                completion(.failure(error))
-//                        }
-//                    }
-//                        
-//                        self.fetchUserGameSpace(userId: user.id) { result in
-//                            switch result {
-//                            case .success(let gammingSpaces):
-//                                self.user?.gammingSpacesComplete = gammingSpaces
-//                                completion(.success(()))
-//                            case .failure(let error):
-//                                completion(.failure(error))
-//                        }
-//                    }
                     }
                 } else {
                     //completion(.failure(NSError(domain: "No User Found", code: 0, userInfo: nil)))
