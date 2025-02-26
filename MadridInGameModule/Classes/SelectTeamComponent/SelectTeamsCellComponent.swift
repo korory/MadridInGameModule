@@ -86,7 +86,7 @@ extension SelectTeamsCellComponent {
                 .padding(.leading, 8)
             
             Text(team.description ?? "Sin Descripción")
-                .font(.system(size: 11))
+                .font(.system(size: 14))
                 .lineLimit(4)
                 .foregroundColor(.white)
                 .padding(.leading, 8)

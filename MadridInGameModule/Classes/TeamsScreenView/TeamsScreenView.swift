@@ -37,7 +37,7 @@ extension TeamsScreenView {
                         }
                         .tag(TabBarTeamsBottom.trainning)
                     
-                    NewsComponentView(viewModel: NewsViewModel(allNews: mockAllNews))
+                    NewsComponentView(viewModel: NewsViewModel())
                         .tabItem {
                             Label("Noticias", systemImage: "newspaper.circle.fill")
                         }

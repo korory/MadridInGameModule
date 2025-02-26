@@ -5,12 +5,15 @@
 //  Created by Arnau Rivas Rivas on 17/10/24.
 //
 
-import SwiftUI
+struct NewsModelResponse: Codable {
+    let data: [NewsModel]
+}
 
-struct NewsModel {
-    var id = UUID()
-    var title: String
-    var description: String
-    var image: UIImage
-    var imageText: String
+struct NewsModel: Identifiable, Codable {
+    let id: Int
+    let title: String?
+    let body: String?
+    let date: String?
+    let image: String?
+    let status: String?
 }

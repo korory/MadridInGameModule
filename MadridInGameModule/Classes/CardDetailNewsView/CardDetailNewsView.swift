@@ -34,8 +34,8 @@ extension CardDetailNewsView {
     
     private var newsImageWithGradient: some View {
             ZStack(alignment: .bottom) {
-                Image(uiImage: news.image) // Reemplaza con el nombre de la imagen que deseas usar
-                    .resizable()
+//                Image(uiImage: news.image) // Reemplaza con el nombre de la imagen que deseas usar
+//                    .resizable()
                     //.scaledToFit()
                 LinearGradient(
                     gradient: Gradient(colors: [.clear, .black.opacity(0.4)]),
@@ -53,7 +53,7 @@ extension CardDetailNewsView {
         }
     
     private var newsTitleBanner: some View {
-        Text(news.title)
+        Text(news.title ?? "")
             .font(.title)
             .foregroundStyle(Color.white)
             .padding()
@@ -61,7 +61,7 @@ extension CardDetailNewsView {
     
     private var descriptionTextComponent: some View {
         ScrollView {
-            Text(news.description)
+            Text(news.body ?? "")
                 .font(.body)
                 .foregroundStyle(Color.white)
                 .padding()
