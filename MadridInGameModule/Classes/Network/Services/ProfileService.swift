@@ -22,6 +22,7 @@ class ProfileInformation {
             "email" : user.email ?? "",
             "dni" : user.dni ?? "",
             "first_name" : user.firstName ?? "",
+            "last_name" : user.lastName ?? "",
             "avatar" : user.avatar ?? "",
             "phone" : user.phone ?? "",
         ]
