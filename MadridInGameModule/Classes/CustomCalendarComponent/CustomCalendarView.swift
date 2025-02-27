@@ -114,23 +114,14 @@ struct CustomCalendarView: View {
         var usedTypes: Set<String> = [] // Para evitar duplicados
         var size: CGFloat = 42
 
-        // Primero, si hay un bloqueado, lo agregamos
-        if (markedDatesForDay.first(where: { $0.blockedDays }) != nil) {
-            circles.append(AnyView(
-                Circle()
-                    .stroke(Color.red, lineWidth: 3)
-                    .frame(width: size, height: size)
-            ))
-            usedTypes.insert("blocked")
-            size -= 6
-        }
-
-        // Luego agregamos los demás (reservas individuales y estándar)
         for markedDate in markedDatesForDay {
             let type: String
             let color: Color
 
-            if markedDate.individualReservation {
+            if markedDate.blockedDays {
+                type = "blocked"
+                color = .red
+            } else if markedDate.individualReservation {
                 type = "reservation"
                 color = .blue
             } else {
@@ -144,8 +135,8 @@ struct CustomCalendarView: View {
                         .stroke(color, lineWidth: 3)
                         .frame(width: size, height: size)
                 ))
-                usedTypes.insert(type)
-                size -= 6
+                usedTypes.insert(type) // Marcar como usado
+                size -= 6 // Reducir tamaño para el siguiente círculo
             }
         }
 

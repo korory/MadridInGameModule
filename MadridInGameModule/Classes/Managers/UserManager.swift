@@ -34,7 +34,7 @@ class UserManager {
 
     private init() {}
     
-    func initializeUser(withEmail email: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    func initializeUser(withEmail email: String, userName: String, dni: String, completion: @escaping (Result<Void, Error>) -> Void) {
         let parameters = ["filter[email][_eq]": email]
 
         Task {
@@ -61,7 +61,7 @@ class UserManager {
                     }
                 } else {
                     //completion(.failure(NSError(domain: "No User Found", code: 0, userInfo: nil)))
-                    registerUserIntoDatabase(email: email, userName: userName) { result in
+                    registerUserIntoDatabase(email: email, userName: userName, dni: dni) { result in
                         DispatchQueue.main.async {
                             switch result {
                             case .success:
@@ -78,12 +78,12 @@ class UserManager {
         }
     }
     
-    func registerUserIntoDatabase(email: String, userName: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    func registerUserIntoDatabase(email: String, userName: String, dni: String, completion: @escaping (Result<Void, Error>) -> Void) {
         
         let userParams: [String: Any] = [
             "email" : email,
             "username" : userName,
-            //"dni" : user.dni ?? "",
+            "dni" : dni,
             //            "first_name" : user.firstName ?? "",
             //            "avatar" : user.avatar ?? "",
             //            "phone" : user.phone ?? "",

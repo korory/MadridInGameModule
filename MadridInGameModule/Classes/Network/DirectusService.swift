@@ -60,7 +60,8 @@ actor DirectusService {
 
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
-        let token = "Bearer 8TZMs1jYI1xIts2uyUnE_MJrPQG9KHfY"
+        let accesToken = UserDefaults.getAccessTokenKey() ?? ""
+        let token = "Bearer \(accesToken)"
         request.setValue(token, forHTTPHeaderField: "Authorization")
 
         if let body = body {
@@ -148,7 +149,8 @@ actor DirectusService {
         
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
-        let token = "Bearer 8TZMs1jYI1xIts2uyUnE_MJrPQG9KHfY"
+        let accesToken = UserDefaults.getAccessTokenKey() ?? ""
+        let token = "Bearer \(accesToken)"
         request.setValue(token, forHTTPHeaderField: "Authorization")
         
         // Agregar el cuerpo (body) si se necesita

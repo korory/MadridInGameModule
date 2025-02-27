@@ -53,9 +53,18 @@ extension String {
 }
 
 extension UserDefaults {
+    private static let accesTokenKey = "accessTokenKey"
     private static let logoMIGKey = "logoMIGKey"
     private static let qrMiddleLogo = "qrMiddleLogo"
 
+    static func saveAccessTokenKey(_ accessToken: String) {
+        UserDefaults.standard.set(accessToken, forKey: "accessTokenKey")
+    }
+    
+    static func getAccessTokenKey() -> String? {
+        return UserDefaults.standard.string(forKey: "accessTokenKey")
+    }
+    
     static func saveLogoMIG(_ image: UIImage) {
         if let data = image.pngData() {
             UserDefaults.standard.set(data, forKey: logoMIGKey)
