@@ -21,6 +21,7 @@ struct UserModel: Codable {
     let avatar: String?
     let reservesAllowed: Int?
     let phone: String?
+    let address: String?
     let trainings: [Int]?
     let gamingSpaceReserves: [Int]?
     let invitations: [Int]?
@@ -31,7 +32,7 @@ struct UserModel: Codable {
     var gammingSpacesComplete: [LoanModel] = []
 
     enum CodingKeys: String, CodingKey {
-        case id, status, username, email, dni, token, firstName = "first_name", lastName = "last_name", avatar
+        case id, status, username, email, dni, token, firstName = "first_name", lastName = "last_name", avatar, address
         case reservesAllowed = "reserves_allowed"
         case phone, trainings, gamingSpaceReserves = "gaming_space_reserves", invitations
     }

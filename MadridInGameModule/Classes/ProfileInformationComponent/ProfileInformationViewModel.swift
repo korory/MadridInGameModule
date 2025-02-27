@@ -73,6 +73,7 @@ class ProfileInformationViewModel: ObservableObject {
                 token: self.user?.token, firstName: firstName,
                 lastName: lastName, avatar: self.avatar,
                 reservesAllowed: self.user?.reservesAllowed, phone: phone,
+                address: self.user?.address,
                 trainings: self.user?.trainings,
                 gamingSpaceReserves: self.user?.gamingSpaceReserves,
                 invitations: self.user?.invitations

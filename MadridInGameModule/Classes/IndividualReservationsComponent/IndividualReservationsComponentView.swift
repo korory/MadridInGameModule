@@ -148,10 +148,10 @@ extension IndividualReservationsComponentView {
     private var reservationButton: some View {
         CustomButton(text: "Reservar",
                      needsBackground: true,
-                     backgroundColor: viewModel.allIndividualReservations.count < 3 ? Color.cyan : Color.gray,
+                     backgroundColor: viewModel.allIndividualReservations.count < viewModel.userManager.getUser()?.reservesAllowed ?? 1 ? Color.cyan : Color.gray,
                      pressEnabled: true,
                      widthButton: 280, heightButton: 50) {
-            if viewModel.allIndividualReservations.count < 3 {
+            if viewModel.allIndividualReservations.count < viewModel.userManager.getUser()?.reservesAllowed ?? 1  {
                 self.viewModel.isReservationFlowPresented = true
             } else {
                 self.viewModel.noReservationAllowed = true

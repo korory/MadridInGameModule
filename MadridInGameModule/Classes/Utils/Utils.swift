@@ -22,13 +22,16 @@ class Utils {
         
         let calendar = Calendar.current
         let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd" // Formato solo con la fecha
+        let dateString1 = dateFormatter.string(from: currentDate)
         
         guard let date = calendar.date(from: DateComponents(year: year, month: month, day: day)) else {
             return nil
         }
         
         // Excluir fechas menores a hoy
-        if date < currentDate {
+        if dateString < dateString1 {
             return nil
         }
         

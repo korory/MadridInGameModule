@@ -120,7 +120,9 @@ class ReservationFlowViewModel: ObservableObject {
                     for blockDay in blockedDays {
                         guard let blockDate = blockDay.date else { continue }
                         if let createDate = Utils.createDate(from: blockDate) {
-                            self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, blockedDays: true))
+                            DispatchQueue.main.async {
+                                self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, blockedDays: true))
+                            }
                         }
                     }
                 case .failure(let error):

@@ -30,7 +30,7 @@ extension PlayerTeamComponentCell {
         let environmentManager = EnvironmentManager()
         
             return AnyView(
-                AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(playerInformation.userId.avatar)")) { phase in
+                AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(playerInformation.usersId?.avatar)")) { phase in
                     switch phase {
                     case .empty:
                         ProgressView()
@@ -61,12 +61,12 @@ extension PlayerTeamComponentCell {
     
     private var playerUsernameAndRole: some View {
         VStack (alignment: .leading, spacing: 10){
-            Text(playerInformation.userId.username)
+            Text(playerInformation.usersId?.username ?? "No Username")
                 .font(.custom("Madridingamefont-Regular", size: 17))
                 .foregroundColor(.white)
                 .padding(.leading, 8)
             
-            Text(playerInformation.role?.name ?? "No Role")
+            Text(playerInformation.roles?.name ?? "No Role")
                 .font(.system(size: 14))
                 .lineLimit(4)
                 .foregroundColor(.white)

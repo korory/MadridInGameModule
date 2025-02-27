@@ -55,6 +55,7 @@ class UserManager {
                             self.user = user
                             completion(.success(()))
                         case .failure(let error):
+                            print(error)
                             completion(.failure(error))
                         }
                     }
