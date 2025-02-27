@@ -27,10 +27,11 @@ struct PlayerTeamComponentCell: View {
 extension PlayerTeamComponentCell {
     
     private var playerAvatarImage: some View {
+        let avatarId = playerInformation.usersId?.avatar ?? ""
         let environmentManager = EnvironmentManager()
         
             return AnyView(
-                AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(playerInformation.usersId?.avatar)")) { phase in
+                AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(avatarId)")) { phase in
                     switch phase {
                     case .empty:
                         ProgressView()
