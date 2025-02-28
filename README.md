@@ -29,7 +29,7 @@ pod install
 ### Importar el módulo
 
 ```swift
-import MadridInGameModule
+import MadridInGameiOSModule
 ```
 
 ### Uso
