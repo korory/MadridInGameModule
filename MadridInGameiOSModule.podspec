@@ -11,10 +11,10 @@ Pod::Spec.new do |s|
   s.source       = { :git => 'https://github.com/korory/MadridInGameModule.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '16.0'
-  s.source_files = 'MadridInGameiOSModule/Classes/**/*.{swift}'
+  s.source_files = 'Sources/**/*.{swift}'
   
   s.resource_bundles = {
-    'MadridInGameiOSModule' => ['MadridInGameiOSModule/Classes/**/*.{ttf,otf}']
+    'MadridInGameiOSModule' => ['Resources/**/*.{ttf,otf}']
   }
   
   s.swift_versions = ['5.0']

@@ -8,7 +8,7 @@
 import SwiftUI
 import FontBlaster
 
-class MadridInGameViewModel: ObservableObject {
+class MadridInGameiOSViewModel: ObservableObject {
     @Published var selectedTab: Int = 0
     @Published var isLoading: Bool = true
     @Published var user: UserModel?
