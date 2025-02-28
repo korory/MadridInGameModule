@@ -176,7 +176,7 @@ class UserManager {
 
                 for gammingSpaceId in userGammingSpacesIds {
                     let parameters = ["filter[id][_eq]": "\(gammingSpaceId)"]
-                    guard let gammingResponse: GamingSpaceResponse = try? await DirectusService.shared.request(
+                    guard let gammingResponse: GamingSpaceResponse = try await DirectusService.shared.request(
                         endpoint: "gaming_space_reserves",
                         method: .GET,
                         parameters: parameters
@@ -189,7 +189,7 @@ class UserManager {
                     if let userGammingSpacesTimesIds = gammingInfo.times {
                         for gammingSpaceTimeId in userGammingSpacesTimesIds {
                             let timeParameters = ["filter[id][_eq]": "\(gammingSpaceTimeId)"]
-                            guard let gammingTimeResponse: GamingSpacesReservationIds = try? await DirectusService.shared.request(
+                            guard let gammingTimeResponse: GamingSpacesReservationIds = try await DirectusService.shared.request(
                                 endpoint: "gaming_space_reserves_gaming_space_times",
                                 method: .GET,
                                 parameters: timeParameters
@@ -198,13 +198,11 @@ class UserManager {
                             }
 
                             let timeInfoParameters = ["filter[id][_eq]": "\(gammingSpaceTimesId)"]
-                            guard let gammingSpaceTimeResponse: GamingSpacesReservationTime = try? await DirectusService.shared.request(
+                            let gammingSpaceTimeResponse: GamingSpacesReservationTime = try await DirectusService.shared.request(
                                 endpoint: "gaming_space_times",
                                 method: .GET,
                                 parameters: timeInfoParameters
-                            ) else {
-                                continue
-                            }
+                            )
 
                             updatedGammingInfo.gammingSpacesTimesComplete.append(contentsOf: gammingSpaceTimeResponse.data)
                         }
@@ -219,4 +217,61 @@ class UserManager {
             }
         }
     }
+
+//
+//    func fetchUserGameSpace(userId: String, completion: @escaping (Result<[LoanModel], Error>) -> Void) {
+//        guard let userGammingSpacesIds = user?.gamingSpaceReserves, !userGammingSpacesIds.isEmpty else {
+//            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No hay entrenamientos disponibles en el perfil del usuario."])))
+//            return
+//        }
+//
+//        Task {
+//            do {
+//                var allGammingSpaces: [LoanModel] = []
+//
+//                for gammingSpaceId in userGammingSpacesIds {
+//                    let parameters = ["filter[id][_eq]": "\(gammingSpaceId)"]
+//                    guard let gammingResponse: GamingSpaceResponse = try? await DirectusService.shared.request(
+//                        endpoint: "gaming_space_reserves",
+//                        method: .GET,
+//                        parameters: parameters
+//                    ), let gammingInfo = gammingResponse.data.first else {
+//                        continue
+//                    }
+//
+//                    var updatedGammingInfo = gammingInfo
+//
+//                    if let userGammingSpacesTimesIds = gammingInfo.times {
+//                        for gammingSpaceTimeId in userGammingSpacesTimesIds {
+//                            let timeParameters = ["filter[id][_eq]": "\(gammingSpaceTimeId)"]
+//                            guard let gammingTimeResponse: GamingSpacesReservationIds = try? await DirectusService.shared.request(
+//                                endpoint: "gaming_space_reserves_gaming_space_times",
+//                                method: .GET,
+//                                parameters: timeParameters
+//                            ), let gammingSpaceTimesId = gammingTimeResponse.data.first?.gamingSpaceTimesId else {
+//                                continue
+//                            }
+//
+//                            let timeInfoParameters = ["filter[id][_eq]": "\(gammingSpaceTimesId)"]
+//                            guard let gammingSpaceTimeResponse: GamingSpacesReservationTime = try? await DirectusService.shared.request(
+//                                endpoint: "gaming_space_times",
+//                                method: .GET,
+//                                parameters: timeInfoParameters
+//                            ) else {
+//                                continue
+//                            }
+//
+//                            updatedGammingInfo.gammingSpacesTimesComplete.append(contentsOf: gammingSpaceTimeResponse.data)
+//                        }
+//                    }
+//
+//                    allGammingSpaces.append(updatedGammingInfo)
+//                }
+//
+//                completion(.success(allGammingSpaces))
+//            } catch {
+//                completion(.failure(error))
+//            }
+//        }
+//    }
 }

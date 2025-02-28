@@ -1,13 +1,14 @@
-////
-////  ProfileInformationViewModel.swift
-////  Pods
-////
-////  Created by Arnau Rivas Rivas on 20/2/25.
-////
 //
+//  ProfileInformationViewModel.swift
+//  Pods
+//
+//  Created by Arnau Rivas Rivas on 20/2/25.
+//
+
 import Combine
 import SwiftUI
 
+@MainActor
 class ProfileInformationViewModel: ObservableObject {
     @Published var newAvatar: UIImage?
     @Published var isEditing: Bool = false
@@ -52,7 +53,7 @@ class ProfileInformationViewModel: ObservableObject {
         self.isLoading = true
         var avatarId = self.user?.avatar
 
-        if let newAvatar = newAvatar {
+        if newAvatar != nil {
             do {
                 avatarId = try await updateAvatar()
                 self.avatar = avatarId
@@ -128,124 +129,3 @@ class ProfileInformationViewModel: ObservableObject {
         }
     }
 }
-
-//
-//class ProfileInformationViewModel: ObservableObject {
-//    @Published var newAvatar: UIImage?
-//    @Published var isEditing: Bool = false
-//    @Published var showToastSuccess = false
-//    @Published var showToastFailure = false
-//    
-//    @Published var isLoading = true
-//    
-//    var firstName: String
-//    var lastName: String
-//    var dni: String
-//    var email: String
-//    var username: String
-//    var phone: String
-//    var avatar: String?
-//    
-//    private let userManager = UserManager.shared
-//    private let user: UserModel?
-//    
-//    init() {
-//        self.user = userManager.getUser()
-//        self.firstName = user?.firstName ?? ""
-//        self.lastName = user?.lastName ?? ""
-//        self.dni = user?.dni ?? ""
-//        self.email = user?.email ?? ""
-//        self.username = user?.username ?? ""
-//        self.phone = user?.phone ?? ""
-//        self.avatar = user?.avatar ?? ""
-//        self.isLoading = false
-//    }
-//    
-//    func discardChanges() {
-//        firstName = user?.firstName ?? ""
-//        lastName = user?.lastName ?? ""
-//        dni = user?.dni ?? ""
-//        email = user?.email ?? ""
-//        username = user?.username ?? ""
-//        phone = user?.phone ?? ""
-//        avatar = nil
-//        isEditing = false
-//    }
-//    
-//    func saveChanges() async{
-//        self.isLoading = true
-//        
-//        var avatarId = self.user?.avatar
-//        
-//        if newAvatar != nil {
-//            await updateAvatar { fileId in
-//                avatarId = fileId
-//            }
-//        }
-//        
-//        ProfileInformation().updateInformationProfile(
-//            UserModel(
-//                id: self.user?.id, status: self.user?.status,
-//                username: username, email: email, dni: dni,
-//                token: self.user?.token, firstName: firstName,
-//                lastName: lastName, avatar: avatarId,
-//                reservesAllowed: self.user?.reservesAllowed, phone: phone,
-//                trainings: self.user?.trainings,
-//                gamingSpaceReserves: self.user?.gamingSpaceReserves,
-//                invitations: self.user?.invitations)
-//        ) { result in
-//            switch result {
-//            case .success(let profile):
-//                print("Perfil actualizado correctamente \(profile)")
-//                DispatchQueue.main.async {
-//                    self.showToastSuccess = true
-//                    self.isEditing = false
-//                    self.isLoading = false
-//                }
-//            case .failure(let error):
-//                print(
-//                    "Error al actualizar perfil: \(error.localizedDescription)")
-//                DispatchQueue.main.async {
-//                    self.showToastFailure = true
-//                    self.isEditing = false
-//                    self.isLoading = false
-//                }
-//            }
-//        }
-//    }
-//    
-//    func toggleEditing() {
-//        isEditing.toggle()
-//    }
-//    
-//    func updateAvatar(completion: @escaping (String) -> Void) {
-//        guard let avatar = self.newAvatar else {
-//            completion("")
-//            return
-//        }
-//        
-//        UploadImageService().uploadImage(image: avatar, fileName: "\(UUID().uuidString.lowercased()).jpg") { result in
-//            switch result {
-//            case .success(let response):
-//                print("Imagen subida con éxito: \(response)")
-//                
-//                if let data = response.data(using: .utf8) {
-//                    do {
-//                        let decodedResponse = try JSONDecoder().decode(SendImageResponse.self, from: data)
-//                        let fileId = decodedResponse.data.id
-//                        print("Imagen subida con éxito. ID: \(fileId)")
-//                        completion(fileId)
-//                    } catch {
-//                        print("Error al decodificar JSON: \(error)")
-//                        completion("")
-//                    }
-//                } else {
-//                    completion("")
-//                }
-//            case .failure(let error):
-//                print("Error al subir la imagen: \(error.localizedDescription)")
-//                completion("")
-//            }
-//        }
-//    }
-//}

@@ -189,17 +189,20 @@ extension ReservationCardComponent {
                 }
             )
         } else {
-            return VStack (spacing: 20){
-                Image(systemName: "qrcode.viewfinder") // Ícono de QR
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: imageSize, height: imageSize)
-                    .foregroundColor(.white.opacity(0.8))
-                    .padding(.top, 10)
-                Text("No se requiere QR")
-                    .font(.custom("Madridingamefont-Regular", size: 15))
-                    .foregroundColor(.white)
-            }
+            return AnyView (
+                VStack (spacing: 20){
+                    Image(systemName: "qrcode.viewfinder") // Ícono de QR
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: imageSize, height: imageSize)
+                        .foregroundColor(.white.opacity(0.8))
+                        .padding(.top, 10)
+                    Text("No se requiere QR")
+                        .font(.custom("Madridingamefont-Regular", size: 15))
+                        .foregroundColor(.white)
+                }
+            )
+            
         }
     }
     

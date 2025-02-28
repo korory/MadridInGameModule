@@ -64,7 +64,8 @@ extension SelectTeamsCellComponent {
                 .padding(.trailing, 2)
             )
         } else {
-            return VStack (spacing: 20){
+            return AnyView(
+            VStack (spacing: 20){
                 Image(systemName: "person.2.circle.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -74,9 +75,9 @@ extension SelectTeamsCellComponent {
             }
             .padding(.leading, 10)
             .padding(.trailing, 2)
+            )
         }
     }
-
     
     private var titleSubtitle: some View {
         VStack (alignment: .leading, spacing: 10){
