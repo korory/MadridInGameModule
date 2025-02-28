@@ -24,17 +24,9 @@ Luego, ejecuta:
 pod install
 ```
 
-## Uso
-
-### Importar el módulo
-
-```swift
-import MadridInGameiOSModule
-```
-
 ### Uso
 
-Importar el módulo
+### Importar el módulo
 Para comenzar a usar MadridInGameiOSModule, importa el módulo en tu archivo Swift:
 
 ```swift
