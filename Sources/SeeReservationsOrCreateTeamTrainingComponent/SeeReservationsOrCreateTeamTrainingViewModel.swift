@@ -43,6 +43,8 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     @Published var showToastDeleteSuccess = false
     @Published var showToastDeleteFailure = false
     
+    @Published var showLeyendPopup = false
+    
     private let reservationService = ReservationService()
     private let selectedTeam: TeamModelReal?
     

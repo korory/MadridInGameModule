@@ -11,7 +11,10 @@ import Foundation
 struct TournamentCellView: View {
     let date: String
     let name: String
+    let targetURL: String
     let statusString: String
+    
+    @State private var showWebView = false
     
     var body: some View {
         VStack {
@@ -74,20 +77,30 @@ extension TournamentCellView {
     
     
     private var subscribeButton: some View {
-        HStack (alignment: .center, spacing: 5){
-            Text("Inscríbete")
-                .font(.custom("Madridingamefont-Regular", size: 15))
-                .foregroundColor(.white)
-                .padding(.leading, 8)
-            
-            Image(systemName: "chevron.forward.circle")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 15, height: 15)
-                .foregroundStyle(.white)
+        Button {
+            if let url = URL(string: targetURL) {
+                UIApplication.shared.open(url)
+            } else {
+                let url = URL(string: "https://webesports.madridingame.es/esports-center/")!
+                UIApplication.shared.open(url)
+            }
+
+        } label: {
+            HStack (alignment: .center, spacing: 5){
+                Text("Inscríbete")
+                    .font(.custom("Madridingamefont-Regular", size: 15))
+                    .foregroundColor(.white)
+                    .padding(.leading, 8)
+                
+                Image(systemName: "chevron.forward.circle")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 15, height: 15)
+                    .foregroundStyle(.white)
+            }
+            .padding(.top, 2)
+            .padding(.bottom, 20)
         }
-        .padding(.top, 2)
-        .padding(.bottom, 20)
     }
     
     func getDayAndMonth() -> (day: String, month: String)? {
