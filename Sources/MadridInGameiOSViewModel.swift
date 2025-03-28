@@ -21,6 +21,8 @@ class MadridInGameiOSViewModel: ObservableObject {
     private let userManager = UserManager.shared
     private let environmentManager: EnvironmentManager
     
+    private var originalStyle: UIUserInterfaceStyle?
+    
     init(email: String, username: String, dni: String, isPro: Bool, openCompetitions: Bool) {
         self.email = email
         self.userName = username
@@ -39,6 +41,7 @@ class MadridInGameiOSViewModel: ObservableObject {
         
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             if let window = windowScene.windows.first {
+                self.originalStyle = window.overrideUserInterfaceStyle
                 window.overrideUserInterfaceStyle = .dark
             }
         }
@@ -69,6 +72,14 @@ class MadridInGameiOSViewModel: ObservableObject {
     
     func getUserTeams() -> [TeamModelReal] {
         return userManager.getUser()?.teamsResponse ?? []
+    }
+    
+    func onDisappear() {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            if let window = windowScene.windows.first {
+                window.overrideUserInterfaceStyle = self.originalStyle ?? .dark
+            }
+        }
     }
     
 //    func loadCustomFonts() {

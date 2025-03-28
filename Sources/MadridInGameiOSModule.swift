@@ -31,6 +31,9 @@ public struct MadridInGameiOSModule: View {
         .onAppear {
             viewModel.initializeModule()
         }
+        .onDisappear {
+            viewModel.onDisappear()
+        }
     }
     
     private func errorView(_ message: String) -> some View {
