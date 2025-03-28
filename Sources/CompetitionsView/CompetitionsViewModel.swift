@@ -15,7 +15,8 @@ class CompetitionsViewModel: ObservableObject {
     @Published var compatitionInformation: [CompetitionData] = []
         
     func initAllSeasons() -> [SeasonsModel] {
-        let years = ["2024", "2025", "2026"]
+        let currentYear = Calendar.current.component(.year, from: Date())
+        let years = (2024...currentYear).map { "\($0)" }
         
         var allYearSessons: [SeasonsModel] = []
         for year in years {            
@@ -40,7 +41,7 @@ class CompetitionsViewModel: ObservableObject {
         }
     }
     
-    func getAllInformationLeagues() -> [LeagueModel]{
+    func getAllInformationLeagues() -> [LeagueModel] {
         let leagueData = [
             ("Liga Municipal", "Esports Series Madrid", "Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid. Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo.", "esm"),
             ("Liga Municipal Junior", "Esports Series Madrid", "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League.", "junior"),
@@ -48,10 +49,12 @@ class CompetitionsViewModel: ObservableObject {
             ("Otras competiciones", "Esports Series Madrid", "", "other")
         ]
         
-        return leagueData.map { title, seriesTitle, description, type in
-            LeagueModel(title: title, seriesTitle: seriesTitle, description: description, allCompetitions: filterCompetitonsByType(type: type))
+        return leagueData.compactMap { title, seriesTitle, description, type in
+            let allCompetitionsInLeague = filterCompetitonsByType(type: type)
+            return allCompetitionsInLeague.isEmpty ? nil : LeagueModel(title: title, seriesTitle: seriesTitle, description: description, allCompetitions: allCompetitionsInLeague)
         }
     }
+
     
     func filterCompetitonsByType(type: String) -> [CompetitionData] {
         return self.compatitionInformation.compactMap { competition in

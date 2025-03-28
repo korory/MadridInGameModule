@@ -1,6 +1,7 @@
 ## README.md
 
-# MadridInGameModule
+
+# MadridInGameiOSModule
 
 ## Requisitos
 
@@ -11,10 +12,10 @@
 
 ### CocoaPods
 
-Para integrar **MadridInGameModule** en tu proyecto usando CocoaPods, añade la siguiente línea a tu `Podfile`:
+Para integrar **MadridInGameiOSModule** en tu proyecto usando CocoaPods, añade la siguiente línea a tu `Podfile`:
 
 ```ruby
-pod 'MadridInGameModule'
+pod 'MadridInGameiOSModule'
 ```
 
 Luego, ejecuta:
@@ -23,13 +24,15 @@ Luego, ejecuta:
 pod install
 ```
 
-## Uso
+### Uso
 
 ### Importar el módulo
+Para comenzar a usar MadridInGameiOSModule, importa el módulo en tu archivo Swift:
 
 ```swift
-import MadridInGameModule
+import MadridInGameiOSModule
 ```
+
 
 ### Ejemplo básico
 
@@ -38,10 +41,26 @@ import MadridInGameModule
 ```swift
 struct ContentView: View {
     var body: some View {
-        MadridInGameModule(email: "adriortega19@gmail.com")
+        MadridInGameiOSModule(
+            email: "test@test.com", 
+            userName: "Test", 
+            dni: "00000000R", 
+            accessToken: "The Acces Token", 
+            logoMIG: logoMIG, 
+            qrMiddleLogo: qrMiddleLogo
+        )
     }
 }
 ```
+Parámetros: (All Required*)
+
+- email: String -> El correo electrónico del usuario.
+- userName: String -> El nombre de usuario.
+- dni: String -> El DNI o documento de identidad del usuario.
+- accessToken: String -> El token de acceso para la autenticación.
+- logoMIG: UIImage -> Un logo de la aplicación (debe ser una imagen que se pase como parámetro).
+- qrMiddleLogo: UIImage -> Un logo adicional que aparecerá en el centro del QR (también una imagen que se pasa como parámetro).
+
 
 ## Licencia
 

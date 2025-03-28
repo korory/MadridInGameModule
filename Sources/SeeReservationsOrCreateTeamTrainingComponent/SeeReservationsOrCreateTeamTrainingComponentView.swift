@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SeeReservationsOrCreateTeamTrainingComponentView: View {
     @ObservedObject var viewModel: SeeReservationsOrCreateTeamTrainingViewModel
-
+    
     var body: some View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
@@ -24,6 +24,12 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                 ToastMessage(message: "Problema al eliminar una reserva", duration: 2, success: false) {
                     self.viewModel.showToastDeleteFailure = false
                 }
+                .zIndex(1)
+            } else if viewModel.showLeyendPopup {
+                CustomPopup(isPresented: $viewModel.showLeyendPopup) {
+                    ColorLegendView()
+                }
+                .transition(.scale)
                 .zIndex(1)
             }
             
@@ -43,6 +49,7 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                             }
                         }
                     }
+                    Spacer()
                 }
                 .padding(.leading, 10)
                 .padding(.trailing, 10)
@@ -70,6 +77,12 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                     .padding(.top, viewModel.isUserMode ? 10 : 0)
                     .padding(.leading, viewModel.isUserMode ? 5 : 0)
                 Spacer()
+                Button {
+                    self.viewModel.showLeyendPopup.toggle()
+                } label: {
+                    Text("Leyenda")
+                }
+                .padding(.trailing, 10)
                 Image(systemName: "arrowtriangle.down.fill")
                     .rotationEffect(.degrees(viewModel.calendarArrowRotation))
                     .animation(.easeInOut, value: viewModel.calendarArrowRotation)
@@ -138,7 +151,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                 .font(.custom("Madridingamefont-Regular", size: 13))
                 .foregroundColor(.white)
                 .opacity(0.7)
-
+            
             ForEach(viewModel.allReservations, id: \.id) { reservation in
                 TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation, showDeleteOption: false)) { optionSelected in
                     viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)

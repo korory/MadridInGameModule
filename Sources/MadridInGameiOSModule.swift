@@ -5,6 +5,7 @@ import SwiftUI
 
 public struct MadridInGameiOSModule: View {
     @StateObject private var viewModel: MadridInGameiOSViewModel
+    @Environment(\.presentationMode) var presentationMode
     
     public init(email: String, userName: String, dni: String, accessToken: String, logoMIG: UIImage, qrMiddleLogo: UIImage) {
         UserDefaults.saveAccessTokenKey(accessToken)
@@ -30,6 +31,9 @@ public struct MadridInGameiOSModule: View {
         .onAppear {
             viewModel.initializeModule()
         }
+        .onDisappear {
+            viewModel.onDisappear()
+        }
     }
     
     private func errorView(_ message: String) -> some View {
@@ -51,6 +55,17 @@ public struct MadridInGameiOSModule: View {
     private var topBarView: some View {
         VStack {
             HStack {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 18)
+                        .foregroundStyle(.white)
+                }
+                .padding(.trailing, 10)
+                
                 tabButton(title: "Dashboard", tab: 0)
                 if !viewModel.getUserTeams().isEmpty {
                     tabButton(title: "Equipos", tab: 1)
@@ -76,7 +91,7 @@ public struct MadridInGameiOSModule: View {
             VStack {
                 Text(title)
                     .foregroundColor(viewModel.selectedTab == tab ? .cyan : .white)
-                    .frame(maxWidth: .infinity)
+                    .font(.custom("Madridingamefont-Regular", size: 15))
                 Rectangle()
                     .fill(viewModel.selectedTab == tab ? Color.cyan : Color.clear)
                     .frame(height: 3)
