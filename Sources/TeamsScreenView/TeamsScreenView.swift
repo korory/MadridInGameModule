@@ -12,15 +12,22 @@ struct TeamsScreenView: View {
     @State private var changeButtonPressed: Bool = false
     
     var body: some View {
+        let teams = viewModel.getAllTeams()
+
         VStack {
-            if viewModel.getAllTeams().count >= 2 && !viewModel.teamSelected {
-                SelectTeamComponent(allTeams: viewModel.getAllTeams(),
-                                    onTeamSelected: { team in
-                    //self.viewModel.userManager.setSelectedTeam(team)
-                    self.viewModel.setTeamSelected(team: team)
-                })
-            } else if viewModel.getAllTeams().count == 1 || viewModel.teamSelected {
+            if teams.count >= 2 && !viewModel.teamSelected {
+                SelectTeamComponent(allTeams: teams) { team in
+                    viewModel.setTeamSelected(team: team)
+                }
+            } else if teams.count == 1 || viewModel.teamSelected {
                 tabBarComponent
+            }
+        }
+        .onAppear {
+            let teams = viewModel.getAllTeams()
+            viewModel.ensureTeamSelectedIfOnlyOne()
+            if teams.count == 1 && !viewModel.teamSelected {
+                viewModel.setTeamSelected(team: teams[0])
             }
         }
     }
@@ -49,24 +56,12 @@ extension TeamsScreenView {
                         }
                         .tag(TabBarTeamsBottom.team
                         )
-                    
-                    //                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: false, allTeams: []))
-                    //                        .tabItem {
-                    //                            Label("Equipo", systemImage: "person.3.fill")
-                    //                        }
-                    //                        .tag(TabBarTeamsBottom.players)
-                    //                        SelectTeamComponent(allTeams: viewModel.getAllTeams(),
-                    //                                            onTeamSelected: { team in
-                    //                            self.viewModel.setTeamSelected(team: team)
-                    //                            self.viewModel.optionTabSelected = .trainning
-                    //                            self.viewModel.selectedTab = TabBarTeamsBottom.trainning
-                    //                        })
+
                     if viewModel.getAllTeams().count >= 2 {
                         VStack {
-                        Text("Hola")
+                        Text("")
                     }
                         .onAppear(perform: {
-                            print("AAAAAA")
                             self.viewModel.resetTeamSelected()
                             self.viewModel.optionTabSelected = .trainning
                             self.viewModel.selectedTab = TabBarTeamsBottom.trainning
@@ -79,6 +74,7 @@ extension TeamsScreenView {
                 }
                 }
                 .accentColor(.cyan)
+                
             } else {
                 Text("No hay información disponible.")
                     .foregroundColor(.white)

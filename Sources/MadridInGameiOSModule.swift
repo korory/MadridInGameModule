@@ -99,16 +99,3 @@ public struct MadridInGameiOSModule: View {
         }
     }
 }
-
-
-/*struct MadridInGameModule_Previews: PreviewProvider {
-    static var previews: some View {
-        MadridInGameModule()
-    }
-}
-
-
-#Preview {
-    MadridInGameModule()
-}
-*/

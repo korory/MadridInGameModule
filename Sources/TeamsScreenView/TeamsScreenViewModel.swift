@@ -47,7 +47,13 @@ class TeamsScreenViewModel: ObservableObject {
         self.userManager.setSelectedTeam(team)
     }
     
-    func getTeamSelected() -> TeamModelReal {
-        return self.selectedTeam!//userManager.getUser()?.selectedTeam
+    func ensureTeamSelectedIfOnlyOne() {
+        if getAllTeams().count == 1 && selectedTeam == nil {
+            selectedTeam = getAllTeams().first
+        }
+    }
+    
+    func getTeamSelected() -> TeamModelReal? {
+        return self.selectedTeam//userManager.getUser()?.selectedTeam
     }
 }
