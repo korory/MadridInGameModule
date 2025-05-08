@@ -14,7 +14,7 @@ struct UserModel: Codable {
     let status: String?
     let username: String?
     let email: String?
-    let dni: String?
+    var dni: String?
     let token: String?
     let firstName: String?
     let lastName: String?

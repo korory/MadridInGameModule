@@ -31,6 +31,10 @@ class UserManager {
     struct TrainningsResponseModel: Codable {
         let data: [TrainningsModel]
     }
+    
+    func setDNI(_ dni: String) {
+        self.user?.dni = dni
+    }
 
     private init() {}
     

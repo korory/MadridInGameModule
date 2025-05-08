@@ -29,6 +29,7 @@ class ReservationFlowViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isCreatingReservation: Bool = false
     @Published var reservationSuccess: Bool = false
+    @Published var dniIsMissing: Bool = false
     
     @Published var userManager = UserManager.shared
     
@@ -265,6 +266,38 @@ class ReservationFlowViewModel: ObservableObject {
         return weekday - 1 // Convertir al formato requerido (Lunes = 1, Domingo = 7)
     }
     
+    func checkIfDNIExists() {
+        let user = userManager.getUser()
+        let dni = user?.dni ?? ""
+        if dni.isEmpty {
+            dniIsMissing = true
+        } else {
+            dniIsMissing = false
+        }
+    }
+    
+    func setDNIToTheUser(_ dni: String) {
+        guard let id = self.userManager.getUser()?.id else {
+            return
+        }
+        
+        self.isCreatingReservation = true
+        ProfileInformation().updateSingleDNIInformationProfile(userId: id, dni: dni) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let profile):
+                    print("Dni actualizado correctamente: \(profile)")
+                    self.userManager.setDNI(dni)
+                    self.createReservation()
+                case .failure(let error):
+                    print("Error al actualizar perfil: \(error.localizedDescription)")
+                    self.isCreatingReservation = false
+
+                }
+            }
+        }
+    }
+    
     func createReservation() {
         guard let date = selectedDate,
               let space = selectedSpace,
@@ -274,35 +307,40 @@ class ReservationFlowViewModel: ObservableObject {
             return
         }
         
-        let times = selectedSlots
+        checkIfDNIExists()
         
-        let reservation = Reservation(
-            id: 0,
-            status: "active",
-            slot: space.slots.first ?? Slot(id: 0, position: "", space: 0),
-            date: date,
-            user: userId,
-            team: nil,
-            training: nil,
-            qrImage: nil,
-            qrValue: nil,
-            times: times,
-            peripheralLoans: []
-        )
-
-        self.isCreatingReservation = true
-        reservationService.createReservation(reservation: reservation) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isLoading = false
-                switch result {
-                case .success (let reservation):
-                    self?.updateReservationWithQR(reservationInfo: reservation)
-                    print("Reserva creada exitosamente")
-                case .failure(let error):
-                    self?.isCreatingReservation = false
-                    self?.reservationSuccess = false
-                    self?.onReservationFail()
-                    print("Error al crear la reserva: \(error.localizedDescription)")
+        if !dniIsMissing {
+            
+            let times = selectedSlots
+            
+            let reservation = Reservation(
+                id: 0,
+                status: "active",
+                slot: space.slots.first ?? Slot(id: 0, position: "", space: 0),
+                date: date,
+                user: userId,
+                team: nil,
+                training: nil,
+                qrImage: nil,
+                qrValue: nil,
+                times: times,
+                peripheralLoans: []
+            )
+            
+            self.isCreatingReservation = true
+            reservationService.createReservation(reservation: reservation) { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    switch result {
+                    case .success (let reservation):
+                        self?.updateReservationWithQR(reservationInfo: reservation)
+                        print("Reserva creada exitosamente")
+                    case .failure(let error):
+                        self?.isCreatingReservation = false
+                        self?.reservationSuccess = false
+                        self?.onReservationFail()
+                        print("Error al crear la reserva: \(error.localizedDescription)")
+                    }
                 }
             }
         }
