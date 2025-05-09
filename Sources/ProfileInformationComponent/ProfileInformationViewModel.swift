@@ -15,6 +15,7 @@ class ProfileInformationViewModel: ObservableObject {
     @Published var showToastSuccess = false
     @Published var showToastFailure = false
     @Published var isLoading = false
+    @Published var isSaving = false
 
     var firstName: String
     var lastName: String
@@ -53,9 +54,23 @@ class ProfileInformationViewModel: ObservableObject {
         self.isLoading = true
         var avatarId = self.user?.avatar
 
+//        if newAvatar != nil {
+//            do {
+//                avatarId = try await updateAvatar()
+//                self.avatar = avatarId
+//            } catch {
+//                print("Error al subir la imagen: \(error.localizedDescription)")
+//                DispatchQueue.main.async {
+//                    self.showToastFailure = true
+//                    self.isLoading = false
+//                }
+//                return
+//            }
+//        }
         if newAvatar != nil {
             do {
                 avatarId = try await updateAvatar()
+                self.newAvatar = nil // <- Primero limpiar esto
                 self.avatar = avatarId
             } catch {
                 print("Error al subir la imagen: \(error.localizedDescription)")
@@ -66,6 +81,7 @@ class ProfileInformationViewModel: ObservableObject {
                 return
             }
         }
+
         
         ProfileInformation().updateInformationProfile(
             UserModel(
@@ -100,10 +116,15 @@ class ProfileInformationViewModel: ObservableObject {
         newAvatar = nil
         isEditing.toggle()
     }
+    
+    func openSafariToPersonalArea() {
+        if let url = URL(string: "https://personal-area.azurewebsites.net") {
+                UIApplication.shared.open(url)
+            }
+    }
 
     func updateAvatar() async throws -> String {
         guard let avatarPhoto = self.newAvatar else { return self.user?.avatar ?? "" }
-
         return try await withCheckedThrowingContinuation { continuation in
             UploadImageService().uploadImage(image: avatarPhoto, fileName: "\(UUID().uuidString.lowercased()).jpg") { result in
                 switch result {

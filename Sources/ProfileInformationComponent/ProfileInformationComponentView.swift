@@ -32,11 +32,11 @@ struct ProfileInformationComponentView: View {
                 .padding(.top, 10)
                 
                 if viewModel.showToastSuccess {
-                    ToastMessage(message: "¡Perfil Actualizado!", duration: 2, success: true) {
+                    ToastMessage(message: "¡Avatar Actualizado!", duration: 2, success: true) {
                         self.viewModel.showToastSuccess = false
                     }
                 } else if viewModel.showToastFailure {
-                    ToastMessage(message: "Problema al actualizar perfil", duration: 2, success: false) {
+                    ToastMessage(message: "Problema al actualizar el avatar", duration: 2, success: false) {
                         self.viewModel.showToastFailure = false
                     }
                 }
@@ -60,46 +60,52 @@ extension ProfileInformationComponentView {
     
     private var formComponent: some View {
         VStack(alignment: .leading, spacing: 20) {
-            if viewModel.isEditing {
-                FloatingTextField(text: viewModel.firstName, placeholderText: "Nombre")
-                    .onTextChange { oldValue, newValue in
-                        self.viewModel.firstName = newValue
-                    }
-                FloatingTextField(text: viewModel.lastName, placeholderText: "Apellidos")
-                    .onTextChange { oldValue, newValue in
-                        self.viewModel.lastName = newValue
-                    }
-                FloatingTextField(text: viewModel.dni, placeholderText: "DNI")
-                    .onTextChange { oldValue, newValue in
-                        self.viewModel.dni = newValue
-                    }
-                FloatingTextField(text: viewModel.email, placeholderText: "Email")
-                    .onTextChange { oldValue, newValue in
-                        self.viewModel.email = newValue
-                    }
-                FloatingTextField(text: viewModel.username, placeholderText: "Nick")
-                    .onTextChange { oldValue, newValue in
-                        self.viewModel.username = newValue
-                    }
-                FloatingTextField(text: viewModel.phone, placeholderText: "Teléfono (Opcional)")
-                    .onTextChange { oldValue, newValue in
-                        self.viewModel.phone = newValue
-                    }
-            } else {
+//            if viewModel.isEditing {
+//                FloatingTextField(text: viewModel.firstName, placeholderText: "Nombre")
+//                    .onTextChange { oldValue, newValue in
+//                        self.viewModel.firstName = newValue
+//                    }
+//                FloatingTextField(text: viewModel.lastName, placeholderText: "Apellidos")
+//                    .onTextChange { oldValue, newValue in
+//                        self.viewModel.lastName = newValue
+//                    }
+//                FloatingTextField(text: viewModel.dni, placeholderText: "DNI")
+//                    .onTextChange { oldValue, newValue in
+//                        self.viewModel.dni = newValue
+//                    }
+//                FloatingTextField(text: viewModel.email, placeholderText: "Email")
+//                    .onTextChange { oldValue, newValue in
+//                        self.viewModel.email = newValue
+//                    }
+//                FloatingTextField(text: viewModel.username, placeholderText: "Nick")
+//                    .onTextChange { oldValue, newValue in
+//                        self.viewModel.username = newValue
+//                    }
+//                FloatingTextField(text: viewModel.phone, placeholderText: "Teléfono (Opcional)")
+//                    .onTextChange { oldValue, newValue in
+//                        self.viewModel.phone = newValue
+//                    }
+//            } else {
                 ProfileInfoView(text: viewModel.firstName, label: "Nombre")
                 ProfileInfoView(text: viewModel.lastName, label: "Apellidos")
                 ProfileInfoView(text: viewModel.dni, label: "DNI")
                 ProfileInfoView(text: viewModel.email, label: "Email")
                 ProfileInfoView(text: viewModel.username, label: "Nick")
                 ProfileInfoView(text: viewModel.phone, label: "Teléfono")
-            }
+            //}
         }
         .padding(.bottom, 20)
     }
     
     private var componentAvatarSelector: some View {
-        AvatarComponentView(viewModel: AvatarViewModel(selectedImage: viewModel.newAvatar, imageId: viewModel.avatar), enablePress: viewModel.isEditing, imageSelected: { image in
+        AvatarComponentView(viewModel: AvatarViewModel(selectedImage: viewModel.newAvatar, imageId: viewModel.avatar), enablePress: true, imageSelected: { image in
+            guard !viewModel.isSaving else { return }
             viewModel.newAvatar = image
+            viewModel.isSaving = true
+            Task {
+                await viewModel.saveChanges()
+                viewModel.isSaving = false
+            }
         })
         .padding(.bottom, 20)
     }
@@ -107,8 +113,9 @@ extension ProfileInformationComponentView {
     private var editButton: some View {
         VStack (alignment: .center){
             if !viewModel.isEditing {
-                CustomButton(text: "Editar", needsBackground: true, backgroundColor: .cyan, pressEnabled: true, widthButton: 280, heightButton: 20) {
-                    viewModel.toggleEditing()
+                CustomButton(text: "Area Personal", needsBackground: true, backgroundColor: .cyan, pressEnabled: true, widthButton: 280, heightButton: 20) {
+                    viewModel.openSafariToPersonalArea()//toggleEditing()
+                    //viewModel.toggleEditing()
                 }
                 //.padding(.bottom, 10)
                 .padding()
@@ -119,9 +126,9 @@ extension ProfileInformationComponentView {
                     }
                     
                     CustomButton(text: "Guardar", needsBackground: true, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
-                        Task {
-                            await viewModel.saveChanges()
-                        }
+//                        Task {
+//                            await viewModel.saveChanges()
+//                        }
                     }
                 }
                 .padding(.horizontal)
