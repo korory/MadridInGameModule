@@ -130,7 +130,7 @@ struct CompatitionsDetailViewComponentView: View {
                 .clipped() // Evita que el contenido se extienda fuera de sus límites
 
             } else {
-                Text("No hay informaciÃ³n disponible.")
+                Text("No hay información disponible.")
                     .foregroundColor(.white)
                     .padding()
             }
