@@ -31,60 +31,11 @@ struct NewsComponentView: View {
                         .zIndex(1)
                         .presentationDetents([.medium, .large])
                 }
-//                .onAppear {
-//                    viewModel.getAllNews()
-//                }
+
                 .onDisappear {
                     self.viewModel.isLoading = false
                 }
             }
-            
-            
-//            CustomPopup(isPresented: Binding(
-//                get: { viewModel.createNewNews },
-//                set: { viewModel.createNewNews = $0 }
-//            )) {
-//                CreateOrEditNewsComponentView(createNew: true) {
-//                    self.viewModel.createNewNews = false
-//                } publishAction: { newModel in
-//                    self.viewModel.createNewNews = false
-//                    self.viewModel.allNews.append(newModel)
-//                }
-//                
-//            }
-//            .transition(.scale)
-//            .zIndex(1)
-//            
-//            CustomPopup(isPresented: Binding(
-//                get: { viewModel.editNew },
-//                set: { viewModel.editNew = $0 }
-//            )) {
-//                CreateOrEditNewsComponentView(createNew: false, newsInformation: viewModel.selectedNew) {
-//                    self.viewModel.editNew = false
-//                } publishAction: { newModel in
-//                    self.viewModel.editNew = false
-//                    self.viewModel.editNewsToArray(newSelected: newModel)
-//                }
-//                
-//            }
-//            .transition(.scale)
-//            .zIndex(1)
-//            
-//            CustomPopup(isPresented: Binding(
-//                get: { viewModel.deleteNews },
-//                set: { viewModel.deleteNews = $0 }
-//            )) {
-//                CancelOrDeleteComponent(title: "ELIMINAR NOTICIA", subtitle: "¿Quieres eliminar la noticia titulada \(self.viewModel.selectedNew?.title ?? "")") {
-//                    self.viewModel.deleteNews = false
-//                } aceptedAction: {
-//                    self.viewModel.deleteNewsToArray()
-//                    self.viewModel.deleteNews = false
-//                    //TODO: Delete reservation to the Backend
-//                }
-//                
-//            }
-//            .transition(.scale)
-//            .zIndex(1)
         }
     }
 }

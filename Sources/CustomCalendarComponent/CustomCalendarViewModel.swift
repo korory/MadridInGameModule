@@ -21,35 +21,72 @@ class CustomCalendarViewModel: ObservableObject {
         }
     }
     
-    // Generar los días del mes actual, incluyendo los del mes anterior y siguiente para completar las semanas
-    func generateDaysInMonth(for date: Date) -> [Date] {
-        guard let range = calendar.range(of: .day, in: .month, for: date),
-              let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))
+//    // Generar los días del mes actual, incluyendo los del mes anterior y siguiente para completar las semanas
+//    func generateDaysInMonth(for date: Date) -> [Date] {
+//        guard let range = calendar.range(of: .day, in: .month, for: date),
+//              let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))
+//        else { return [] }
+//        
+//        var days = range.compactMap { day -> Date? in
+//            return calendar.date(byAdding: .day, value: day - 1, to: firstDayOfMonth)
+//        }
+//        
+//        // Días de padding al principio del mes
+//        let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth)
+//        let paddingDaysBefore = (firstWeekday + 5) % 7
+//        let previousMonthDays = (1...paddingDaysBefore).compactMap { day -> Date? in
+//            return calendar.date(byAdding: .day, value: -day, to: firstDayOfMonth)
+//        }.reversed()
+//        
+//        days.insert(contentsOf: previousMonthDays, at: 0)
+//        
+//        // Días de padding al final del mes
+//        let remainingDays = (7 - (days.count % 7)) % 7
+//        let nextMonthDays = (1...remainingDays).compactMap { day -> Date? in
+//            return calendar.date(byAdding: .day, value: day, to: days.last!)
+//        }
+//        
+//        days.append(contentsOf: nextMonthDays)
+//        
+//        return days
+//    }
+    
+    func generateDaysInMonth(for date: Date, calendar: Calendar = .current) -> [Date] {
+        guard
+            let range = calendar.range(of: .day, in: .month, for: date),
+            let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))
         else { return [] }
-        
-        var days = range.compactMap { day -> Date? in
-            return calendar.date(byAdding: .day, value: day - 1, to: firstDayOfMonth)
+
+        // Días del mes actual
+        var days: [Date] = range.compactMap { day in
+            calendar.date(byAdding: .day, value: day - 1, to: firstDayOfMonth)
         }
-        
-        // Días de padding al principio del mes
-        let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth)
-        let paddingDaysBefore = (firstWeekday + 5) % 7
-        let previousMonthDays = (1...paddingDaysBefore).compactMap { day -> Date? in
-            return calendar.date(byAdding: .day, value: -day, to: firstDayOfMonth)
-        }.reversed()
-        
-        days.insert(contentsOf: previousMonthDays, at: 0)
-        
-        // Días de padding al final del mes
-        let remainingDays = (7 - (days.count % 7)) % 7
-        let nextMonthDays = (1...remainingDays).compactMap { day -> Date? in
-            return calendar.date(byAdding: .day, value: day, to: days.last!)
+
+        // Padding al principio (calendario empezando en lunes)
+        let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth) // 1=Domingo..7=Sábado
+        let paddingDaysBefore = (firstWeekday + 5) % 7                        // 0=Lunes..6=Domingo
+
+        if paddingDaysBefore > 0 {
+            let prev = (1...paddingDaysBefore).compactMap { day in
+                calendar.date(byAdding: .day, value: -day, to: firstDayOfMonth)
+            }.reversed()
+            days.insert(contentsOf: prev, at: 0)
         }
-        
-        days.append(contentsOf: nextMonthDays)
-        
+
+        // Padding al final para completar semanas
+        let remainder = days.count % 7
+        let remainingDays = (7 - remainder) % 7
+
+        if remainingDays > 0, let last = days.last {
+            let next = (1...remainingDays).compactMap { day in
+                calendar.date(byAdding: .day, value: day, to: last)
+            }
+            days.append(contentsOf: next)
+        }
+
         return days
     }
+
     
     func dateText(for date: Date) -> String {
         return "\(calendar.component(.day, from: date))"

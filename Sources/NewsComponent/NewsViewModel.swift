@@ -26,7 +26,12 @@ class NewsViewModel: ObservableObject {
     }
     
     func getAllNews()  {
-        guard let selectedTeam = userManager.getSelectedTeam() else { return }
+        guard let selectedTeam = userManager.getSelectedTeam()
+                
+        else {
+            self.isLoading = false
+            return
+        }
         
         self.isLoading = true
         

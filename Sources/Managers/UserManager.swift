@@ -12,16 +12,28 @@ class UserManager {
     
     private var user: UserModel?
     
+    func setUser(user: UserModel) {
+        self.user = user
+    }
+    
     func getUser() -> UserModel? {
         return user
     }
     
     func setSelectedTeam(_ team: TeamModelReal) {
-        self.user?.selectedTeam = team
+        guard var u = self.user else { return }
+        u.selectedTeam = team
+        self.user?.selectedTeam = u.selectedTeam
     }
 
     func getSelectedTeam() -> TeamModelReal? {
         return self.user?.selectedTeam
+    }
+    
+    func setAllTeamsUser(_ teams: [TeamModelReal]) {
+        guard var u = self.user else { return }
+        u.teamsResponse = teams
+        self.user?.teamsResponse = u.teamsResponse
     }
     
     struct TeamResponse: Codable {
@@ -33,7 +45,9 @@ class UserManager {
     }
     
     func setDNI(_ dni: String) {
-        self.user?.dni = dni
+        guard var u = self.user else { return }
+        u.dni = dni
+        self.user?.dni = u.dni
     }
 
     private init() {}
@@ -50,13 +64,16 @@ class UserManager {
                 )
 
                 if let users = response["data"], var user = users.first {
-                    self.user = user
+                    if (self.user == nil) {
+                        setUser(user: user)
+                    }
 
                     fetchTeamsByUser(userId: user.id ?? "") { result in
                         switch result {
                         case .success(let teams):
                             user.teamsResponse = teams
-                            self.user = user
+                            self.setAllTeamsUser(teams)
+                            //self.user = user
                             completion(.success(()))
                         case .failure(let error):
                             print(error)
@@ -221,61 +238,4 @@ class UserManager {
             }
         }
     }
-
-//
-//    func fetchUserGameSpace(userId: String, completion: @escaping (Result<[LoanModel], Error>) -> Void) {
-//        guard let userGammingSpacesIds = user?.gamingSpaceReserves, !userGammingSpacesIds.isEmpty else {
-//            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No hay entrenamientos disponibles en el perfil del usuario."])))
-//            return
-//        }
-//
-//        Task {
-//            do {
-//                var allGammingSpaces: [LoanModel] = []
-//
-//                for gammingSpaceId in userGammingSpacesIds {
-//                    let parameters = ["filter[id][_eq]": "\(gammingSpaceId)"]
-//                    guard let gammingResponse: GamingSpaceResponse = try? await DirectusService.shared.request(
-//                        endpoint: "gaming_space_reserves",
-//                        method: .GET,
-//                        parameters: parameters
-//                    ), let gammingInfo = gammingResponse.data.first else {
-//                        continue
-//                    }
-//
-//                    var updatedGammingInfo = gammingInfo
-//
-//                    if let userGammingSpacesTimesIds = gammingInfo.times {
-//                        for gammingSpaceTimeId in userGammingSpacesTimesIds {
-//                            let timeParameters = ["filter[id][_eq]": "\(gammingSpaceTimeId)"]
-//                            guard let gammingTimeResponse: GamingSpacesReservationIds = try? await DirectusService.shared.request(
-//                                endpoint: "gaming_space_reserves_gaming_space_times",
-//                                method: .GET,
-//                                parameters: timeParameters
-//                            ), let gammingSpaceTimesId = gammingTimeResponse.data.first?.gamingSpaceTimesId else {
-//                                continue
-//                            }
-//
-//                            let timeInfoParameters = ["filter[id][_eq]": "\(gammingSpaceTimesId)"]
-//                            guard let gammingSpaceTimeResponse: GamingSpacesReservationTime = try? await DirectusService.shared.request(
-//                                endpoint: "gaming_space_times",
-//                                method: .GET,
-//                                parameters: timeInfoParameters
-//                            ) else {
-//                                continue
-//                            }
-//
-//                            updatedGammingInfo.gammingSpacesTimesComplete.append(contentsOf: gammingSpaceTimeResponse.data)
-//                        }
-//                    }
-//
-//                    allGammingSpaces.append(updatedGammingInfo)
-//                }
-//
-//                completion(.success(allGammingSpaces))
-//            } catch {
-//                completion(.failure(error))
-//            }
-//        }
-//    }
 }

@@ -60,5 +60,6 @@ struct DetailSectionView: View {
                 .padding(.bottom)
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }

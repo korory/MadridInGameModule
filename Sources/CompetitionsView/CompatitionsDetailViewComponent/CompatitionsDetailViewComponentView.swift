@@ -17,7 +17,7 @@ enum Tab {
 
 struct CompatitionsDetailViewComponentView: View {
     @ObservedObject var viewModel: CompetitionsDetailViewModel
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ZStack {
@@ -26,8 +26,14 @@ struct CompatitionsDetailViewComponentView: View {
             
             VStack(alignment: .leading, spacing: 5) {
                 titleBanner
+                    .zIndex(10) // Asegurar que el banner esté por encima
+                
                 dropdownSplitSelectorComponent
+                    .zIndex(5) // Dropdown por encima del TabView pero debajo del banner
+                
                 tabBarComponent
+                    .zIndex(1) // TabView con menor zIndex
+                
                 Spacer()
             }
         }
@@ -41,7 +47,7 @@ struct CompatitionsDetailViewComponentView: View {
     private var titleBanner: some View {
         HStack (spacing: 25){
             Button {
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             } label: {
                 Image(systemName: "chevron.left")
                     .resizable()
@@ -49,6 +55,8 @@ struct CompatitionsDetailViewComponentView: View {
                     .frame(height: 18)
                     .foregroundStyle(.white)
             }
+            .frame(width: 44, height: 44) // Área de toque más grande
+            .contentShape(Rectangle()) // Asegurar que toda el área sea tocable
             
             Text((viewModel.competitionsInformation.title)!)
                 .font(.custom("Madridingamefont-Regular", size: 25))
@@ -60,6 +68,7 @@ struct CompatitionsDetailViewComponentView: View {
             Spacer()
         }
         .padding(.leading, 20)
+        .background(Color.clear) // Fondo transparente pero interactuable
     }
     
     private var dropdownTitle: some View {
@@ -118,15 +127,13 @@ struct CompatitionsDetailViewComponentView: View {
                 }
                 .accentColor(.cyan)
                 .padding(.top)
+                .clipped() // Evita que el contenido se extienda fuera de sus límites
 
             } else {
-                Text("No hay información disponible.")
+                Text("No hay informaciÃ³n disponible.")
                     .foregroundColor(.white)
                     .padding()
             }
         }
-        .ignoresSafeArea(.all)
     }
 }
-
-

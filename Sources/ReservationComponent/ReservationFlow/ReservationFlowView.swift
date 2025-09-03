@@ -136,7 +136,7 @@ struct SelectDateView: View {
                 .foregroundColor(.white)
                 .padding(.bottom, 20)
             
-            if viewModel.markedDates.isEmpty { //&& viewModel.blockedDates.isEmpty {
+            if viewModel.isLoading { //&& viewModel.blockedDates.isEmpty {
                 VStack {
                     Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
                         .resizable()

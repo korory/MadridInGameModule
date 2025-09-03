@@ -98,10 +98,14 @@ class ReservationFlowViewModel: ObservableObject {
                     // Esperamos que todas las llamadas internas terminen
                     innerDispatchGroup.notify(queue: .main) {
                         print("Reservas obtenidas: \(reservations)")
+                        self?.isLoading = false
+
                     }
                     
                 case .failure(let error):
                     print("Error al obtener reservas: \(error)")
+                    self?.isLoading = false
+
                 }
             }
         }

@@ -101,11 +101,13 @@ extension NewsFlowComponent {
                         .clipShape(RoundedRectangle(cornerRadius: 10.0))
                         .padding()
                 case .failure:
-                    Image(systemName: "photo")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: imageSize, height: imageSize)
-                        .foregroundColor(.gray)
+                    EmptyView()
+
+//                    Image(systemName: "photo")
+//                        .resizable()
+//                        .aspectRatio(contentMode: .fit)
+//                        .frame(width: imageSize, height: imageSize)
+//                        .foregroundColor(.gray)
                 @unknown default:
                     EmptyView()
                 }
