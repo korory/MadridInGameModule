@@ -7,12 +7,31 @@ public struct MadridInGameiOSModule: View {
     @StateObject private var viewModel: MadridInGameiOSViewModel
     @Environment(\.presentationMode) var presentationMode
     
-    public init(email: String, userName: String, dni: String, accessToken: String, logoMIG: UIImage, qrMiddleLogo: UIImage) {
-        UserDefaults.saveAccessTokenKey(accessToken)
-        UserDefaults.saveLogoMIG(logoMIG)
-        UserDefaults.saveQrMiddleLogo(qrMiddleLogo)
+    public init(_ model: MadridInGameUserData, isPreRelease: Bool = false) {
+        UserDefaults.saveAccessTokenKey(model.accessToken)
+        if let logo = model.logoMIG {
+            UserDefaults.saveLogoMIG(logo)
+        }
+        if let logo = model.qrMiddleLogo {
+            UserDefaults.saveQrMiddleLogo(logo)
+        }
+        
+        _viewModel = StateObject(wrappedValue: MadridInGameiOSViewModel(userInfo: model, isPro: !isPreRelease, openCompetitions: false))
+    }
 
-        _viewModel = StateObject(wrappedValue: MadridInGameiOSViewModel(email: email, username: userName, dni: dni, isPro: true, openCompetitions: false))
+    public init(email: String, userName: String, dni: String? = nil, accessToken: String, logoMIG: UIImage?, qrMiddleLogo: UIImage?, isPreRelease: Bool = false) {
+        UserDefaults.saveAccessTokenKey(accessToken)
+
+        if let logo = logoMIG {
+            UserDefaults.saveLogoMIG(logo)
+        }
+        if let logo = qrMiddleLogo {
+            UserDefaults.saveQrMiddleLogo(logo)
+        }
+
+        let userInfo = MadridInGameUserData(name: nil, lastName: nil, userName: userName, email: email, dni: dni, phone: nil, accessToken: accessToken, logoMIG: logoMIG, qrMiddleLogo: qrMiddleLogo)
+        
+        _viewModel = StateObject(wrappedValue: MadridInGameiOSViewModel(userInfo: userInfo, isPro: !isPreRelease, openCompetitions: false))
     }
     
     public var body: some View {
@@ -91,7 +110,7 @@ public struct MadridInGameiOSModule: View {
             VStack {
                 Text(title)
                     .foregroundColor(viewModel.selectedTab == tab ? .cyan : .white)
-                    .font(.custom("Madridingamefont-Regular", size: 15))
+                    .font(.madridInGameiOSFont(size: 15))
                 Rectangle()
                     .fill(viewModel.selectedTab == tab ? Color.cyan : Color.clear)
                     .frame(height: 3)

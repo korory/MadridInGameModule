@@ -24,7 +24,7 @@ struct CustomButton: View {
             }
         }) {
             Text(text)
-                .font(.custom("Madridingamefont-Regular", size: 17))
+                .font(.madridInGameiOSFont(size: 17))
                 .foregroundStyle(needsBackground ?? false ? .black : .white)
                 .padding()
                 .frame(maxWidth: .infinity)
@@ -42,6 +42,6 @@ struct CustomButton: View {
 
 #Preview {
     CustomButton(text: "Press Me", needsBackground: true, backgroundColor: Color.gray, pressEnabled: true, widthButton: 180 , heightButton: 50, action: {
-        print("Button pressed!")
+        Logger.shared.log("Button pressed!")
     })
 }

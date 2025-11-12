@@ -29,7 +29,10 @@ struct ConfirmDNIView: View {
 
                 textComponent
 
-                acceptButton
+                HStack {
+                    acceptButton
+                    cancelButton
+                }
             }
             .padding()
             .background(Color.white.opacity(0.2))
@@ -44,7 +47,7 @@ extension ConfirmDNIView {
     private var titleAndSubtitleComponent: some View {
         VStack(spacing: 8) {
             Text("Confirma tu DNI")
-                .font(.custom("Madridingamefont-Regular", size: 25))
+                .font(.madridInGameiOSFont(size: 25))
                 .foregroundStyle(Color.white)
 
             Text("Introduce y confirma tu DNI")
@@ -55,7 +58,7 @@ extension ConfirmDNIView {
 
     private var textComponent: some View {
         Text("Importante: Debes llevar tu DNI contigo para poder acceder al centro la primera vez y validar tu usuario.")
-            .font(.custom("Madridingamefont-Regular", size: 12))
+            .font(.madridInGameiOSFont(size: 12))
             .foregroundStyle(.white)
             .multilineTextAlignment(.center)
             .padding(.horizontal)
@@ -75,8 +78,22 @@ extension ConfirmDNIView {
         .padding(.top, 12)
     }
 
+    private var cancelButton: some View {
+        CustomButton(
+            text: "Cancel",
+            needsBackground: true,
+            backgroundColor: Color.cyan,
+            pressEnabled: true,
+            widthButton: 180,
+            heightButton: 50
+        ) {
+            action("")
+        }
+        .padding(.top, 12)
+    }
+
     private func validateDNI(_ dni: String) -> Bool {
-        let dniRegex = "^[0-9]{8}[A-Z]$"
+        let dniRegex = "^[0-9]{8}[A-Za-z]$"
         return NSPredicate(format: "SELF MATCHES %@", dniRegex).evaluate(with: dni)
     }
 }

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DetailsTournamentView: View {
     var title: String
-    var content: [TournamentModel]
+    var content: [TournamentModel]?
     var image: String
     var environmentManager = EnvironmentManager()
     
@@ -43,13 +43,19 @@ struct DetailsTournamentView: View {
                     }
                     
                     Text(title.uppercased())
-                        .font(.custom("Madridingamefont-Regular", size: 20))
+                        .font(.madridInGameiOSFont(size: 20))
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .padding(.top, 5)
                     
-                    ForEach(content) { singleContent in
-                        TournamentCellView(date: singleContent.date ?? "", name: singleContent.name ?? "", targetURL: singleContent.link ?? "", statusString: singleContent.status ?? "")
+                    if let content, !content.isEmpty {
+                        ForEach(content) { singleContent in
+                            TournamentCellView(date: singleContent.date ?? "", name: singleContent.name ?? "", targetURL: singleContent.link ?? "", statusString: singleContent.status ?? "")
+                        }
+                    } else {
+                        Text("No hay información disponible.")
+                            .foregroundColor(.white)
+                            .padding()
                     }
                     
                     Spacer()

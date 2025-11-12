@@ -42,10 +42,10 @@ class IndividualReservationsCellViewModel: ObservableObject {
     func handleAction(_ action: IndividualReservationsCellOptions) {
         switch action {
         case .seeReservation:
-            print("Ver reserva: \(reservation.id ?? 0)")
+            Logger.shared.log("Ver reserva: \(reservation.id ?? 0)")
             // Aquí podrías agregar navegación o lógica adicional
         case .cancelReservation:
-            print("Cancelar reserva: \(reservation.id ?? 0)")
+            Logger.shared.log("Cancelar reserva: \(reservation.id ?? 0)")
             // Aquí podrías manejar la cancelación de la reserva
         }
     }

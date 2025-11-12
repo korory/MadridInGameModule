@@ -1,5 +1,5 @@
 //
-//  GammingSpacesModel.swift
+//  GamingSpacesModel.swift
 //  Pods
 //
 //  Created by Arnau Rivas Rivas on 4/2/25.
@@ -7,10 +7,10 @@
 
 // Modelo para la respuesta principal
 struct GamingSpaceTimeResponse: Codable {
-    let data: [GammingSpacesModel]
+    let data: [GamingSpacesModel]
 }
 
-struct GammingSpacesModel: Codable {
+struct GamingSpacesModel: Codable {
     let id: String
     let dateCreated: String
     let dateUpdated: String
@@ -67,7 +67,7 @@ struct LoanModel: Codable {
     let training: String
     let user: String
     let peripheralLoans: [PeripheralLoan]
-    var gammingSpacesTimesComplete: [GamingSpaceReservationTimes] = []
+    var gamingSpacesTimesComplete: [GamingSpaceReservationTimes] = []
 
     enum CodingKeys: String, CodingKey {
         case id, date, qrImage, qrValue, slot, status, team, times, training, user

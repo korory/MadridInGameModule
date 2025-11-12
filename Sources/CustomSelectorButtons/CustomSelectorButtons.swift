@@ -21,7 +21,7 @@ struct CustomSelectorButtons: View {
                              backgroundColor: selectedItems.contains(item) ? Color.white : Color.clear,
                              pressEnabled: pressEnabled,
                              widthButton: 180, heightButton: 50) {
-                    print("Press \(item)")
+                    Logger.shared.log("Press \(item)")
                     onSelect(item)
                 }
                              .padding(.bottom, 10)

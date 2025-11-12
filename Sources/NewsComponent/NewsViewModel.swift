@@ -48,7 +48,7 @@ class NewsViewModel: ObservableObject {
                     self?.isLoading = false
                 }
             case .failure(let failure):
-                print(failure)
+                Logger.shared.log(failure)
                 self?.isLoading = false
             }
         }

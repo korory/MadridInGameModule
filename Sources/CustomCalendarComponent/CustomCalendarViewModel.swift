@@ -10,9 +10,25 @@ import SwiftUI
 class CustomCalendarViewModel: ObservableObject {
     @Published var currentDate = Date()
     @Published var selectedDate: Date?
-    let calendar = Calendar.current
+
+    let calendar: Calendar = {
+        var calendar = Calendar.current
+        calendar.locale = Locale.current
+        return calendar
+    }()
     
-    let daysOfWeek = ["L", "M", "M", "J", "V", "S", "D"]
+    var daysOfWeek: [String] {
+        let symbols = calendar.veryShortStandaloneWeekdaySymbols
+        let firstIndex = calendar.firstWeekday - 1
+        return Array(symbols[firstIndex...] + symbols[..<firstIndex])
+    }
+    
+    var formatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.locale = calendar.locale
+        return formatter
+    }
     
     // Función para cambiar el mes
     func changeMonth(by value: Int) {
@@ -51,20 +67,23 @@ class CustomCalendarViewModel: ObservableObject {
 //        return days
 //    }
     
-    func generateDaysInMonth(for date: Date, calendar: Calendar = .current) -> [Date] {
+    func generateDaysInMonth(for date: Date) -> [Date] {
         guard
             let range = calendar.range(of: .day, in: .month, for: date),
             let firstDayOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))
         else { return [] }
 
-        // Días del mes actual
+        // Generate days in the current month
         var days: [Date] = range.compactMap { day in
             calendar.date(byAdding: .day, value: day - 1, to: firstDayOfMonth)
         }
 
-        // Padding al principio (calendario empezando en lunes)
-        let firstWeekday = calendar.component(.weekday, from: firstDayOfMonth) // 1=Domingo..7=Sábado
-        let paddingDaysBefore = (firstWeekday + 5) % 7                        // 0=Lunes..6=Domingo
+        // Determine the first weekday according to the locale
+        let firstWeekdayIndex = (calendar.firstWeekday - 1 + 7) % 7
+        let firstDayWeekday = (calendar.component(.weekday, from: firstDayOfMonth) - 1 + 7) % 7
+
+        // Calculate padding before
+        let paddingDaysBefore = (firstDayWeekday - firstWeekdayIndex + 7) % 7
 
         if paddingDaysBefore > 0 {
             let prev = (1...paddingDaysBefore).compactMap { day in
@@ -73,7 +92,7 @@ class CustomCalendarViewModel: ObservableObject {
             days.insert(contentsOf: prev, at: 0)
         }
 
-        // Padding al final para completar semanas
+        // Padding at the end to complete full weeks
         let remainder = days.count % 7
         let remainingDays = (7 - remainder) % 7
 
@@ -98,8 +117,11 @@ class CustomCalendarViewModel: ObservableObject {
     
     func monthAndYearString(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "es_ES")
-        formatter.dateFormat = "MMMM"
+        if date.isInCurrentYear {
+            formatter.dateFormat = "MMMM"
+        } else {
+            formatter.dateFormat = "MMMM yyyy"
+        }
         return formatter.string(from: date).capitalized
     }
     
@@ -124,7 +146,7 @@ class CustomCalendarViewModel: ObservableObject {
             self.selectedDate = selectedDate // Actualiza la fecha seleccionada
             let formatter = DateFormatter()
             formatter.dateFormat = "dd/MM/yyyy"
-            print("Selected date: \(formatter.string(from: selectedDate))")
+            Logger.shared.log("Selected date: \(formatter.string(from: selectedDate))")
             onDateSelected(formatter.string(from: selectedDate)) // Llama al closure
         }
     }

@@ -82,7 +82,7 @@ extension SelectTeamsCellComponent {
     private var titleSubtitle: some View {
         VStack (alignment: .leading, spacing: 10){
             Text(team.name ?? "Equipo sin nombre")
-                .font(.custom("Madridingamefont-Regular", size: 17))
+                .font(.madridInGameiOSFont(size: 17))
                 .foregroundColor(.white)
                 .padding(.leading, 8)
             

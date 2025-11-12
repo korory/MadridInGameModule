@@ -49,7 +49,7 @@ extension NewsCellComponentView {
                             .padding()
                         
                         Text("Cargando Imagen")
-                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .font(.madridInGameiOSFont(size: 15))
                             .foregroundColor(.white)
                             .opacity(0.7)
                     }
@@ -72,7 +72,7 @@ extension NewsCellComponentView {
     private var newsContent: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(viewModel.news.title ?? "")
-                .font(.custom("Madridingamefont-Regular", size: 15))
+                .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white)
                 .lineLimit(2)
                 

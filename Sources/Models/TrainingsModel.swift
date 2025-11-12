@@ -1,5 +1,5 @@
 //
-//  TrainningsModel.swift
+//  TrainingsModel.swift
 //  Pods
 //
 //  Created by Arnau Rivas Rivas on 4/2/25.
@@ -7,11 +7,11 @@
 
 import Foundation
 
-//struct TrainningsResponseModel: Codable {
-//    let data: [TrainningsModel]?
+//struct TrainingsResponseModel: Codable {
+//    let data: [TrainingsModel]?
 //}
 
-struct TrainningsModel: Codable {
+struct TrainingsModel: Codable {
     let idUUID = UUID()
     let id: String
     let dateCreated: String

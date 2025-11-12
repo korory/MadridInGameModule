@@ -10,7 +10,7 @@ import SwiftUI
 struct CustomCalendarView: View {
     @StateObject private var viewModel = CustomCalendarViewModel()
     var canUserInteract: Bool
-    var markedDates: [MarkTrainnigDatesAndReservetions] = []
+    var markedDates: [MarkTrainingDatesAndReservations] = []
     var onDateSelected: (String) -> Void
     
     var body: some View {
@@ -32,7 +32,7 @@ struct CustomCalendarView: View {
             }
             Spacer()
             Text(viewModel.monthAndYearString(viewModel.currentDate).uppercased())
-                .font(.custom("Madridingamefont-Regular", size: 20))
+                .font(.madridInGameiOSFont(size: 20))
                 .foregroundStyle(Color.white)
             Spacer()
             Button(action: {
@@ -177,7 +177,7 @@ struct CustomCalendarView: View {
             
             let formatter = DateFormatter()
             formatter.dateFormat = "dd/MM/yyyy"
-            print("Selected date: \(formatter.string(from: date))")
+            Logger.shared.log("Selected date: \(formatter.string(from: date))")
             onDateSelected(formatter.string(from: date))
         }
     }
@@ -208,7 +208,7 @@ struct CustomCalendarView: View {
 //            }
 //            Spacer()
 //            Text(viewModel.monthAndYearString(viewModel.currentDate).uppercased())
-//                .font(.custom("Madridingamefont-Regular", size: 20))
+//                .font(.madridInGameiOSFont(size: 20))
 //                .foregroundStyle(Color.white)
 //            Spacer()
 //            Button(action: {
@@ -295,7 +295,7 @@ struct CustomCalendarView: View {
 //                                            viewModel.onDateSelected(selectedDate)
 //                                            let formatter = DateFormatter()
 //                                            formatter.dateFormat = "dd/MM/yyyy"
-//                                            print("Selected date: \(formatter.string(from: date))")
+//                                            Logger.shared.log("Selected date: \(formatter.string(from: date))")
 //                                            onDateSelected(formatter.string(from: date))
 //                                        }
 //                                    }

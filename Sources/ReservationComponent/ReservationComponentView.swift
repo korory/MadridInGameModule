@@ -41,7 +41,7 @@ struct ReservationComponentView: View {
                     set: { viewModel.isReservationValid = $0 }
                 )) {
                     ConfirmDNIView(action: { dni in
-                        print("DNI recibido: \(dni)")
+                        Logger.shared.log("DNI recibido: \(dni)")
                         viewModel.isReservationValid = false
                         viewModel.isDNICorrect = true
                     })
@@ -67,6 +67,7 @@ struct ReservationComponentView: View {
     
 }
 extension ReservationComponentView {
+    // TODO: add holidays
     private var calendarComponent: some View {
         CustomCalendarView(canUserInteract: true, markedDates:[]) { stringDate in
             viewModel.resetAll()

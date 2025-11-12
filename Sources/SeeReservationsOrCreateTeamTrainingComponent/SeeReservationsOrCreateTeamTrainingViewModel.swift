@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct MarkTrainnigDatesAndReservetions: Codable {
+struct MarkTrainingDatesAndReservations: Codable {
     let date: Date
     var individualReservation: Bool = false
     var blockedDays: Bool = false
@@ -18,9 +18,9 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     @Published var isDateSelected: Bool = false
     @Published var dateSelected: String = ""
     @Published var isUserMode: Bool = false
-    @Published var markedDates: [MarkTrainnigDatesAndReservetions] = []
-    @Published var isEditTraning: Bool = false
-    @Published var isRemoveTraning: Bool = false
+    @Published var markedDates: [MarkTrainingDatesAndReservations] = []
+    @Published var isEditTraining: Bool = false
+    @Published var isRemoveTraining: Bool = false
     @Published var isCreateNewTraining: Bool = false
     
     //@Published var teamReservationCellInformation: TeamReservation?
@@ -43,7 +43,7 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     @Published var showToastDeleteSuccess = false
     @Published var showToastDeleteFailure = false
     
-    @Published var showLeyendPopup = false
+    @Published var showLegendPopup = false
     
     private let reservationService = ReservationService()
     private let selectedTeam: TeamModelReal?
@@ -108,13 +108,13 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                                 switch result {
                                 case .success(let gameSpaces):
                                     if let createDate = Utils.createDate(from: reservation.date) {
-                                        self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, individualReservation: true))
+                                        self?.markedDates.append(MarkTrainingDatesAndReservations(date: createDate, individualReservation: true))
                                         reservation.gamingSpaces = gameSpaces
                                         self?.allIndividualReservations.append(reservation)
                                     }
                                     
                                 case .failure(let error):
-                                    print("Error al obtener reservas: \(error)")
+                                    Logger.shared.log("Error al obtener reservas: \(error)")
                                 }
                                 innerDispatchGroup.leave()
                             }
@@ -122,18 +122,18 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
 
                         if let createDate = Utils.createDate(from: reservation.date) {
                             DispatchQueue.main.async {
-                                self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, individualReservation: true))
+                                self?.markedDates.append(MarkTrainingDatesAndReservations(date: createDate, individualReservation: true))
                             }
                         }
                     }
                     
                     // Esperamos que todas las llamadas internas terminen
                     innerDispatchGroup.notify(queue: .main) {
-                        print("Reservas obtenidas: \(reservations)")
+                        Logger.shared.log("Reservas obtenidas: \(reservations)")
                     }
 
                 case .failure(let error):
-                    print("Error al obtener reservas: \(error)")
+                    Logger.shared.log("Error al obtener reservas: \(error)")
                 }
             }
         }
@@ -153,7 +153,7 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     }
     
     func reservationsService(team: TeamModelReal, userId: String, completion: @escaping () -> Void) {
-        reservationService.getAllTrainnings(teamId: team.id, userId: userId) { [weak self] result in
+        reservationService.getAllTrainings(teamId: team.id, userId: userId) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let reservations):
@@ -161,12 +161,12 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                         if let createDate = Utils.createDate(from: reservation.startDate) {
                             reservation.teamName = team.name
                             self?.allReservations.append(reservation)
-                            self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate))
+                            self?.markedDates.append(MarkTrainingDatesAndReservations(date: createDate))
                         }
                     }
                     completion()
                 case .failure(let error):
-                    print("Error al obtener reservas de equipo: \(error)")
+                    Logger.shared.log("Error al obtener reservas de equipo: \(error)")
                 }
             }
         }
@@ -180,11 +180,11 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                     for blockDay in blockedDays {
                         guard let blockDate = blockDay.date else { continue }
                         if let createDate = Utils.createDate(from: blockDate) {
-                            self?.markedDates.append(MarkTrainnigDatesAndReservetions(date: createDate, blockedDays: true))
+                            self?.markedDates.append(MarkTrainingDatesAndReservations(date: createDate, blockedDays: true))
                         }
                     }
                 case .failure(let error):
-                    print("Error al obtener los dias bloqueados: \(error)")
+                    Logger.shared.log("Error al obtener los días bloqueados: \(error)")
                 }
             }
         }
@@ -202,32 +202,32 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
         switch option {
         case .removeCell:
             // Handle the removal logic here
-            print("Remove training for \(reservation)")
+            Logger.shared.log("Remove training for \(reservation)")
             //teamReservations.removeAll { $0.date.formatted() == reservation.dateSelected }
         case .editTraining:
             // Handle the edit logic
-            print("Edit training for \(reservation)")
+            Logger.shared.log("Edit training for \(reservation)")
         case .seeDetails:
             // Handle showing details
-            print("See training for \(reservation)")
+            Logger.shared.log("See training for \(reservation)")
             self.teamSelectedInformation = reservation
             //ReservationCardComponent(reservation: reservation)
-            //print("See details for \(reservation.dateSelected)")
+            //Logger.shared.log("See details for \(reservation.dateSelected)")
         }
     }
     
     func trainingTeamListCellPressed (teamSelectedInformation: EventModel, optionSelected: TeamReservationCellComponentOptionSelected) {
         switch optionSelected {
         case .removeCell:
-            //print("Remove Cell for \(teamSelectedInformation.dateSelected)")
-            self.isRemoveTraning = true
+            //Logger.shared.log("Remove Cell for \(teamSelectedInformation.dateSelected)")
+            self.isRemoveTraining = true
 //        case .editTraining:
-//            //print("Edit Training for \(teamSelectedInformation.dateSelected)")
+//            //Logger.shared.log("Edit Training for \(teamSelectedInformation.dateSelected)")
 //            self.isEditTraning = true
         case .seeDetails:
-            print("See training for \(teamSelectedInformation)")
+            Logger.shared.log("See training for \(teamSelectedInformation)")
             self.teamSelectedInformation = teamSelectedInformation
-            //print("See Details for \(teamSelectedInformation.dateSelected)")
+            //Logger.shared.log("See Details for \(teamSelectedInformation.dateSelected)")
             break
         }
     }
@@ -235,16 +235,16 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     func trainingIndividualListCellPressed (individualSelectedInformation: IndividualReservation, optionSelected: TeamReservationCellComponentOptionSelected) {
         switch optionSelected {
         case .removeCell:
-            //print("Remove Cell for \(teamSelectedInformation.dateSelected)")
-            self.isRemoveTraning = true
+            //Logger.shared.log("Remove Cell for \(teamSelectedInformation.dateSelected)")
+            self.isRemoveTraining = true
 //        case .editTraining:
-//            //print("Edit Training for \(teamSelectedInformation.dateSelected)")
+//            //Logger.shared.log("Edit Training for \(teamSelectedInformation.dateSelected)")
 //            self.isEditTraning = true
         case .seeDetails:
-            print("See individual training for \(individualSelectedInformation)")
+            Logger.shared.log("See individual training for \(individualSelectedInformation)")
             self.individualSelectedInformation = individualSelectedInformation
             //self.teamSelectedInformation = teamSelectedInformation
-            //print("See Details for \(teamSelectedInformation.dateSelected)")
+            //Logger.shared.log("See Details for \(teamSelectedInformation.dateSelected)")
             break
         }
     }
@@ -257,7 +257,7 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                     self?.isLoading = false
                     switch result {
                     case .success:
-                        print("Success")
+                        Logger.shared.log("Success")
                         self?.allIndividualReservations.removeAll()
                         self?.allReservations.removeAll()
                         self?.showToastDeleteSuccess = true
@@ -266,7 +266,7 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
                     case .failure(let error):
                         self?.isLoading = false
                         self?.showToastDeleteFailure = true
-                        print("Error al eliminar la reserva: \(error.localizedDescription)")
+                        Logger.shared.log("Error al eliminar la reserva: \(error.localizedDescription)")
                         //self?.cancelReservation.toggle()
                     }
                 }

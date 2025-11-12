@@ -28,12 +28,28 @@ struct UserModel: Codable {
     var teamsResponse: [TeamModelReal] = []
     var teams: [Int] = []
     var selectedTeam: TeamModelReal?
-    var trainningsComplete: [TrainningsModel] = []
-    var gammingSpacesComplete: [LoanModel] = []
+    var trainingsComplete: [TrainingsModel] = []
+    var gamingSpacesComplete: [LoanModel] = []
 
     enum CodingKeys: String, CodingKey {
         case id, status, username, email, dni, token, firstName = "first_name", lastName = "last_name", avatar, address
         case reservesAllowed = "reserves_allowed"
         case phone, trainings, gamingSpaceReserves = "gaming_space_reserves", invitations
+    }
+    
+    var numberOfBookingsAllowed: Int {
+        return if isUserActive {
+            reservesAllowed ?? 1
+        } else {
+            1
+        }
+    }
+    
+    var isUserActive: Bool {
+        status == "published"
+    }
+    
+    var isDNIAvailable: Bool {
+        dni != nil && dni != ""
     }
 }

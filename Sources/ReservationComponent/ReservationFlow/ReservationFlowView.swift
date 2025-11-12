@@ -25,7 +25,7 @@ struct ReservationFlowView: View {
                         }
                     }) {
                         Image(systemName: "chevron.left")
-                            .foregroundColor(.white)
+                            .foregroundColor(viewModel.currentStep == 0 ? .black : .white)
                             .padding()
                     }
                     
@@ -149,7 +149,7 @@ struct SelectDateView: View {
                         .padding()
                     
                     Text("Cargando fechas disponibles...")
-                        .font(.custom("Madridingamefont-Regular", size: 15))
+                        .font(.madridInGameiOSFont(size: 15))
                         .foregroundColor(.white)
                         .opacity(0.7)
                 }
@@ -183,7 +183,7 @@ struct SelectSlotView: View {
                 .foregroundColor(.white)
                 .padding(.bottom, 10)
             
-            Text(viewModel.selectedDate?.formatted() ?? "")
+            Text(viewModel.selectedDate?.toUIDateString() ?? "")
                 .font(.caption)
                 .foregroundColor(.white)
                 .padding(.bottom, 20)
@@ -201,13 +201,13 @@ struct SelectSlotView: View {
                         .padding()
                     
                     Text("Cargando horarios disponibles...")
-                        .font(.custom("Madridingamefont-Regular", size: 15))
+                        .font(.madridInGameiOSFont(size: 15))
                         .foregroundColor(.white)
                         .opacity(0.7)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .onAppear {
-                    viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate?.formatted() ?? "01/01/2029"))
+                    viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate))
                 }
             } else {
                 ScrollView {
@@ -216,7 +216,7 @@ struct SelectSlotView: View {
                         spacing: 20
                     ) {
                         ForEach(viewModel.availableSlots) { slot in
-                            slotButton(for: slot)
+                            slotButton(for: slot, selectedDate: viewModel.selectedDate)
                         }
                     }
                     .padding(.horizontal)
@@ -246,12 +246,23 @@ struct SelectSlotView: View {
         .padding()
     }
     
-    private func slotButton(for slot: GamingSpaceTime) -> some View {
+    private func slotButton(for slot: GamingSpaceTime, selectedDate: Date?) -> some View {
         let isEnabled = viewModel.enabledSlots.contains(where: { $0.id == slot.id })
         let isSelected = viewModel.selectedSlots.contains(where: { $0.id == slot.id })
         
+        let calendar = Calendar.current
+        let currentHourPlus2 = calendar.component(.hour, from: Date()) + 1
+        let isSlotDateToday = if let selectedDate { Calendar.current.isDateInToday(selectedDate)
+        } else {
+            false
+        }
+        let isSlotTimeValid = slot.value > currentHourPlus2
+
+        let computedEnabled = isSlotDateToday ? (isSlotTimeValid && isEnabled) : isEnabled
+
+        
         return Button(action: {
-            if isEnabled {
+            if computedEnabled {
                 viewModel.toggleSlotSelection(slot)
             }
         }) {
@@ -259,14 +270,14 @@ struct SelectSlotView: View {
                 .font(.system(size: 16, weight: .medium))
                 .frame(width: 95, height: 50) // Tamaño de las píldoras
                 .background(isSelected ? Color.white : Color.clear) // Fondo según selección
-                .foregroundColor(isSelected ? Color.black : isEnabled ? Color.white : Color.gray) // Color del texto
+                .foregroundColor(isSelected ? Color.black : computedEnabled ? Color.white : Color.gray) // Color del texto
                 .overlay(
                     RoundedRectangle(cornerRadius: 100)
-                        .stroke(isSelected ? Color.clear : isEnabled ? Color.white : Color.gray, lineWidth: 1) // Borde según estado
+                        .stroke(isSelected ? Color.clear : computedEnabled ? Color.white : Color.gray, lineWidth: 1) // Borde según estado
                 )
                 .cornerRadius(100) // Bordes redondeados
         }
-        .disabled(!isEnabled) // Deshabilita el botón si no está habilitado
+        .disabled(!computedEnabled) // Deshabilita el botón si no está habilitado
     }
 }
 
@@ -275,17 +286,7 @@ struct SelectSpaceView: View {
     @ObservedObject var viewModel: ReservationFlowViewModel
     
     var body: some View {
-        if self.viewModel.dniIsMissing {
-            VStack {
-                ConfirmDNIView { value in
-                    self.viewModel.isCreatingReservation = true
-                    self.viewModel.dniIsMissing = false
-                    self.viewModel.setDNIToTheUser(value)
-                }
-            }
-            .padding(.bottom, 20)
-        }
-        else if (viewModel.isCreatingReservation){
+       if (viewModel.isCreatingReservation){
             VStack {
                 Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
                     .resizable()
@@ -298,7 +299,7 @@ struct SelectSpaceView: View {
                     .padding()
                 
                 Text("Creando la reserva...")
-                    .font(.custom("Madridingamefont-Regular", size: 15))
+                    .font(.madridInGameiOSFont(size: 15))
                     .foregroundColor(.white)
                     .opacity(0.7)
             }
@@ -323,7 +324,7 @@ struct SelectSpaceView: View {
                             .padding()
                         
                         Text("Cargando espacios disponibles...")
-                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .font(.madridInGameiOSFont(size: 15))
                             .foregroundColor(.white)
                             .opacity(0.7)
                     }

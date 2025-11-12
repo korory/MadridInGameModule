@@ -8,13 +8,13 @@
 import SwiftUI
 
 class IndividualReservationCellComponentViewModel: ObservableObject {
-    @Published var trainingLocation: IndividualReservationTrainningLocationSelected
+    @Published var trainingLocation: IndividualReservationTrainingLocationSelected
     @Published var teamAssigned: TeamModel
     @Published var dateSelected: String
     @Published var hourSelected: String
 
     
-    init(trainingLocation: IndividualReservationTrainningLocationSelected, teamAssigned: TeamModel, dateSelected: String, hourSelected: String) {
+    init(trainingLocation: IndividualReservationTrainingLocationSelected, teamAssigned: TeamModel, dateSelected: String, hourSelected: String) {
         self.trainingLocation = trainingLocation
         self.teamAssigned = teamAssigned
         self.dateSelected = dateSelected

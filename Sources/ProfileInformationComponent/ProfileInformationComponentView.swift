@@ -42,6 +42,35 @@ struct ProfileInformationComponentView: View {
                 }
             }
         }
+        .onAppear {
+            viewModel.selectedImage = nil
+        }
+        .onTapGesture {
+            viewModel.showActionSheet = true
+        }
+        .actionSheet(isPresented: $viewModel.showActionSheet) {
+            ActionSheet(
+                title: Text("Selecciona una opción"),
+                buttons: [
+                    .default(Text("Cámara")) {
+                        viewModel.selectCamera()
+                    },
+                    .default(Text("Galería")) {
+                        viewModel.selectGallery()
+                    },
+                    .cancel()
+                ]
+            )
+        }
+        .sheet(isPresented: $viewModel.showImagePicker) {
+            ImagePicker(isCamera: $viewModel.isCamera, selectedImage: $viewModel.selectedImage, imageSelected: { image in
+                Task {
+                    viewModel.isLoading = true
+                    await viewModel.saveChanges(image: image)
+                    viewModel.isLoading = false
+                }
+            })
+        }
     }
 }
 
@@ -49,7 +78,7 @@ extension ProfileInformationComponentView {
     private var titleComponent: some View {
         HStack {
             Text("SOBRE MÍ")
-                .font(.custom("Madridingamefont-Regular", size: 20))
+                .font(.madridInGameiOSFont(size: 20))
                 .foregroundColor(.white)
                 .padding(.top, 4)
             
@@ -98,22 +127,14 @@ extension ProfileInformationComponentView {
     }
     
     private var componentAvatarSelector: some View {
-        AvatarComponentView(viewModel: AvatarViewModel(selectedImage: viewModel.newAvatar, imageId: viewModel.avatar), enablePress: true, imageSelected: { image in
-            guard !viewModel.isSaving else { return }
-            viewModel.newAvatar = image
-            viewModel.isSaving = true
-            Task {
-                await viewModel.saveChanges()
-                viewModel.isSaving = false
-            }
-        })
+        AvatarComponentView(imageId: viewModel.avatar)
         .padding(.bottom, 20)
     }
     
     private var editButton: some View {
         VStack (alignment: .center){
             if !viewModel.isEditing {
-                CustomButton(text: "Area Personal", needsBackground: true, backgroundColor: .cyan, pressEnabled: true, widthButton: 280, heightButton: 20) {
+                CustomButton(text: "Área Personal", needsBackground: true, backgroundColor: .cyan, pressEnabled: true, widthButton: 280, heightButton: 20) {
                     viewModel.openSafariToPersonalArea()//toggleEditing()
                     //viewModel.toggleEditing()
                 }
@@ -145,11 +166,11 @@ struct ProfileInfoView: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.custom("Madridingamefont-Regular", size: 14))
+                .font(.madridInGameiOSFont(size: 14))
                 .foregroundColor(.gray.opacity(1.0))
             Spacer()
             Text(text)
-                .font(.custom("Madridingamefont-Regular", size: 14))
+                .font(.madridInGameiOSFont(size: 14))
                 .foregroundColor(.white)
         }
         .padding()

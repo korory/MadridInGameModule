@@ -60,10 +60,10 @@ class ReservationViewModel: ObservableObject {
                 switch result {
                 case .success:
                     self?.isReservationValid = true
-                    print("Reservation created successfully")
+                    Logger.shared.log("Reservation created successfully")
                 case .failure(let error):
                     self?.isReservationValid = false
-                    print("Error creating reservation: \(error)")
+                    Logger.shared.log("Error creating reservation: \(error)")
                 }
             }
         }*/

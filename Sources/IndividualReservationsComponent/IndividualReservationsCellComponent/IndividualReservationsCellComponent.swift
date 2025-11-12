@@ -46,12 +46,12 @@ extension IndividualReservationsCellComponent {
                 titleAndDeleteReservation
 
                 Text(viewModel.parseReservationDate())
-                    .font(.custom("Madridingamefont-Regular", size: 12))
+                    .font(.madridInGameiOSFont(size: 12))
                     .foregroundColor(.white.opacity(0.85))
 
                 if !viewModel.reservation.times.isEmpty {
                     Text(viewModel.formatTimes())
-                        .font(.custom("Madridingamefont-Regular", size: 12))
+                        .font(.madridInGameiOSFont(size: 12))
                         .foregroundColor(.white.opacity(0.7))
                 }
             }
@@ -62,7 +62,7 @@ extension IndividualReservationsCellComponent {
         HStack {
             
             Text("Reserva - \(viewModel.getReservationConsole())")
-                .font(.custom("Madridingamefont-Regular", size: 15))
+                .font(.madridInGameiOSFont(size: 15))
                 .fontWeight(.bold)
                 .foregroundColor(.white)
             
@@ -95,7 +95,7 @@ extension IndividualReservationsCellComponent {
                         .frame(height: 15)
                         .foregroundColor(.cyan)
                     Text("Ver reserva")
-                        .font(.custom("Madridingamefont-Regular", size: 14))
+                        .font(.madridInGameiOSFont(size: 14))
                         .foregroundColor(.cyan)
                 }
             }

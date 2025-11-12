@@ -25,8 +25,8 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                     self.viewModel.showToastDeleteFailure = false
                 }
                 .zIndex(1)
-            } else if viewModel.showLeyendPopup {
-                CustomPopup(isPresented: $viewModel.showLeyendPopup) {
+            } else if viewModel.showLegendPopup {
+                CustomPopup(isPresented: $viewModel.showLegendPopup) {
                     ColorLegendView()
                 }
                 .transition(.scale)
@@ -39,13 +39,13 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
             } else {
                 VStack (alignment: .leading) {
                     calendarComponent
-                    nextTrainningBanner
+                    nextTrainingBanner
                     if viewModel.isTrainingsVisible {
                         ScrollView {
                             if !viewModel.isUserMode {
-                                trainningTeamList
+                                trainingTeamList
                             } else {
-                                trainningTeamList
+                                trainingTeamList
                             }
                         }
                     }
@@ -73,14 +73,14 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                 if !viewModel.isUserMode {
                     loadTeamImage
                 }
-                TextWithUnderlineComponent(title: viewModel.isUserMode ? "Calendario" : "Calendario", underlineColor: Color.cyan)
+                TextWithUnderlineComponent(title: viewModel.isUserMode ? "calendar".localized : "calendar".localized, underlineColor: Color.cyan)
                     .padding(.top, viewModel.isUserMode ? 10 : 0)
                     .padding(.leading, viewModel.isUserMode ? 5 : 0)
                 Spacer()
                 Button {
-                    self.viewModel.showLeyendPopup.toggle()
+                    self.viewModel.showLegendPopup.toggle()
                 } label: {
-                    Text("Leyenda")
+                    Text("legend".localized)
                 }
                 .padding(.trailing, 10)
                 Image(systemName: "arrowtriangle.down.fill")
@@ -101,11 +101,12 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                     viewModel.dateSelected = stringDate
                     viewModel.isDateSelected = true
                 }
+                .frame(height: 300)
             }
         }
     }
     
-    private var nextTrainningBanner: some View {
+    private var nextTrainingBanner: some View {
         VStack {
             HStack (spacing: 8){
                 TextWithUnderlineComponent(title: viewModel.isDateSelected ? "Entrenamientos" : "Próximos entrenamientos", underlineColor: Color.cyan)
@@ -131,12 +132,12 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
         }
     }
     
-    private var trainningTeamList: some View {
+    private var trainingTeamList: some View {
         VStack(alignment: .leading, spacing: 20) {
             
             if !viewModel.allIndividualReservations.isEmpty {
                 Text("Reservas Individuales")
-                    .font(.custom("Madridingamefont-Regular", size: 13))
+                    .font(.madridInGameiOSFont(size: 13))
                     .foregroundColor(.white)
                     .opacity(0.7)
                     .padding(.leading, 2)
@@ -147,17 +148,28 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                     }
                 }
             }
-            Text("Reservas De Equipo")
-                .font(.custom("Madridingamefont-Regular", size: 13))
-                .foregroundColor(.white)
-                .opacity(0.7)
             
-            ForEach(viewModel.allReservations, id: \.id) { reservation in
-                TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation, showDeleteOption: false)) { optionSelected in
-                    viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)
+            if !viewModel.allReservations.isEmpty {
+                Text("Reservas De Equipo")
+                    .font(.madridInGameiOSFont(size: 13))
+                    .foregroundColor(.white)
+                    .opacity(0.7)
+                
+                ForEach(viewModel.allReservations, id: \.id) { reservation in
+                    TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation, showDeleteOption: false)) { optionSelected in
+                        viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)
+                    }
                 }
             }
             
+            
+            if viewModel.allIndividualReservations.isEmpty && viewModel.allReservations.isEmpty {
+                Text("No hay entrenamientos programados")
+                    .font(.madridInGameiOSFont(size: 14))
+                    .foregroundColor(.white)
+                    .opacity(0.7)
+                    .padding()
+            }
         }
         .padding(5)
     }

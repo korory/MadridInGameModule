@@ -16,11 +16,12 @@ struct LoadingView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
-                Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 50)
-                
+                if let logoMIG = UserDefaults.getLogoMIG() {
+                    Image(uiImage: logoMIG)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 50)
+                }
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
                     .scaleEffect(1.5)

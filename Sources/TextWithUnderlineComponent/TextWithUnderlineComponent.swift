@@ -15,7 +15,7 @@ struct TextWithUnderlineComponent: View {
     var body: some View {
         VStack {
             Text(title)
-                .font(.custom("Madridingamefont-Regular", size: 17))
+                .font(.madridInGameiOSFont(size: 17))
 
                 //.font(.body)
                 .foregroundColor(.white)

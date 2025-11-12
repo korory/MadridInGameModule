@@ -63,7 +63,7 @@ extension PlayerTeamComponentCell {
     private var playerUsernameAndRole: some View {
         VStack (alignment: .leading, spacing: 10){
             Text(playerInformation.usersId?.username ?? "No Username")
-                .font(.custom("Madridingamefont-Regular", size: 17))
+                .font(.madridInGameiOSFont(size: 17))
                 .foregroundColor(.white)
                 .padding(.leading, 8)
             

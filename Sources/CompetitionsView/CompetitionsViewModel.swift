@@ -12,7 +12,7 @@ class CompetitionsViewModel: ObservableObject {
     @Published var seasonSelected: SeasonsModel?
     
     private let competitionsService = CompetitionsService()
-    @Published var compatitionInformation: [CompetitionData] = []
+    @Published var competitionInformation: [CompetitionData] = []
         
     func initAllSeasons() -> [SeasonsModel] {
         let currentYear = Calendar.current.component(.year, from: Date())
@@ -33,9 +33,9 @@ class CompetitionsViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let competitions):
-                    self?.compatitionInformation = competitions
+                    self?.competitionInformation = competitions
                 case .failure(let error):
-                    print("Error al obtener reservas de equipo: \(error)")
+                    Logger.shared.log("Error al obtener reservas de equipo: \(error)")
                 }
             }
         }
@@ -57,7 +57,7 @@ class CompetitionsViewModel: ObservableObject {
 
     
     func filterCompetitonsByType(type: String) -> [CompetitionData] {
-        return self.compatitionInformation.compactMap { competition in
+        return self.competitionInformation.compactMap { competition in
             (competition.game?.type == type) ? competition : nil
         }
     }

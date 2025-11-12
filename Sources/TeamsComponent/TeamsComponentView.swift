@@ -70,7 +70,7 @@ extension TeamsComponentView {
             
             if viewModel.isUserMode {
                 Button {
-                    print("Create Team")
+                    Logger.shared.log("Create Team")
                     viewModel.createTeamButtonPressed.toggle()
                 } label: {
                     HStack {
