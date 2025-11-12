@@ -38,7 +38,7 @@ struct ReservationIndividualCardComponent: View {
             
             VStack {
                 Text("Madrid in game")
-                    .font(.custom("Madridingamefont-Regular", size: 25))
+                    .font(.madridInGameiOSFont(size: 25))
                     .foregroundColor(.white)
                     .padding(.top, 20)
                 
@@ -56,7 +56,7 @@ struct ReservationIndividualCardComponent: View {
                                 .overlay(
                                     VStack(spacing: 10) {
                                         Text("Normas de uso")
-                                            .font(.custom("Madridingamefont-Regular", size: 20))
+                                            .font(.madridInGameiOSFont(size: 20))
                                             .foregroundColor(.white)
                                         imageNormasUso(rulesSize)
                                         
@@ -106,7 +106,7 @@ struct ReservationIndividualCardComponent: View {
                         }
                 )
                 // Botón para girar la tarjeta
-                CustomButton(text: "Normas de uso",
+                CustomButton(text: viewModel.isFlipped ? "Detalles": "Normas de uso",
                              needsBackground: true,
                              backgroundColor: Color.cyan,
                              pressEnabled: true,
@@ -130,23 +130,23 @@ extension ReservationIndividualCardComponent {
     private var titleSubtitle: some View {
         VStack (spacing: 10){
             Text("Reserva Confirmada")
-                .font(.custom("Madridingamefont-Regular", size: 20))
+                .font(.madridInGameiOSFont(size: 20))
                 .foregroundColor(.white)
             
             Text("Localización: \(viewModel.getIfReservationIscenterOrVirtualText())")
-                .font(.custom("Madridingamefont-Regular", size: 15))
+                .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
             Text("Plataforma: \(viewModel.getReservationConsole())")
-                .font(.custom("Madridingamefont-Regular", size: 15))
+                .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
             Text("Fecha: \(viewModel.parseReservationDate())")
-                .font(.custom("Madridingamefont-Regular", size: 15))
+                .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
             Text("Horas: \(viewModel.formatTimes())")
-                .font(.custom("Madridingamefont-Regular", size: 15))
+                .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
         }
@@ -173,7 +173,7 @@ extension ReservationIndividualCardComponent {
                             .padding()
                         
                         Text("Cargando QR....")
-                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .font(.madridInGameiOSFont(size: 15))
                             .foregroundColor(.white)
                             .opacity(0.7)
                     }
@@ -215,7 +215,7 @@ extension ReservationIndividualCardComponent {
                             .padding()
                         
                         Text("Cargando Normas de Uso....")
-                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .font(.madridInGameiOSFont(size: 15))
                             .foregroundColor(.white)
                             .opacity(0.7)
                     }

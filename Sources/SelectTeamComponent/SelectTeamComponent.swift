@@ -20,7 +20,7 @@ struct SelectTeamComponent: View {
                 Spacer()
                 
                 Text("¿Qué equipo quieres gestionar?")
-                    .font(.custom("Madridingamefont-Regular", size: 20))
+                    .font(.madridInGameiOSFont(size: 20))
                     .bold()
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)

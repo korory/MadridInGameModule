@@ -19,7 +19,7 @@ class WeekTimeService {
     func fetchWeekTimeByDay(dayValue: Int, completion: @escaping (Result<[WeekData], Error>) -> Void) {
         
         let parameters: [String: String] = [
-            "fields": "times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
+            "fields": "*,times.gaming_space_times_id.time,times.gaming_space_times_id.id,times.gaming_space_times_id.value",
             "filter[value][_eq]": String(dayValue)
         ]
         

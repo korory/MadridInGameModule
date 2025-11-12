@@ -12,8 +12,8 @@ public class FontManager {
     func loadCustomFonts() {
         FontBlaster.debugEnabled = true
         
-        FontBlaster.blast() { (fonts) in
-          print(fonts)
+        FontBlaster.blast() { fonts in
+            Logger.shared.log(fonts.joined(separator: "\n"))
         }
     }
 }

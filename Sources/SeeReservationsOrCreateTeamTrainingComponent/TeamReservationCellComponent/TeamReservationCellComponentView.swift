@@ -7,9 +7,11 @@ struct TeamReservationCellComponentView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             iconDateAndRemoveBannerComponent
-            showReservationLocarion
-            playersCarouselComponent
-            if viewModel.reservation.notes != "" {
+            showReservationLocation
+            if !viewModel.getAllPlayers().isEmpty {
+                playersCarouselComponent
+            }
+            if !(viewModel.reservation.notes?.isEmpty ?? true) {
                 descriptionComponent
             }
             buttonsComponent
@@ -33,7 +35,7 @@ extension TeamReservationCellComponentView {
                 .padding(.trailing, 2)
             
             Text(viewModel.parseReservationDate() + " - " + viewModel.parseTimeDeleteSeconds())
-                .font(.custom("Madridingamefont-Regular", size: 17))
+                .font(.madridInGameiOSFont(size: 17))
                 .foregroundStyle(Color.white)
             
             Spacer()
@@ -51,9 +53,9 @@ extension TeamReservationCellComponentView {
         }
     }
     
-    private var showReservationLocarion: some View {
+    private var showReservationLocation: some View {
         Text(viewModel.getTeamName() + " - " + viewModel.getReservationSite())
-            .font(.custom("Madridingamefont-Regular", size: 12))
+            .font(.madridInGameiOSFont(size: 12))
             .foregroundStyle(Color.white.opacity(0.8))
     }
     
@@ -61,7 +63,7 @@ extension TeamReservationCellComponentView {
         VStack (alignment: .leading){
         
             Text("Players")
-                .font(.custom("Madridingamefont-Regular", size: 12))
+                .font(.madridInGameiOSFont(size: 12))
                 .foregroundStyle(.white)
                 .padding(.top, 4)
                 .padding(.leading, 2)
@@ -80,7 +82,7 @@ extension TeamReservationCellComponentView {
                                     case .success(let image):
                                         image
                                             .resizable()
-                                            .scaledToFit()
+                                            .scaledToFill()
                                             .frame(width: 35, height: 35)
                                             .clipShape(Circle())
                                     case .failure:
@@ -116,7 +118,7 @@ extension TeamReservationCellComponentView {
     private var descriptionComponent: some View {
         VStack (alignment: .leading){
             Text("Notas")
-                .font(.custom("Madridingamefont-Regular", size: 12))
+                .font(.madridInGameiOSFont(size: 12))
                 .foregroundStyle(.white)
                 .padding(.top, 4)
             
@@ -155,7 +157,7 @@ extension TeamReservationCellComponentView {
                         .frame(height: 15)
                         .foregroundColor(.cyan)
                     Text("Ver reserva")
-                        .font(.custom("Madridingamefont-Regular", size: 14))
+                        .font(.madridInGameiOSFont(size: 14))
                         .foregroundColor(.cyan)
                 }
             }
@@ -170,7 +172,7 @@ extension TeamReservationCellComponentView {
 //                        .frame(height: 12)
 //                        .foregroundColor(.red)
 //                    Text("Editar")
-//                        .font(.custom("Madridingamefont-Regular", size: 14))
+//                        .font(.madridInGameiOSFont(size: 14))
 //                        .foregroundColor(.red)
 //                }
 //            }

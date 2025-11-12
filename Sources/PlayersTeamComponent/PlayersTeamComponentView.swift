@@ -23,7 +23,7 @@ struct PlayersTeamComponentView: View {
 extension PlayersTeamComponentView {
     private var titleBanner: some View {
         Text("JUGADORES")
-            .font(.custom("Madridingamefont-Regular", size: 25))
+            .font(.madridInGameiOSFont(size: 25))
             .foregroundStyle(Color.white)
     }
 

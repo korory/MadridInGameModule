@@ -40,8 +40,8 @@ class UserManager {
         let data: [TeamModelReal]
     }
     
-    struct TrainningsResponseModel: Codable {
-        let data: [TrainningsModel]
+    struct TrainingsResponseModel: Codable {
+        let data: [TrainingsModel]
     }
     
     func setDNI(_ dni: String) {
@@ -52,7 +52,57 @@ class UserManager {
 
     private init() {}
     
-    func initializeUser(withEmail email: String, userName: String, dni: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    func initializeUser(userInfo: MadridInGameUserData, completion: @escaping (Result<Void, Error>) -> Void) {
+        let parameters = ["filter[email][_eq]": userInfo.email]
+        
+        Task {
+            do {
+                let response: [String: [UserModel]] = try await DirectusService.shared.request(
+                    endpoint: "users",
+                    method: .GET,
+                    parameters: parameters
+                )
+                
+                if let users = response["data"], var user = users.first {
+                    if (self.user == nil) {
+                        setUser(user: user)
+                    }
+                    
+                    if let userId = user.id {
+                        await updateUserInformation(userId: userId, userInfo: userInfo)
+                        fetchTeamsByUser(userId: userId) { result in
+                            switch result {
+                            case .success(let teams):
+                                user.teamsResponse = teams
+                                self.setAllTeamsUser(teams)
+                                //self.user = user
+                                completion(.success(()))
+                            case .failure(let error):
+                                Logger.shared.log(error)
+                                completion(.failure(error))
+                            }
+                        }
+                    }
+                } else {
+                    //completion(.failure(NSError(domain: "No User Found", code: 0, userInfo: nil)))
+                    registerUserIntoDatabase(userInfo: userInfo) { result in
+                        DispatchQueue.main.async {
+                            switch result {
+                            case .success:
+                                completion(.success(()))
+                            case .failure(let error):
+                                completion(.failure(error))
+                            }
+                        }
+                    }
+                }
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func initializeUser(withEmail email: String, userName: String, dni: String?, completion: @escaping (Result<Void, Error>) -> Void) {
         let parameters = ["filter[email][_eq]": email]
 
         Task {
@@ -67,17 +117,18 @@ class UserManager {
                     if (self.user == nil) {
                         setUser(user: user)
                     }
-
-                    fetchTeamsByUser(userId: user.id ?? "") { result in
-                        switch result {
-                        case .success(let teams):
-                            user.teamsResponse = teams
-                            self.setAllTeamsUser(teams)
-                            //self.user = user
-                            completion(.success(()))
-                        case .failure(let error):
-                            print(error)
-                            completion(.failure(error))
+                    
+                    if let userId = user.id {
+                        fetchTeamsByUser(userId: userId) { result in
+                            switch result {
+                            case .success(let teams):
+                                user.teamsResponse = teams
+                                self.setAllTeamsUser(teams)
+                                completion(.success(()))
+                            case .failure(let error):
+                                Logger.shared.log(error)
+                                completion(.failure(error))
+                            }
                         }
                     }
                 } else {
@@ -99,17 +150,24 @@ class UserManager {
         }
     }
     
-    func registerUserIntoDatabase(email: String, userName: String, dni: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        
-        let userParams: [String: Any] = [
-            "email" : email,
-            "username" : userName,
-            "dni" : dni,
-            //            "first_name" : user.firstName ?? "",
-            //            "avatar" : user.avatar ?? "",
-            //            "phone" : user.phone ?? "",
+    
+    func registerUserIntoDatabase(userInfo: MadridInGameUserData, completion: @escaping (Result<Void, Error>) -> Void) {
+        var userParams: [String: Any] = [
+            "email" : userInfo.email,
+            "username" : userInfo.userName,
         ]
-        
+        if let dni = userInfo.dni {
+            userParams["dni"] = dni
+        }
+        if let name = userInfo.name {
+            userParams["first_name"] = name
+        }
+        if let phone = userInfo.phone {
+            userParams["phone"] = phone
+        }
+        if let lastName = userInfo.lastName {
+            userParams["last_name"] = lastName
+        }
         Task {
             do {
                 let updatedUser: UserModelResponse = try await DirectusService.shared.sendRequest(
@@ -118,13 +176,60 @@ class UserManager {
                     body: userParams
                 )
                 
-                print("Usuario actualizado: \(updatedUser)")
+                Logger.shared.log("Usuario actualizado: \(updatedUser)")
                 self.user = updatedUser.data
                 completion(.success(()))
             } catch {
-                print("Error al actualizar usuario: \(error)")
+                Logger.shared.log("Error al actualizar usuario: \(error)")
                 completion(.failure(error))
             }
+        }
+    }
+    
+    func registerUserIntoDatabase(email: String, userName: String, dni: String?, completion: @escaping (Result<Void, Error>) -> Void) {
+        
+        var userParams: [String: Any] = [
+            "email" : email,
+            "username" : userName,
+        ]
+        if let dni {
+            userParams["dni"] = dni
+        }
+        Task {
+            do {
+                let updatedUser: UserModelResponse = try await DirectusService.shared.sendRequest(
+                    endpoint: "users",
+                    method: .POST,
+                    body: userParams
+                )
+                
+                Logger.shared.log("Usuario actualizado: \(updatedUser)")
+                self.user = updatedUser.data
+                completion(.success(()))
+            } catch {
+                Logger.shared.log("Error al actualizar usuario: \(error)")
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func updateUserInformation(userId: String, userInfo: MadridInGameUserData) async {
+        guard let user = self.user,
+              let parameters = createUserParamsDictionary(from: user, using: userInfo) else {
+            return
+        }
+
+        do {
+            let updatedUser: UserModelResponse = try await DirectusService.shared.sendRequest(
+                endpoint: "users/\(userId)",
+                method: .PATCH,
+                body: parameters
+            )
+            
+            Logger.shared.log("Usuario actualizado: \(updatedUser)")
+            self.user = updatedUser.data
+        } catch {
+            Logger.shared.log("Error al actualizar usuario: \(error)")
         }
     }
     
@@ -147,7 +252,7 @@ class UserManager {
         }
     }
     
-    func fetchUserTrainings(userId: String, completion: @escaping (Result<[TrainningsModel], Error>) -> Void) {
+    func fetchUserTrainings(userId: String, completion: @escaping (Result<[TrainingsModel], Error>) -> Void) {
         guard let userTrainingIds = user?.trainings else {
             completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No hay entrenamientos disponibles en el perfil del usuario."])))
             return
@@ -155,7 +260,7 @@ class UserManager {
 
         Task {
             do {
-                var allTrainings: [TrainningsModel] = []
+                var allTrainings: [TrainingsModel] = []
 
                 for trainingId in userTrainingIds {
                     let parameters = ["filter[id][_eq]": "\(trainingId)"]
@@ -167,7 +272,7 @@ class UserManager {
 
                     if let trainingId = trainingResponse.data?.first?.trainingsId {
                         let trainingParameters = ["filter[id][_eq]": "\(trainingId)"]
-                        let eventResponse: TrainningsResponseModel = try await DirectusService.shared.request(
+                        let eventResponse: TrainingsResponseModel = try await DirectusService.shared.request(
                             endpoint: "trainings",
                             method: .GET,
                             parameters: trainingParameters
@@ -186,56 +291,85 @@ class UserManager {
     }
     
     func fetchUserGameSpace(userId: String, completion: @escaping (Result<[LoanModel], Error>) -> Void) {
-        guard let userGammingSpacesIds = user?.gamingSpaceReserves, !userGammingSpacesIds.isEmpty else {
+        guard let userGamingSpacesIds = user?.gamingSpaceReserves, !userGamingSpacesIds.isEmpty else {
             completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No hay entrenamientos disponibles en el perfil del usuario."])))
             return
         }
 
         Task {
             do {
-                var allGammingSpaces: [LoanModel] = []
+                var allGamingSpaces: [LoanModel] = []
 
-                for gammingSpaceId in userGammingSpacesIds {
-                    let parameters = ["filter[id][_eq]": "\(gammingSpaceId)"]
-                    guard let gammingResponse: GamingSpaceResponse = try await DirectusService.shared.request(
+                for gamingSpaceId in userGamingSpacesIds {
+                    let parameters = ["filter[id][_eq]": "\(gamingSpaceId)"]
+                    guard let gamingResponse: GamingSpaceResponse = try await DirectusService.shared.request(
                         endpoint: "gaming_space_reserves",
                         method: .GET,
                         parameters: parameters
-                    ), let gammingInfo = gammingResponse.data.first else {
+                    ), let gamingInfo = gamingResponse.data.first else {
                         continue
                     }
 
-                    var updatedGammingInfo = gammingInfo
+                    var updatedGamingInfo = gamingInfo
 
-                    if let userGammingSpacesTimesIds = gammingInfo.times {
-                        for gammingSpaceTimeId in userGammingSpacesTimesIds {
-                            let timeParameters = ["filter[id][_eq]": "\(gammingSpaceTimeId)"]
-                            guard let gammingTimeResponse: GamingSpacesReservationIds = try await DirectusService.shared.request(
+                    if let userGamingSpacesTimesIds = gamingInfo.times {
+                        for gamingSpaceTimeId in userGamingSpacesTimesIds {
+                            let timeParameters = ["filter[id][_eq]": "\(gamingSpaceTimeId)"]
+                            guard let gamingTimeResponse: GamingSpacesReservationIds = try await DirectusService.shared.request(
                                 endpoint: "gaming_space_reserves_gaming_space_times",
                                 method: .GET,
                                 parameters: timeParameters
-                            ), let gammingSpaceTimesId = gammingTimeResponse.data.first?.gamingSpaceTimesId else {
+                            ), let gamingSpaceTimesId = gamingTimeResponse.data.first?.gamingSpaceTimesId else {
                                 continue
                             }
 
-                            let timeInfoParameters = ["filter[id][_eq]": "\(gammingSpaceTimesId)"]
-                            let gammingSpaceTimeResponse: GamingSpacesReservationTime = try await DirectusService.shared.request(
+                            let timeInfoParameters = ["filter[id][_eq]": "\(gamingSpaceTimesId)"]
+                            let gamingSpaceTimeResponse: GamingSpacesReservationTime = try await DirectusService.shared.request(
                                 endpoint: "gaming_space_times",
                                 method: .GET,
                                 parameters: timeInfoParameters
                             )
 
-                            updatedGammingInfo.gammingSpacesTimesComplete.append(contentsOf: gammingSpaceTimeResponse.data)
+                            updatedGamingInfo.gamingSpacesTimesComplete.append(contentsOf: gamingSpaceTimeResponse.data)
                         }
                     }
 
-                    allGammingSpaces.append(updatedGammingInfo)
+                    allGamingSpaces.append(updatedGamingInfo)
                 }
 
-                completion(.success(allGammingSpaces))
+                completion(.success(allGamingSpaces))
             } catch {
                 completion(.failure(error))
             }
         }
+    }
+}
+
+extension UserManager {
+    private func createUserParamsDictionary(
+        from user: UserModel,
+        using data: MadridInGameUserData
+    ) -> [String: Any]? {
+        var params: [String: Any] = [:]
+
+        func addParamIfChanged<T: Equatable>(_ key: String, _ oldValue: T?, _ newValue: T?) {
+            if let newValue = newValue, newValue != oldValue {
+                params[key] = newValue
+            }
+        }
+
+        addParamIfChanged("email", user.email, data.email)
+        addParamIfChanged("username", user.username, data.userName)
+
+        let oldDni = user.dni ?? ""
+        if oldDni.isEmpty, let newDni = data.dni, !newDni.isEmpty {
+            params["dni"] = newDni
+        }
+
+        addParamIfChanged("first_name", user.firstName, data.name)
+        addParamIfChanged("last_name", user.lastName, data.lastName)
+        addParamIfChanged("phone", user.phone, data.phone)
+
+        return params.isEmpty ? nil : params
     }
 }

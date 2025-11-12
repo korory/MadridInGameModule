@@ -47,12 +47,12 @@ extension TournamentCellView {
                 .overlay(
                     VStack {
                         Text(getDayAndMonth()?.day ?? "")
-                            .font(.custom("Madridingamefont-Regular", size: 40))
+                            .font(.madridInGameiOSFont(size: 40))
                             .fontWeight(.bold)
                             .foregroundColor(.white)
                         
                         Text(getDayAndMonth()?.month ?? "") // Cambia este segundo día si es necesario
-                            .font(.custom("Madridingamefont-Regular", size: 10))
+                            .font(.madridInGameiOSFont(size: 10))
                             .fontWeight(.bold)
                             .foregroundColor(.white)
                     }
@@ -64,7 +64,7 @@ extension TournamentCellView {
     private var tornamentNameAndStatus: some View {
         VStack (alignment: .leading, spacing: 10){
             Text(name)
-                .font(.custom("Madridingamefont-Regular", size: 20))
+                .font(.madridInGameiOSFont(size: 20))
                 .foregroundColor(.white)
                 .padding(.leading, 8)
             
@@ -88,7 +88,7 @@ extension TournamentCellView {
         } label: {
             HStack (alignment: .center, spacing: 5){
                 Text("Inscríbete")
-                    .font(.custom("Madridingamefont-Regular", size: 15))
+                    .font(.madridInGameiOSFont(size: 15))
                     .foregroundColor(.white)
                     .padding(.leading, 8)
                 

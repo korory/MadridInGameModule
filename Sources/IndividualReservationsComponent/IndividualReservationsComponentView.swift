@@ -44,7 +44,11 @@ struct IndividualReservationsComponentView: View {
                 } else {
                     VStack (spacing: 10){
                         titleBanner
-                        trainningTeamList
+                        if viewModel.allIndividualReservations.isEmpty {
+                            noReservationAvailable
+                        } else {
+                            trainingTeamList
+                        }
                         Spacer()
                         reservationButton
                     }
@@ -56,12 +60,20 @@ struct IndividualReservationsComponentView: View {
                     set: { viewModel.cancelReservation = $0 }
                 )) {
                     Group {
+                        let subtitle = if let description = viewModel.individualSelectedInformation?.friendlyDescription {
+                            "¿Quieres cancelar la reserva del \(description)?"
+                        } else {
+                            "¿Quieres cancelar la reserva?"
+                        }
+                        
                         CancelOrDeleteComponent(
                             title: "CANCELAR RESERVA",
-                            subtitle: "¿Quieres cancelar esta reserva?"
+                            subtitle: subtitle,
+                            acceptTitle: "Sí",
+                            cancelTitle: "No"
                         ) {
                             viewModel.cancelReservation = false
-                        } aceptedAction: {
+                        } acceptedAction: {
                             viewModel.deleteReservation()
                         }
                     }
@@ -72,7 +84,18 @@ struct IndividualReservationsComponentView: View {
                 CustomPopup(isPresented: $viewModel.noReservationAllowed) {
                     VStack (spacing: 10){
                         Text("Se ha alcanzado el máximo de reservas solicitadas")
-                            .font(.custom("Madridingamefont-Regular", size: 17))
+                            .font(.madridInGameiOSFont(size: 17))
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                }
+                .transition(.scale)
+                .zIndex(1)
+                
+                CustomPopup(isPresented: $viewModel.noReservationAllowedWithoutDNI) {
+                    VStack (spacing: 10){
+                        Text("Se ha alcanzado el máximo de reservas solicitadas para usuarios no verificados. Por favor, verifica tu DNI y vuelve a intentarlo.")
+                            .font(.madridInGameiOSFont(size: 17))
                             .foregroundColor(.white)
                             .padding()
                     }
@@ -104,6 +127,20 @@ struct IndividualReservationsComponentView: View {
         .onAppear {
             self.viewModel.getAndRefreshReservationsData()
         }
+        .overlay {
+            if self.viewModel.dniIsMissing {
+                VStack {
+                    ConfirmDNIView { value in
+                        if !value.isEmpty {
+                            self.viewModel.setDNIToTheUser(value)
+                        }
+                        self.viewModel.dniIsMissing = false
+                    }
+                }
+                .background(.black)
+                .padding(.bottom, 20)
+            }
+        }
     }
 }
 
@@ -111,7 +148,7 @@ extension IndividualReservationsComponentView {
     private var titleBanner: some View {
         HStack {
             Text("RESERVAS INDIVIDUALES")
-                .font(.custom("Madridingamefont-Regular", size: 20))
+                .font(.madridInGameiOSFont(size: 20))
                 .fontWeight(.bold)
                 .foregroundStyle(Color.white)
             Spacer()
@@ -129,7 +166,7 @@ extension IndividualReservationsComponentView {
         }
     }
     
-    private var trainningTeamList: some View {
+    private var trainingTeamList: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 ForEach(viewModel.allIndividualReservations, id: \.id) { individualReservation in
@@ -144,19 +181,66 @@ extension IndividualReservationsComponentView {
         }
     }
     
+    private var noReservationAvailable: some View {
+        VStack(alignment: .center, spacing: 20) {
+            Spacer()
+            Text("No hay reservas")
+                .font(.madridInGameiOSFont(size: 18))
+                .foregroundStyle(Color.white)
+            Spacer()
+        }
+    }
     
+    @ViewBuilder
     private var reservationButton: some View {
+        let backgroundColor: Color = if let user = viewModel.userManager.getUser() {
+            if viewModel.allIndividualReservations.count < user.numberOfBookingsAllowed {
+                Color.cyan
+            } else {
+                Color.gray
+            }
+        } else {
+            Color.gray
+        }
+        
         CustomButton(text: "Reservar",
                      needsBackground: true,
-                     backgroundColor: viewModel.allIndividualReservations.count < viewModel.userManager.getUser()?.reservesAllowed ?? 1 ? Color.cyan : Color.gray,
+                     backgroundColor: backgroundColor,
                      pressEnabled: true,
                      widthButton: 280, heightButton: 50) {
-            if viewModel.allIndividualReservations.count < viewModel.userManager.getUser()?.reservesAllowed ?? 1  {
-                self.viewModel.isReservationFlowPresented = true
+            guard let user = viewModel.userManager.getUser() else {
+                viewModel.noReservationAllowed = true
+                return
+            }
+            
+            if viewModel.allIndividualReservations.count >= user.numberOfBookingsAllowed && user.isUserActive {
+                viewModel.noReservationAllowed = true
+                return
+            } else if viewModel.allIndividualReservations.count >= user.numberOfBookingsAllowed && !user.isUserActive {
+                viewModel.noReservationAllowedWithoutDNI = true
             } else {
-                self.viewModel.noReservationAllowed = true
+                // check for dni
+                if user.isDNIAvailable {
+                    viewModel.isReservationFlowPresented = true
+                } else {
+                    viewModel.dniIsMissing = true
+                }
             }
         }
     }
 }
 
+extension IndividualReservation {
+    var friendlyDescription: String? {
+        if let date = Date.dateFromString(date: date) {
+            let formattedDate = date.toUIDateString()
+            if let time = times.first?.gamingSpaceTimesID?.time {
+                return "\(formattedDate) - \(time)"
+            } else {
+                return "\(formattedDate)"
+            }
+        } else {
+            return nil
+        }
+    }
+}

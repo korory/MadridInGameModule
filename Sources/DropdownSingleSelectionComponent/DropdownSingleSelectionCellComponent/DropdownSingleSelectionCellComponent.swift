@@ -34,7 +34,7 @@ extension DropdownSingleSelectionCellComponent {
                 .foregroundStyle(Color.cyan)
             
             Text(title)
-                .font(.custom("Madridingamefont-Regular", size: 18))
+                .font(.madridInGameiOSFont(size: 18))
 
             Spacer()
         }

@@ -34,7 +34,7 @@ extension NewsFlowComponent {
     private var titleBanner: some View {
         HStack {
             Text("Noticias")
-                .font(.custom("Madridingamefont-Regular", size: 25))
+                .font(.madridInGameiOSFont(size: 25))
                 .foregroundColor(.white)
                 .padding(.leading, 5)
             
@@ -56,7 +56,7 @@ extension NewsFlowComponent {
     private var newsTitle: some View {
         VStack (alignment: .leading) {
             Text(news?.title ?? "No hay titulo")
-                .font(.custom("Madridingamefont-Regular", size: 20))
+                .font(.madridInGameiOSFont(size: 20))
                 .foregroundColor(.white)
         }
         .padding(.leading, 10)
@@ -89,7 +89,7 @@ extension NewsFlowComponent {
                             .padding()
                         
                         Text("Cargando Imagen")
-                            .font(.custom("Madridingamefont-Regular", size: 15))
+                            .font(.madridInGameiOSFont(size: 15))
                             .foregroundColor(.white)
                             .opacity(0.7)
                     }

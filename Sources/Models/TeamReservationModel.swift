@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-enum TeamReservationTrainningLocationSelected {
+enum TeamReservationTrainingLocationSelected {
     case eSportsCenter
     case virtual
 }
 
 struct TeamReservationModel {
     let id = UUID()
-    let trainingLocation: TeamReservationTrainningLocationSelected
+    let trainingLocation: TeamReservationTrainingLocationSelected
     let dateSelected: String
     let hoursSelected: [String]
     let playersAsigned: [PlayerModel]

@@ -34,10 +34,10 @@ class ProfileInformation {
                     method: .PATCH,
                     body: userParams
                 )
-                print("Usuario actualizado: \(updatedUser)")
+                Logger.shared.log("Usuario actualizado: \(updatedUser)")
                 completion(.success(updatedUser.data)) // Devolver el usuario actualizado
             } catch {
-                print("Error al actualizar usuario: \(error)")
+                Logger.shared.log("Error al actualizar usuario: \(error)")
                 completion(.failure(error)) // Llamar el completion con el error
             }
         }
@@ -63,10 +63,10 @@ class ProfileInformation {
                     method: .PATCH,
                     body: userParams
                 )
-                print("Usuario actualizado: \(updatedUser)")
+                Logger.shared.log("Usuario actualizado: \(updatedUser)")
                 completion(.success(updatedUser.data)) // Devolver el usuario actualizado
             } catch {
-                print("Error al actualizar usuario: \(error)")
+                Logger.shared.log("Error al actualizar usuario: \(error)")
                 completion(.failure(error)) // Llamar el completion con el error
             }
         }

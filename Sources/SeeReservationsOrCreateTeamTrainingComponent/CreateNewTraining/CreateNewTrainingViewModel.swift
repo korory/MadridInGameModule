@@ -76,7 +76,7 @@ class CreateNewTrainingViewModel: ObservableObject {
     
     func reservationCall() {
         if (dateSelected != "" && !hoursSelected.isEmpty && consoleSelected != "") {
-            print("Reservation")
+            Logger.shared.log("Reservation")
             isReservationValid = true
         }
     }

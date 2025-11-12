@@ -27,7 +27,7 @@ struct ToastMessage: View {
                     .foregroundStyle( success ? .green : .red)
                     .padding(.trailing, 10)
                 Text(message)
-                    .font(.custom("Madridingamefont-Regular", size: 20))
+                    .font(.madridInGameiOSFont(size: 20))
                     .foregroundColor(.white)
                     .padding()
                 Spacer()

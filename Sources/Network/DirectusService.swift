@@ -27,6 +27,29 @@ enum HTTPMethods: String {
     case OPTIONS
 }
 
+extension NetworkError: LocalizedError {
+    public var localizedDescription: String {
+        switch self {
+        case .invalidURL:
+            return "Invalid URL"
+        case .invalidBody:
+            return "Invalid Body"
+        case .noData:
+            return "No Data"
+        case .invalidResponse:
+            return "Invalid Response"
+        case .encodingError:
+            return "Encoding Error"
+        case .decodingError:
+            return "Decoding Error"
+        }
+    }
+    
+    public var errorDescription: String? {
+        localizedDescription
+    }
+}
+
 actor DirectusService {
     // MARK: - Singleton Instance
     public static let shared = DirectusService()
@@ -57,6 +80,8 @@ actor DirectusService {
         guard let url = URL(string: fullURLString) else {
             throw NetworkError.invalidURL
         }
+        
+        Logger.shared.log("🛜 Endpoint request: \(url.absoluteString)")
 
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
@@ -70,7 +95,7 @@ actor DirectusService {
             
             if let jsonData = try? JSONSerialization.data(withJSONObject: body),
                let jsonString = String(data: jsonData, encoding: .utf8) {
-                print("Cuerpo de la petición JSON: \(jsonString)")
+                Logger.shared.log("Cuerpo de la petición JSON: \(jsonString)")
             }
         }
         
@@ -87,18 +112,18 @@ actor DirectusService {
 
         if !(200...299).contains(httpResponse.statusCode) {
             let responseData = String(data: data, encoding: .utf8) ?? "No se pudo leer la respuesta"
-            print("Error HTTP: \(httpResponse.statusCode) - Respuesta: \(responseData)")
+            Logger.shared.log("Error HTTP: \(httpResponse.statusCode) - Respuesta: \(responseData)")
             throw NetworkError.invalidResponse
         }
         
         do {
             if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                print("Datos JSON (sin decodificar): \(jsonResponse)")
+                Logger.shared.log("Datos JSON (sin decodificar): \(jsonResponse)")
             } else {
-                print("La respuesta no es un [String: Any]")
+                Logger.shared.log("La respuesta no es un [String: Any]")
             }
         } catch {
-            print("Error al deserializar JSON: \(error.localizedDescription)")
+            Logger.shared.log("Error al deserializar JSON: \(error.localizedDescription)")
         }
 
 
@@ -181,3 +206,9 @@ actor DirectusService {
 }
 
 
+extension String {
+    var urlQueryValueEncoded: String? {
+        return addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)?
+            .replacingOccurrences(of: "+", with: "%2B")
+    }
+}

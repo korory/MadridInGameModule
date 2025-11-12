@@ -1,5 +1,5 @@
 //
-//  CompatitionsDetailViewComponentView.swift
+//  CompetitionsDetailViewComponentView.swift
 //  CalendarComponent
 //
 //  Created by Arnau Rivas Rivas on 17/10/24.
@@ -12,10 +12,10 @@ enum Tab {
     case teams
     case schedule
     case results
-    case tornaments
+    case tournaments
 }
 
-struct CompatitionsDetailViewComponentView: View {
+struct CompetitionsDetailViewComponentView: View {
     @ObservedObject var viewModel: CompetitionsDetailViewModel
     @Environment(\.dismiss) private var dismiss
     
@@ -27,13 +27,18 @@ struct CompatitionsDetailViewComponentView: View {
             VStack(alignment: .leading, spacing: 5) {
                 titleBanner
                     .zIndex(10) // Asegurar que el banner esté por encima
-                
-                dropdownSplitSelectorComponent
-                    .zIndex(5) // Dropdown por encima del TabView pero debajo del banner
-                
-                tabBarComponent
-                    .zIndex(1) // TabView con menor zIndex
-                
+                if viewModel.competitionsInformation.splits?.isEmpty == false {
+                    
+                    dropdownSplitSelectorComponent
+                        .zIndex(5) // Dropdown por encima del TabView pero debajo del banner
+                    
+                    tabBarComponent
+                        .zIndex(1) // TabView con menor zIndex
+                } else {
+                    Text("No hay información disponible.")
+                        .foregroundColor(.white)
+                        .padding()
+                }
                 Spacer()
             }
         }
@@ -59,7 +64,7 @@ struct CompatitionsDetailViewComponentView: View {
             .contentShape(Rectangle()) // Asegurar que toda el área sea tocable
             
             Text((viewModel.competitionsInformation.title)!)
-                .font(.custom("Madridingamefont-Regular", size: 25))
+                .font(.madridInGameiOSFont(size: 25))
                 .foregroundColor(.white)
                 .shadow(color: Color.black.opacity(0.5), radius: 5)
                 .padding(.bottom, 8)
@@ -95,35 +100,35 @@ struct CompatitionsDetailViewComponentView: View {
         Group {
             if viewModel.optionTabSelected != nil {
                 TabView(selection: $viewModel.selectedTab) {
-                    DetailSectionView(title: "SOBRE ESTA COMPETICIÓN...", content: viewModel.competitionsInformation.overview ?? "", image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailSectionView(title: "SOBRE ESTA COMPETICIÓN...", content: viewModel.competitionsInformation.overview, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
                             Label("Overview", systemImage: "info.circle")
                         }
                         .tag(Tab.overview)
                     
-                    DetailSectionView(title: "Detalles", content: viewModel.competitionsInformation.details ?? "", image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailSectionView(title: "Detalles", content: viewModel.competitionsInformation.details, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
                             Label("Detalles", systemImage: "person.2")
                         }
                         .tag(Tab.teams)
                     
-                    DetailSectionView(title: "Reglas", content: viewModel.competitionsInformation.rules ?? "", image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailSectionView(title: "Reglas", content: viewModel.competitionsInformation.rules, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
                             Label("Reglas", systemImage: "clock")
                         }
                         .tag(Tab.schedule)
                     
-                    DetailSectionView(title: "Contacto", content: viewModel.competitionsInformation.contact ?? "", image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailSectionView(title: "Contacto", content: viewModel.competitionsInformation.contact, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
                             Label("Contacto", systemImage: "info.circle.fill")
                         }
                         .tag(Tab.results)
                     
-                    DetailsTournamentView(title: "Torneos", content: viewModel.optionTabSelected?.tournaments ?? [], image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailsTournamentView(title: "Torneos", content: viewModel.optionTabSelected?.tournaments, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
                             Label("Torneos", systemImage: "trophy.fill")
                         }
-                        .tag(Tab.tornaments)
+                        .tag(Tab.tournaments)
                 }
                 .accentColor(.cyan)
                 .padding(.top)

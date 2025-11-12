@@ -120,14 +120,14 @@ class ReservationService {
                         body: reservationDict
                     )
                     if reserveResponseModel.data.id != 0 {
-                        print("Reserva registrada con éxito: \(reserveResponseModel.data)")
+                        Logger.shared.log("Reserva registrada con éxito: \(reserveResponseModel.data)")
                         completion(.success(reserveResponseModel.data))
                     } else {
-                        print("Error: No se recibieron datos válidos.")
+                        Logger.shared.log("Error: No se recibieron datos válidos.")
                         completion(.failure(NSError(domain: "com.example.error", code: 0, userInfo: [NSLocalizedDescriptionKey: "No se recibieron datos válidos."])))
                     }
                 } catch {
-                    print("Error al hacer un registro: \(error)")
+                    Logger.shared.log("Error al hacer un registro: \(error)")
                     completion(.failure(error))
                 }
             }
@@ -161,20 +161,20 @@ class ReservationService {
                 )
                 
                 if reserveResponseModel.data.id != 0 {
-                    print("Reserva actualizada con éxito: \(reserveResponseModel.data)")
+                    Logger.shared.log("Reserva actualizada con éxito: \(reserveResponseModel.data)")
                     completion(.success(reserveResponseModel.data))
                 } else {
-                    print("Error: No se recibieron datos válidos.")
+                    Logger.shared.log("Error: No se recibieron datos válidos.")
                     completion(.failure(NSError(domain: "com.example.error", code: 0, userInfo: [NSLocalizedDescriptionKey: "No se recibieron datos válidos."])))
                 }
             } catch {
-                print("Error al actualizar la reserva: \(error)")
+                Logger.shared.log("Error al actualizar la reserva: \(error)")
                 completion(.failure(error))
             }
         }
     }
 
-    func getAllTrainnings(teamId: String, userId: String, completion: @escaping (Result<[EventModel], Error>) -> Void) {
+    func getAllTrainings(teamId: String, userId: String, completion: @escaping (Result<[EventModel], Error>) -> Void) {
         let parameters: [String: String] = [
             "fields": "id, status, start_date, time, players.users_id.id, players.users_id.avatar, players.users_id.email, players.users_id.first_name, type, reserves.*, reserves.team.name, reserves.team.picture, reserves.times.gaming_space_times_id.time, notes",
             "filter[team][_eq]": teamId,
@@ -244,7 +244,8 @@ class ReservationService {
     func getAllBlockedDays(completion: @escaping (Result<[BlockedDaysModel], Error>) -> Void) {
         
         let parameters: [String: String] = [
-            "fields": "id, date, description"
+            "fields": "id, date, description",
+            "filter[date][_gte]": Date().toServerDateString()
         ]
         
         Task {
@@ -277,7 +278,7 @@ class ReservationService {
                 completion(.success(()))
             } catch {
                 // Llamamos a completion con un Failure si ocurre un error
-                print("Error al eliminar la reserva: \(error)")
+                Logger.shared.log("Error al eliminar la reserva: \(error)")
                 completion(.failure(error))
             }
         }

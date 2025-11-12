@@ -10,8 +10,8 @@ import SwiftUI
 struct ColorLegendView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Leyenda")
-                .font(.custom("Madridingamefont-Regular", size: 20))
+            Text("legend".localized)
+                .font(.madridInGameiOSFont(size: 20))
                 .padding(.leading, 10)
                 .padding(.bottom, 10)
             
@@ -29,7 +29,7 @@ struct ColorLegendView: View {
                 .fill(color)
                 .frame(width: 20, height: 20)
             Text(text)
-                .font(.custom("Madridingamefont-Regular", size: 15))
+                .font(.madridInGameiOSFont(size: 15))
             
             Spacer()
         }

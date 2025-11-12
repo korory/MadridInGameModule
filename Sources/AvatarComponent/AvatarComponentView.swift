@@ -9,99 +9,127 @@ import SwiftUI
 import PhotosUI
 
 struct AvatarComponentView: View {
-    @StateObject var viewModel: AvatarViewModel
-    var enablePress: Bool
-    var imageSelected: (UIImage) -> Void
+    private let environmentManager = EnvironmentManager()
+
+    var imageId: String?
     
     var body: some View {
-        VStack {
-            if enablePress {
-                if let selectedImage = viewModel.selectedImage {
-                    Image(uiImage: selectedImage)
-                        .resizable()
-                        .frame(width: 140, height: 140)
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.gray, lineWidth: 4))
-                        .onAppear {
-                            imageSelected(selectedImage)
-                        }
-                } else {
-                    loadImageView
-                }
-            } else {
-                loadImageView
-            }
-        }
-        .onAppear {
-            viewModel.selectedImage = nil
-        }
-        .onTapGesture {
-            if enablePress {
-                viewModel.showActionSheet = true
-            }
-        }
-        .actionSheet(isPresented: $viewModel.showActionSheet) {
-            ActionSheet(
-                title: Text("Selecciona una opción"),
-                buttons: [
-                    .default(Text("Cámara")) {
-                        viewModel.selectCamera()
-                    },
-                    .default(Text("Galería")) {
-                        viewModel.selectGallery()
-                    },
-                    .cancel()
-                ]
-            )
-        }
-        .sheet(isPresented: $viewModel.showImagePicker) {
-            ImagePicker(isCamera: $viewModel.isCamera, selectedImage: $viewModel.selectedImage, imageSelected: imageSelected)
-        }
+        loadImageView
     }
     
     // Extracted image loading logic to avoid repetition
+    @ViewBuilder
     private var loadImageView: some View {
-        AsyncImage(url: URL(string: "\(viewModel.environmentManager.getBaseURL())/assets/\(viewModel.imageId)")) { phase in
-            switch phase {
-            case .empty:
-                ProgressView()
-                    .frame(width: 50, height: 50)
-                    .tint(.purple)
-            case .success(let image):
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 140, height: 140)
-                    .clipShape(Circle())
-                    .overlay(bottomOverlay, alignment: .bottom)
-            case .failure:
-                Image(systemName: "person.circle")
-                    .resizable()
-                    .frame(width: 140, height: 140)
-                    .clipShape(Circle())
-                    .foregroundColor(.white)
-                    .overlay(bottomOverlay, alignment: .bottom)
-            @unknown default:
-                EmptyView()
+        if let imageId {
+            AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(imageId)")) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                        .frame(width: 50, height: 50)
+                        .tint(.purple)
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 140, height: 140)
+                        .clipShape(Circle())
+                        .overlay(bottomOverlay, alignment: .bottom)
+                case .failure:
+                    Image(systemName: "person.circle")
+                        .resizable()
+                        .frame(width: 140, height: 140)
+                        .clipShape(Circle())
+                        .foregroundColor(.white)
+                        .overlay(bottomOverlay, alignment: .bottom)
+                @unknown default:
+                    EmptyView()
+                }
             }
-        }
-        .onAppear {
-            self.viewModel.selectedImage = nil
+        } else {
+            Image(systemName: "person.circle")
+                .resizable()
+                .frame(width: 140, height: 140)
+                .clipShape(Circle())
+                .foregroundColor(.white)
+                .overlay(bottomOverlay, alignment: .bottom)
         }
     }
 
     // Bottom overlay for "Pulsar para cambiar" text
     private var bottomOverlay: some View {
         Group {
-            if enablePress {
                 Text("Pulsar para cambiar")
                     .foregroundColor(.white)
                     .font(.caption)
                     .padding(8)
                     .background(Color.black.opacity(0.6), in: RoundedRectangle(cornerRadius: 8))
                     .padding(5)
+        }
+    }
+}
+
+struct NonCachedAsyncImage<Placeholder: View, ErrorView: View, Content: View>: View {
+    let url: URL?
+    let disableCache: Bool
+    let placeholder: () -> Placeholder
+    let errorView: () -> ErrorView
+    let content: (Image) -> Content
+
+    @State private var loadedImage: Image? = nil
+    @State private var isLoading = false
+    @State private var hasError = false
+
+    var body: some View {
+        Group {
+            if isLoading {
+                placeholder()
+            } else if hasError {
+                errorView()
+            } else if let image = loadedImage {
+                content(image)
+            } else {
+                placeholder()
             }
         }
+        .onAppear {
+            loadImage()
+        }
+    }
+
+    private func loadImage() {
+        isLoading = true
+        hasError = false
+        loadedImage = nil
+        
+        guard let url else {
+            hasError = true
+            isLoading = false
+            return
+        }
+
+        var request = URLRequest(url: url)
+        if disableCache {
+            request.cachePolicy = .reloadIgnoringCacheData
+        }
+
+        URLSession.shared.dataTask(with: request) { data, _, error in
+            DispatchQueue.main.async {
+                isLoading = false
+
+                if let _ = error {
+                    hasError = true
+                    return
+                }
+
+                guard let data = data, let uiImage = UIImage(data: data) else {
+                    hasError = true
+                    return
+                }
+
+                loadedImage = Image(uiImage: uiImage)
+            }
+        }
+        .resume()
     }
 }
 
