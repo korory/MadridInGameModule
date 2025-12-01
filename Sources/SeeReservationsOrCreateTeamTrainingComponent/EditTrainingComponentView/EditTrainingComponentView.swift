@@ -27,14 +27,14 @@ struct EditTrainingComponentView: View {
 extension EditTrainingComponentView {
     
     private var titleBanner: some View {
-        Text("Editar Entrenamiento")
+        Text("Editar Entrenamiento".localized)
             .font(.title)
             .foregroundStyle(Color.white)
     }
     
     private var dropdownSelectPlayers: some View {
         VStack (alignment: .leading, spacing: 28){
-            TextWithUnderlineComponent(title: "Jugadores Asignados", underlineColor: Color.cyan)
+            TextWithUnderlineComponent(title: "Jugadores Asignados".localized, underlineColor: Color.cyan)
             
             DropdownMultipleSelectionComponentView(options: [
                 DropdownMultipleSelectionModel(title: "Player 1", isOptionSelected: true),
@@ -50,9 +50,9 @@ extension EditTrainingComponentView {
     
     private var notesComponent: some View {
         VStack (alignment: .leading, spacing: 28){
-            TextWithUnderlineComponent(title: "Notas", underlineColor: Color.cyan)
+            TextWithUnderlineComponent(title: "Notas".localized, underlineColor: Color.cyan)
 
-            FloatingTextField(text: "", placeholderText: "Notas (Optional)", isDescripcionTextfield: true)
+            FloatingTextField(text: "", placeholderText: "Notas (Opcional)".localized, isDescripcionTextfield: true)
         }
         .padding(.leading, 10)
     }
@@ -60,7 +60,7 @@ extension EditTrainingComponentView {
     private var dateSelectedComponent: some View {
         VStack (spacing: 28) {
             HStack {
-                TextWithUnderlineComponent(title: "Fecha Seleccionada", underlineColor: Color.cyan)
+                TextWithUnderlineComponent(title: "Fecha Seleccionada".localized, underlineColor: Color.cyan)
                 Spacer()
             }
             Text(reservationModel.dateSelected)
@@ -73,7 +73,7 @@ extension EditTrainingComponentView {
     private var consoleSelectedComponent: some View {
         VStack (spacing: 28){
             HStack {
-                TextWithUnderlineComponent(title: "Consola Seleccionada", underlineColor: Color.cyan)
+                TextWithUnderlineComponent(title: "Consola Seleccionada".localized, underlineColor: Color.cyan)
                 Spacer()
             }
             CustomButton(text: reservationModel.consoleSelected, needsBackground: false, backgroundColor: .white, pressEnabled: false, widthButton: 180, heightButton: 50) {}
@@ -84,7 +84,7 @@ extension EditTrainingComponentView {
     private var hoursSelectedComponent: some View {
         VStack (spacing: 28){
             HStack {
-                TextWithUnderlineComponent(title: reservationModel.hoursSelected.count > 1 ? "Horas Seleccionadas" : "Hora Seleccionada" , underlineColor: Color.cyan)
+                TextWithUnderlineComponent(title: reservationModel.hoursSelected.count > 1 ? "Horas Seleccionadas".localized : "Hora Seleccionada".localized , underlineColor: Color.cyan)
                 Spacer()
             }
             CustomSelectorButtons(items: reservationModel.hoursSelected,

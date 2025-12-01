@@ -35,7 +35,7 @@ struct CompetitionsDetailViewComponentView: View {
                     tabBarComponent
                         .zIndex(1) // TabView con menor zIndex
                 } else {
-                    Text("No hay información disponible.")
+                    Text("No hay información disponible.".localized)
                         .foregroundColor(.white)
                         .padding()
                 }
@@ -78,7 +78,7 @@ struct CompetitionsDetailViewComponentView: View {
     
     private var dropdownTitle: some View {
         VStack (alignment: .leading, spacing: 28){
-            TextWithUnderlineComponent(title: "Splits", underlineColor: Color.cyan)
+            TextWithUnderlineComponent(title: "Splits".localized, underlineColor: Color.cyan)
         }
         .padding(.leading, 20)
     }
@@ -88,7 +88,7 @@ struct CompetitionsDetailViewComponentView: View {
             DropdownSingleSelectionModel(title: split.name ?? "", isOptionSelected: ((viewModel.competitionsInformation.splits?.first) != nil))
         } ?? []
         
-        return DropdownSingleSelectionComponentView(options: options, textTop: "Splits", onOptionSelected: { optionSelected in
+        return DropdownSingleSelectionComponentView(options: options, textTop: "Splits".localized, onOptionSelected: { optionSelected in
             //viewModel.getFirstOptionSelected()
         })
         .padding(.top, 2)
@@ -100,33 +100,33 @@ struct CompetitionsDetailViewComponentView: View {
         Group {
             if viewModel.optionTabSelected != nil {
                 TabView(selection: $viewModel.selectedTab) {
-                    DetailSectionView(title: "SOBRE ESTA COMPETICIÓN...", content: viewModel.competitionsInformation.overview, image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailSectionView(title: "Sobre esta competición...".localized, content: viewModel.competitionsInformation.overview, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
-                            Label("Overview", systemImage: "info.circle")
+                            Label("Overview".localized, systemImage: "info.circle")
                         }
                         .tag(Tab.overview)
                     
-                    DetailSectionView(title: "Detalles", content: viewModel.competitionsInformation.details, image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailSectionView(title: "Detalles".localized, content: viewModel.competitionsInformation.details, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
-                            Label("Detalles", systemImage: "person.2")
+                            Label("Detalles".localized, systemImage: "person.2")
                         }
                         .tag(Tab.teams)
                     
-                    DetailSectionView(title: "Reglas", content: viewModel.competitionsInformation.rules, image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailSectionView(title: "Reglas".localized, content: viewModel.competitionsInformation.rules, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
-                            Label("Reglas", systemImage: "clock")
+                            Label("Reglas".localized, systemImage: "clock")
                         }
                         .tag(Tab.schedule)
                     
-                    DetailSectionView(title: "Contacto", content: viewModel.competitionsInformation.contact, image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailSectionView(title: "Contacto".localized, content: viewModel.competitionsInformation.contact, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
-                            Label("Contacto", systemImage: "info.circle.fill")
+                            Label("Contacto".localized, systemImage: "info.circle.fill")
                         }
                         .tag(Tab.results)
                     
-                    DetailsTournamentView(title: "Torneos", content: viewModel.optionTabSelected?.tournaments, image: viewModel.competitionsInformation.game?.banner ?? "")
+                    DetailsTournamentView(title: "Torneos".localized, content: viewModel.optionTabSelected?.tournaments, image: viewModel.competitionsInformation.game?.banner ?? "")
                         .tabItem {
-                            Label("Torneos", systemImage: "trophy.fill")
+                            Label("Torneos".localized, systemImage: "trophy.fill")
                         }
                         .tag(Tab.tournaments)
                 }
@@ -135,7 +135,7 @@ struct CompetitionsDetailViewComponentView: View {
                 .clipped() // Evita que el contenido se extienda fuera de sus límites
 
             } else {
-                Text("No hay información disponible.")
+                Text("No hay información disponible.".localized)
                     .foregroundColor(.white)
                     .padding()
             }

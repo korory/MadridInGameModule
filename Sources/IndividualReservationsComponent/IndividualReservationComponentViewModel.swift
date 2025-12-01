@@ -7,8 +7,8 @@ class IndividualReservationComponentViewModel: ObservableObject {
     
     @Published var userManager = UserManager.shared
 
-    @Published var isRemoveTraning: Bool = false
-    @Published var isSelectTraning: Bool = false
+    @Published var isRemoveTranning: Bool = false
+    @Published var isSelectTranning: Bool = false
 
     
     @Published var allIndividualReservations: [IndividualReservation] = []
@@ -131,7 +131,7 @@ class IndividualReservationComponentViewModel: ObservableObject {
         case .seeDetails:
             Logger.shared.log("See individual training for \(individualSelectedInformation)")
             self.individualSelectedInformation = individualSelectedInformation
-            self.isSelectTraning = true
+            self.isSelectTranning = true
             break
         }
     }

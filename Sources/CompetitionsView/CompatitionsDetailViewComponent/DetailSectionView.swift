@@ -55,7 +55,7 @@ struct DetailSectionView: View {
                             .padding(.top, 5)
                     } else {
                         Spacer()
-                        Text("No hay información disponible.")
+                        Text("No hay información disponible.".localized)
                             .foregroundColor(.white)
                             .padding()
                     }

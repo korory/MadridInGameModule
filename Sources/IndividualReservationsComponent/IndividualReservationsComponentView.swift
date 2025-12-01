@@ -17,29 +17,29 @@ struct IndividualReservationsComponentView: View {
                     .ignoresSafeArea(.all)
                 
                 if viewModel.showToastSuccess {
-                    ToastMessage(message: "¡Reserva Realizada!", duration: 2, success: true) {
+                    ToastMessage(message: "¡Reserva Realizada!".localized, duration: 2, success: true) {
                         self.viewModel.showToastSuccess = false
                     }
                     .zIndex(1)
                 } else if viewModel.showToastFailure {
-                    ToastMessage(message: "Problema al crear una reserva", duration: 2, success: false) {
+                    ToastMessage(message: "Problema al crear una reserva".localized, duration: 2, success: false) {
                         self.viewModel.showToastFailure = false
                     }
                     .zIndex(1)
                 } else if viewModel.showToastDeleteSuccess {
-                    ToastMessage(message: "Reserva Eliminada", duration: 2, success: true) {
+                    ToastMessage(message: "Reserva Eliminada".localized, duration: 2, success: true) {
                         self.viewModel.showToastDeleteSuccess = false
                     }
                     .zIndex(1)
                 } else if viewModel.showToastDeleteFailure {
-                    ToastMessage(message: "Problema al eliminar una reserva", duration: 2, success: false) {
+                    ToastMessage(message: "Problema al eliminar una reserva".localized, duration: 2, success: false) {
                         self.viewModel.showToastDeleteFailure = false
                     }
                     .zIndex(1)
                 }
                 
                 if viewModel.isLoading {
-                    LoadingView(message: "Obteniendo tus reservas...")
+                    LoadingView(message: "Obteniendo tus reservas...".localized)
                     
                 } else {
                     VStack (spacing: 10){
@@ -61,16 +61,16 @@ struct IndividualReservationsComponentView: View {
                 )) {
                     Group {
                         let subtitle = if let description = viewModel.individualSelectedInformation?.friendlyDescription {
-                            "¿Quieres cancelar la reserva del \(description)?"
+                            "¿Quieres cancelar la reserva del %@?".localized(description)
                         } else {
-                            "¿Quieres cancelar la reserva?"
+                            "¿Quieres cancelar la reserva?".localized
                         }
                         
                         CancelOrDeleteComponent(
-                            title: "CANCELAR RESERVA",
+                            title: "CANCELAR RESERVA".localized,
                             subtitle: subtitle,
-                            acceptTitle: "Sí",
-                            cancelTitle: "No"
+                            acceptTitle: "Sí".localized,
+                            cancelTitle: "No".localized
                         ) {
                             viewModel.cancelReservation = false
                         } acceptedAction: {
@@ -83,7 +83,7 @@ struct IndividualReservationsComponentView: View {
                 
                 CustomPopup(isPresented: $viewModel.noReservationAllowed) {
                     VStack (spacing: 10){
-                        Text("Se ha alcanzado el máximo de reservas solicitadas")
+                        Text("Se ha alcanzado el máximo de reservas solicitadas".localized)
                             .font(.madridInGameiOSFont(size: 17))
                             .foregroundColor(.white)
                             .padding()
@@ -94,7 +94,7 @@ struct IndividualReservationsComponentView: View {
                 
                 CustomPopup(isPresented: $viewModel.noReservationAllowedWithoutDNI) {
                     VStack (spacing: 10){
-                        Text("Se ha alcanzado el máximo de reservas solicitadas para usuarios no verificados. Por favor, verifica tu DNI y vuelve a intentarlo.")
+                        Text("Se ha alcanzado el máximo de reservas solicitadas para usuarios no verificados. Por favor, verifica tu DNI y vuelve a intentarlo.".localized)
                             .font(.madridInGameiOSFont(size: 17))
                             .foregroundColor(.white)
                             .padding()
@@ -120,7 +120,7 @@ struct IndividualReservationsComponentView: View {
                 })
             )
         }
-        .sheet(isPresented: $viewModel.isSelectTraning) {
+        .sheet(isPresented: $viewModel.isSelectTranning) {
             ReservationIndividualCardComponent(viewModel: ReservationIndividualCardViewModel(reservation: self.viewModel.getIndividualReservation()))
                 .zIndex(1)
         }
@@ -147,7 +147,7 @@ struct IndividualReservationsComponentView: View {
 extension IndividualReservationsComponentView {
     private var titleBanner: some View {
         HStack {
-            Text("RESERVAS INDIVIDUALES")
+            Text("RESERVAS INDIVIDUALES".localized)
                 .font(.madridInGameiOSFont(size: 20))
                 .fontWeight(.bold)
                 .foregroundStyle(Color.white)
@@ -184,7 +184,7 @@ extension IndividualReservationsComponentView {
     private var noReservationAvailable: some View {
         VStack(alignment: .center, spacing: 20) {
             Spacer()
-            Text("No hay reservas")
+            Text("No hay reservas".localized)
                 .font(.madridInGameiOSFont(size: 18))
                 .foregroundStyle(Color.white)
             Spacer()
@@ -203,7 +203,7 @@ extension IndividualReservationsComponentView {
             Color.gray
         }
         
-        CustomButton(text: "Reservar",
+        CustomButton(text: "Reservar".localized,
                      needsBackground: true,
                      backgroundColor: backgroundColor,
                      pressEnabled: true,

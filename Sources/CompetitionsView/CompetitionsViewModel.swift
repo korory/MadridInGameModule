@@ -43,10 +43,25 @@ class CompetitionsViewModel: ObservableObject {
     
     func getAllInformationLeagues() -> [LeagueModel] {
         let leagueData = [
-            ("Liga Municipal", "Esports Series Madrid", "Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid. Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo.", "esm"),
-            ("Liga Municipal Junior", "Esports Series Madrid", "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League.", "junior"),
-            ("Circuito Tormenta", "Esports Series Madrid", "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgarán puntos para el ranking general del Circuito de Tormenta del Split correspondiente.", "stormCircuit"),
-            ("Otras competiciones", "Esports Series Madrid", "", "other")
+            ("Liga Municipal".localized,
+             "Esports Series Madrid".localized,
+             "Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid. Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo.".localized,
+             "esm"),
+
+            ("Liga Municipal Junior".localized,
+             "Esports Series Madrid".localized,
+             "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League.".localized,
+             "junior"),
+
+            ("Circuito Tormenta".localized,
+             "Esports Series Madrid".localized,
+             "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgarán puntos para el ranking general del Circuito de Tormenta del Split correspondiente.".localized,
+             "stormCircuit"),
+
+            ("Otras competiciones".localized,
+             "Esports Series Madrid".localized,
+             "".localized,
+             "other")
         ]
         
         return leagueData.compactMap { title, seriesTitle, description, type in

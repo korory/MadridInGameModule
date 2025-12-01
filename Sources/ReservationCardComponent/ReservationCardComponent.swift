@@ -37,7 +37,7 @@ struct ReservationCardComponent: View {
             }
             
             VStack {
-                Text("Madrid in game")
+                Text("Madrid in game".localized)
                     .font(.madridInGameiOSFont(size: 25))
                     .foregroundColor(.white)
                     .padding(.top, 20)
@@ -55,7 +55,7 @@ struct ReservationCardComponent: View {
                                 .shadow(radius: 10)
                                 .overlay(
                                     VStack(spacing: 10) {
-                                        Text("Normas de uso")
+                                        Text("Normas de uso".localized)
                                             .font(.madridInGameiOSFont(size: 20))
                                             .foregroundColor(.white)
                                         imageNormasUso(rulesSize)
@@ -109,7 +109,7 @@ struct ReservationCardComponent: View {
                 )
                 if !viewModel.checkIfReservationIsVirtual() {
                     // Botón para girar la tarjeta
-                    CustomButton(text: viewModel.isFlipped ? "Detalles": "Normas de uso",
+                    CustomButton(text: viewModel.isFlipped ? "Detalles".localized: "Normas de uso".localized,
                                  needsBackground: true,
                                  backgroundColor: Color.cyan,
                                  pressEnabled: true,
@@ -132,19 +132,19 @@ extension ReservationCardComponent {
     
     private var titleSubtitle: some View {
         VStack (spacing: 10){
-            Text("Reserva Confirmada")
+            Text("Reserva Confirmada".localized)
                 .font(.madridInGameiOSFont(size: 20))
                 .foregroundColor(.white)
             
-            Text("Localización: \(viewModel.getIfReservationIscenterOrVirtualText())")
+            Text("Localización: %@".localized(viewModel.getIfReservationIscenterOrVirtualText()))
                 .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
-            Text("Fecha: \(viewModel.parseReservationDate())")
+            Text("Fecha: %@".localized(viewModel.parseReservationDate()))
                 .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
-            Text(viewModel.checkIfReservationIsVirtual() ? "Hora: \(viewModel.getAllReservationTimes().joined(separator: ", "))" : "Horas: \(viewModel.getAllReservationTimes().joined(separator: ", "))")
+            Text(viewModel.checkIfReservationIsVirtual() ? "Hora: %@".localized( viewModel.getAllReservationTimes().joined(separator: ", ")) : "Horas: %@".localized( viewModel.getAllReservationTimes().joined(separator: ", ")))
                 .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
@@ -168,7 +168,7 @@ extension ReservationCardComponent {
                                 .scaleEffect(1.5)
                                 .padding()
                             
-                            Text("Cargando QR....")
+                            Text("Cargando QR...".localized)
                                 .font(.madridInGameiOSFont(size: 15))
                                 .foregroundColor(.white)
                                 .opacity(0.7)
@@ -200,7 +200,7 @@ extension ReservationCardComponent {
                         .frame(width: imageSize, height: imageSize)
                         .foregroundColor(.white.opacity(0.8))
                         .padding(.top, 10)
-                    Text("No se requiere QR")
+                    Text("No se requiere QR".localized)
                         .font(.madridInGameiOSFont(size: 15))
                         .foregroundColor(.white)
                 }
@@ -225,7 +225,7 @@ extension ReservationCardComponent {
                             .scaleEffect(1.5)
                             .padding()
                         
-                        Text("Cargando Normas de Uso....")
+                        Text("Cargando Normas de Uso...".localized)
                             .font(.madridInGameiOSFont(size: 15))
                             .foregroundColor(.white)
                             .opacity(0.7)
@@ -251,7 +251,7 @@ extension ReservationCardComponent {
     private var playersCarouselComponent: some View {
         VStack (alignment: .leading){
             
-            Text("Players")
+            Text("Players".localized)
                 .font(.madridInGameiOSFont(size: 12))
                 .foregroundStyle(.white)
                 .padding(.top, 4)

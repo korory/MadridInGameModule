@@ -53,7 +53,7 @@ struct DetailsTournamentView: View {
                             TournamentCellView(date: singleContent.date ?? "", name: singleContent.name ?? "", targetURL: singleContent.link ?? "", statusString: singleContent.status ?? "")
                         }
                     } else {
-                        Text("No hay información disponible.")
+                        Text("No hay información disponible.".localized)
                             .foregroundColor(.white)
                             .padding()
                     }

@@ -29,20 +29,20 @@ extension DashboardScreenView {
                     
                     IndividualReservationsComponentView(viewModel: IndividualReservationComponentViewModel())
                         .tabItem {
-                            Label("Reservas", systemImage: "calendar.badge.checkmark")
+                            Label("Reservas".localized, systemImage: "calendar.badge.checkmark")
                         }
                         .tag(TabBarDashboardBottom.reservation)
                     
 //                    TeamsComponentView(viewModel: TeamsComponentViewModel(isUserMode: true, allTeams: []))
 //                        .tabItem {
-//                            Label("Equipos", systemImage: "person.3.fill")
+//                            Label("Equipos".localized, systemImage: "person.3.fill")
 //                        }
 //                        .tag(TabBarDashboardBottom.teams)
 
                     
                     ProfileInformationComponentView()
                         .tabItem {
-                            Label("Sobre Mi", systemImage: "person.circle")
+                            Label("Sobre Mi".localized, systemImage: "person.circle")
                         }
                         .tag(TabBarDashboardBottom.aboutus)
 
@@ -50,7 +50,7 @@ extension DashboardScreenView {
                 .accentColor(.cyan)
                 //.padding(.top)
             } else {
-                Text("No hay información disponible.")
+                Text("No hay información disponible.".localized)
                     .foregroundColor(.white)
                     .padding()
             }

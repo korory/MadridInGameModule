@@ -13,14 +13,29 @@ struct ProfileInformationComponentView: View {
                 .ignoresSafeArea(.all)
             
             if viewModel.isLoading {
-                LoadingView(message: "Actualizando Perfil....")
+                LoadingView(message: "Actualizando Perfil...".localized)
             } else {
                 VStack(spacing: 10) {
                     titleComponent
                     ScrollView {
                         componentAvatarSelector
+                            .actionSheet(isPresented: $viewModel.showActionSheet) {
+                                ActionSheet(
+                                    title: Text("Selecciona una opción"),
+                                    buttons: [
+                                        .default(Text("Cámara")) {
+                                            viewModel.selectCamera()
+                                        },
+                                        .default(Text("Galería")) {
+                                            viewModel.selectGallery()
+                                        },
+                                        .cancel()
+                                    ]
+                                )
+                            }
                         formComponent
                     }
+                    .scrollIndicators(.hidden)
                     .padding()
                     
                     editButton
@@ -32,11 +47,11 @@ struct ProfileInformationComponentView: View {
                 .padding(.top, 10)
                 
                 if viewModel.showToastSuccess {
-                    ToastMessage(message: "¡Avatar Actualizado!", duration: 2, success: true) {
+                    ToastMessage(message: "¡Avatar Actualizado!".localized, duration: 2, success: true) {
                         self.viewModel.showToastSuccess = false
                     }
                 } else if viewModel.showToastFailure {
-                    ToastMessage(message: "Problema al actualizar el avatar", duration: 2, success: false) {
+                    ToastMessage(message: "Problema al actualizar el avatar".localized, duration: 2, success: false) {
                         self.viewModel.showToastFailure = false
                     }
                 }
@@ -48,21 +63,7 @@ struct ProfileInformationComponentView: View {
         .onTapGesture {
             viewModel.showActionSheet = true
         }
-        .actionSheet(isPresented: $viewModel.showActionSheet) {
-            ActionSheet(
-                title: Text("Selecciona una opción"),
-                buttons: [
-                    .default(Text("Cámara")) {
-                        viewModel.selectCamera()
-                    },
-                    .default(Text("Galería")) {
-                        viewModel.selectGallery()
-                    },
-                    .cancel()
-                ]
-            )
-        }
-        .sheet(isPresented: $viewModel.showImagePicker) {
+        .fullScreenCover(isPresented: $viewModel.showImagePicker) {
             ImagePicker(isCamera: $viewModel.isCamera, selectedImage: $viewModel.selectedImage, imageSelected: { image in
                 Task {
                     viewModel.isLoading = true
@@ -70,6 +71,7 @@ struct ProfileInformationComponentView: View {
                     viewModel.isLoading = false
                 }
             })
+            .ignoresSafeArea()
         }
     }
 }
@@ -77,7 +79,7 @@ struct ProfileInformationComponentView: View {
 extension ProfileInformationComponentView {
     private var titleComponent: some View {
         HStack {
-            Text("SOBRE MÍ")
+            Text("SOBRE MÍ".localized)
                 .font(.madridInGameiOSFont(size: 20))
                 .foregroundColor(.white)
                 .padding(.top, 4)
@@ -115,12 +117,12 @@ extension ProfileInformationComponentView {
 //                        self.viewModel.phone = newValue
 //                    }
 //            } else {
-                ProfileInfoView(text: viewModel.firstName, label: "Nombre")
-                ProfileInfoView(text: viewModel.lastName, label: "Apellidos")
-                ProfileInfoView(text: viewModel.dni, label: "DNI")
-                ProfileInfoView(text: viewModel.email, label: "Email")
-                ProfileInfoView(text: viewModel.username, label: "Nick")
-                ProfileInfoView(text: viewModel.phone, label: "Teléfono")
+            ProfileInfoView(text: viewModel.firstName, label: "Nombre".localized)
+            ProfileInfoView(text: viewModel.lastName, label: "Apellidos".localized)
+            ProfileInfoView(text: viewModel.dni, label: "DNI".localized)
+            ProfileInfoView(text: viewModel.email, label: "Email".localized)
+            ProfileInfoView(text: viewModel.username, label: "Nick".localized)
+            ProfileInfoView(text: viewModel.phone, label: "Teléfono".localized)
             //}
         }
         .padding(.bottom, 20)
@@ -134,7 +136,7 @@ extension ProfileInformationComponentView {
     private var editButton: some View {
         VStack (alignment: .center){
             if !viewModel.isEditing {
-                CustomButton(text: "Área Personal", needsBackground: true, backgroundColor: .cyan, pressEnabled: true, widthButton: 280, heightButton: 20) {
+                CustomButton(text: "Área Personal".localized, needsBackground: true, backgroundColor: .cyan, pressEnabled: true, widthButton: 280, heightButton: 20) {
                     viewModel.openSafariToPersonalArea()//toggleEditing()
                     //viewModel.toggleEditing()
                 }
@@ -142,11 +144,11 @@ extension ProfileInformationComponentView {
                 .padding()
             } else {
                 HStack {
-                    CustomButton(text: "Descartar", needsBackground: false, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
+                    CustomButton(text: "Descartar".localized, needsBackground: false, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
                         viewModel.discardChanges()
                     }
                     
-                    CustomButton(text: "Guardar", needsBackground: true, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
+                    CustomButton(text: "Guardar".localized, needsBackground: true, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
 //                        Task {
 //                            await viewModel.saveChanges()
 //                        }
@@ -177,3 +179,4 @@ struct ProfileInfoView: View {
         .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.15)))
     }
 }
+

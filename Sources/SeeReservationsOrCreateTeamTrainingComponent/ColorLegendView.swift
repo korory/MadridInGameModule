@@ -15,10 +15,10 @@ struct ColorLegendView: View {
                 .padding(.leading, 10)
                 .padding(.bottom, 10)
             
-            legendItem(color: .white, text: "Día actual")
-            legendItem(color: .blue, text: "Reserva individual")
-            legendItem(color: .blue.opacity(0.5), text: "Reserva de equipo")
-            legendItem(color: .red, text: "Día bloqueado")
+            legendItem(color: .white, text: "Día actual".localized)
+            legendItem(color: .blue, text: "Reserva individual".localized)
+            legendItem(color: .blue.opacity(0.5), text: "Reserva de equipo".localized)
+            legendItem(color: .red, text: "Día bloqueado".localized)
         }
         .padding(.bottom, 25)
     }

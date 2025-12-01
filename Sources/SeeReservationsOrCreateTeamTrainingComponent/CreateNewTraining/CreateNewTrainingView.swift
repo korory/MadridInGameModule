@@ -136,7 +136,7 @@
 //                viewModel.addRemoveHours(hour: hour)
 //            }
 //            
-//            Text("Máximo 2 spots consecutivos")
+//            Text("Máximo 2 spots consecutivos".localized)
 //                .font(.body)
 //                .foregroundStyle(Color.white)
 //                .padding()

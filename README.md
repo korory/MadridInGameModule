@@ -41,26 +41,76 @@ import MadridInGameiOSModule
 ```swift
 struct ContentView: View {
     var body: some View {
+      
+        // Opción 1: Inicializar usando la estructura [translate:MadridInGameModel]
+        let model = MadridInGameModel(
+            name: "Nombre",
+            lastName: "Apellido",
+            userName: "Test",
+            email: "test@test.com",
+            dni: "00000000R",
+            phone: "600000000",
+            accessToken: "El Token de Acceso",
+            logoMIG: logoMIG,
+            qrMiddleLogo: qrMiddleLogo
+        )
+        
+        // Lanzar el módulo usando el objeto model
+        MadridInGameiOSModule(model)
+        
+        // Opción 2: Inicializar el módulo pasando los parámetros individualmente
         MadridInGameiOSModule(
-            email: "test@test.com", 
-            userName: "Test", 
-            dni: "00000000R", 
-            accessToken: "The Acces Token", 
-            logoMIG: logoMIG, 
+            email: "test@test.com",
+            userName: "Test",
+            dni: "00000000R",
+            accessToken: "El Token de Acceso",
+            logoMIG: logoMIG,
             qrMiddleLogo: qrMiddleLogo
         )
     }
 }
 ```
-Parámetros: (All Required*)
 
-- email: String -> El correo electrónico del usuario.
-- userName: String -> El nombre de usuario.
-- dni: String -> El DNI o documento de identidad del usuario.
-- accessToken: String -> El token de acceso para la autenticación.
-- logoMIG: UIImage -> Un logo de la aplicación (debe ser una imagen que se pase como parámetro).
-- qrMiddleLogo: UIImage -> Un logo adicional que aparecerá en el centro del QR (también una imagen que se pasa como parámetro).
+### Parámetros de MadridInGameiOSModule (Todos obligatorios*)
 
+- **email: String**
+El correo electrónico del usuario.
+- **userName: String**
+El nombre de usuario.
+- **dni: String**
+El DNI o documento de identidad nacional del usuario.
+- **accessToken: String**
+El token de acceso utilizado para la autenticación.
+- **logoMIG: UIImage**
+El logo de la aplicación que se mostrará o usará. Debe pasarse como un objeto `UIImage`.
+- **qrMiddleLogo: UIImage**
+Un logo adicional que aparecerá centrado en el código QR. También debe pasarse como un objeto `UIImage`.
+
+
+### Parámetros del modelo MadridInGameModel (Todos opcionales excepto los indicados)
+
+- **name: String?**
+El nombre del usuario.
+- **lastName: String?**
+El apellido del usuario.
+- **userName: String**
+El nombre de usuario.
+- **email: String**
+El correo electrónico del usuario.
+- **dni: String?**
+El DNI o documento de identidad del usuario.
+- **phone: String?**
+El teléfono de contacto del usuario.
+- **accessToken: String**
+El token de acceso para la autenticación.
+- **logoMIG: UIImage?**
+El logo de la aplicación que se mostrará o usará.
+- **qrMiddleLogo: UIImage?**
+Un logo adicional que aparecerá centrado en el código QR.
+
+### Notas
+
+- Puede inicializar el módulo pasando una instancia completa de MadridInGameModel o proporcionando cada parámetro por separado.
 
 ## Licencia
 

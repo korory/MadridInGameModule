@@ -47,7 +47,7 @@ class TeamReservationCellComponentViewModel: ObservableObject {
         if reservationLocal.isEmpty {
             return "VIRTUAL"
         } else {
-            return "ESPORTS CENTER"
+            return "ESPORTS MADRID CENTER"
         }
     }
     

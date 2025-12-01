@@ -15,7 +15,7 @@ struct DropdownMultipleSelectionModel {
 
 struct DropdownMultipleSelectionComponentView: View {
     @State private var isExpanded: Bool = false
-    @State var dropdownText: [String] = ["No hay ningún jugador seleccionado"]
+    @State var dropdownText: [String] = ["No hay ningún jugador seleccionado".localized]
     let options: [DropdownMultipleSelectionModel]
     let optionPressed: (String) -> Void
     

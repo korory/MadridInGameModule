@@ -35,7 +35,7 @@ class ReservationCardViewModel: ObservableObject {
         if checkIfReservationIsVirtual() {
             return "VIRTUAL"
         } else {
-            return "ESPORTS CENTER"
+            return "ESPORTS MADRID CENTER"
         }
     }
     

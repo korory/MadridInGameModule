@@ -58,7 +58,7 @@ struct AvatarComponentView: View {
     // Bottom overlay for "Pulsar para cambiar" text
     private var bottomOverlay: some View {
         Group {
-                Text("Pulsar para cambiar")
+                Text("Pulsar para cambiar".localized)
                     .foregroundColor(.white)
                     .font(.caption)
                     .padding(8)
@@ -133,87 +133,77 @@ struct NonCachedAsyncImage<Placeholder: View, ErrorView: View, Content: View>: V
     }
 }
 
-// MARK: - ImagePicker corregido
+// MARK: - Modern ImagePicker for iOS 26
+import PhotosUI
+
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var isCamera: Bool
     @Binding var selectedImage: UIImage?
-    
+
     var imageSelected: (UIImage) -> Void
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.delegate = context.coordinator
-        picker.sourceType = isCamera ? .camera : .photoLibrary
-        return picker
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        if isCamera {
+            let picker = UIImagePickerController()
+            picker.delegate = context.coordinator
+            picker.sourceType = .camera
+            picker.allowsEditing = false
+            return picker
+        } else {
+            var configuration = PHPickerConfiguration(photoLibrary: .shared())
+            configuration.filter = .images
+            configuration.selectionLimit = 1
+            configuration.preferredAssetRepresentationMode = .current
+            let picker = PHPickerViewController(configuration: configuration)
+            picker.delegate = context.coordinator
+            return picker
+        }
     }
-    
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        // No dynamic updates required.
+    }
 }
 
-// MARK: - Coordinator Extension
+// MARK: - Coordinator
 extension ImagePicker {
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        var parent: ImagePicker
-        
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate, PHPickerViewControllerDelegate {
+        let parent: ImagePicker
+
         init(_ parent: ImagePicker) {
             self.parent = parent
         }
-        
+
+        // UIImagePickerController (Camera)
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            if let image = info[.originalImage] as? UIImage {
                 parent.selectedImage = image
                 parent.imageSelected(image)
             }
             picker.dismiss(animated: true)
         }
-        
+
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             picker.dismiss(animated: true)
         }
+
+        // PHPickerViewController (Photo Library)
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            guard let provider = results.first?.itemProvider, provider.canLoadObject(ofClass: UIImage.self) else { return }
+            provider.loadObject(ofClass: UIImage.self) { [weak self] object, error in
+                guard let self = self else { return }
+                if let image = object as? UIImage {
+                    DispatchQueue.main.async {
+                        self.parent.selectedImage = image
+                        self.parent.imageSelected(image)
+                    }
+                }
+            }
+        }
     }
 }
-
-//// MARK: - ImagePicker corregido
-//struct ImagePicker: UIViewControllerRepresentable {
-//    @Binding var isCamera: Bool
-//    @Binding var selectedImage: UIImage?
-//    
-//    var imageSelected: (UIImage) -> Void
-//    
-//    func makeCoordinator() -> Coordinator {
-//        Coordinator(self)
-//    }
-//    
-//    func makeUIViewController(context: Context) -> UIImagePickerController {
-//        let picker = UIImagePickerController()
-//        picker.delegate = context.coordinator
-//        picker.sourceType = isCamera ? .camera : .photoLibrary
-//        return picker
-//    }
-//    
-//    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-//
-//    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-//        var parent: ImagePicker
-//        
-//        init(_ parent: ImagePicker) {
-//            self.parent = parent
-//        }
-//        
-//        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-//            if let image = info[.originalImage] as? UIImage {
-//                parent.selectedImage = image
-//                parent.imageSelected(image)
-//            }
-//            picker.dismiss(animated: true)
-//        }
-//        
-//        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-//            picker.dismiss(animated: true)
-//        }
-//    }
-//}

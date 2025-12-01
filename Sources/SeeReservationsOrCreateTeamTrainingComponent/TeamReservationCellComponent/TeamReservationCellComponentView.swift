@@ -62,7 +62,7 @@ extension TeamReservationCellComponentView {
     private var playersCarouselComponent: some View {
         VStack (alignment: .leading){
         
-            Text("Players")
+            Text("Players".localized)
                 .font(.madridInGameiOSFont(size: 12))
                 .foregroundStyle(.white)
                 .padding(.top, 4)
@@ -117,7 +117,7 @@ extension TeamReservationCellComponentView {
     
     private var descriptionComponent: some View {
         VStack (alignment: .leading){
-            Text("Notas")
+            Text("Notas".localized)
                 .font(.madridInGameiOSFont(size: 12))
                 .foregroundStyle(.white)
                 .padding(.top, 4)
@@ -156,7 +156,7 @@ extension TeamReservationCellComponentView {
                         .scaledToFit()
                         .frame(height: 15)
                         .foregroundColor(.cyan)
-                    Text("Ver reserva")
+                    Text("Ver reserva".localized)
                         .font(.madridInGameiOSFont(size: 14))
                         .foregroundColor(.cyan)
                 }
@@ -171,7 +171,7 @@ extension TeamReservationCellComponentView {
 //                        .scaledToFit()
 //                        .frame(height: 12)
 //                        .foregroundColor(.red)
-//                    Text("Editar")
+//                    Text("Editar".localized)
 //                        .font(.madridInGameiOSFont(size: 14))
 //                        .foregroundColor(.red)
 //                }

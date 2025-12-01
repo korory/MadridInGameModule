@@ -40,19 +40,19 @@ extension TeamsScreenView {
                 TabView(selection: $viewModel.selectedTab) {
                     SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: false, selectedTeam: viewModel.getTeamSelected()))
                         .tabItem {
-                            Label("Entrenamiento", systemImage: "calendar")
+                            Label("Entrenamiento".localized, systemImage: "calendar")
                         }
                         .tag(TabBarTeamsBottom.trainning)
                     
                     NewsComponentView()
                         .tabItem {
-                            Label("Noticias", systemImage: "newspaper.circle.fill")
+                            Label("Noticias".localized, systemImage: "newspaper.circle.fill")
                         }
                         .tag(TabBarTeamsBottom.news)
                     
                     PlayersTeamComponentView()
                         .tabItem {
-                            Label("Jugadores", systemImage: "person.3.fill")
+                            Label("Jugadores".localized, systemImage: "person.3.fill")
                         }
                         .tag(TabBarTeamsBottom.team
                         )
@@ -68,7 +68,7 @@ extension TeamsScreenView {
                             
                         })
                         .tabItem {
-                            Label("Cambio Equipo", systemImage: "arrow.left.arrow.right")
+                            Label("Cambio Equipo".localized, systemImage: "arrow.left.arrow.right")
                         }
                         .tag(TabBarTeamsBottom.changeTeam)
                 }
@@ -76,7 +76,7 @@ extension TeamsScreenView {
                 .accentColor(.cyan)
                 
             } else {
-                Text("No hay información disponible.")
+                Text("No hay información disponible.".localized)
                     .foregroundColor(.white)
                     .padding()
             }

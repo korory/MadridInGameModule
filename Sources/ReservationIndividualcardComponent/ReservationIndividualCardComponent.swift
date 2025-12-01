@@ -37,7 +37,7 @@ struct ReservationIndividualCardComponent: View {
             }
             
             VStack {
-                Text("Madrid in game")
+                Text("Madrid in game".localized)
                     .font(.madridInGameiOSFont(size: 25))
                     .foregroundColor(.white)
                     .padding(.top, 20)
@@ -55,7 +55,7 @@ struct ReservationIndividualCardComponent: View {
                                 .shadow(radius: 10)
                                 .overlay(
                                     VStack(spacing: 10) {
-                                        Text("Normas de uso")
+                                        Text("Normas de uso".localized)
                                             .font(.madridInGameiOSFont(size: 20))
                                             .foregroundColor(.white)
                                         imageNormasUso(rulesSize)
@@ -106,7 +106,7 @@ struct ReservationIndividualCardComponent: View {
                         }
                 )
                 // Botón para girar la tarjeta
-                CustomButton(text: viewModel.isFlipped ? "Detalles": "Normas de uso",
+                CustomButton(text: viewModel.isFlipped ? "Detalles".localized: "Normas de uso".localized,
                              needsBackground: true,
                              backgroundColor: Color.cyan,
                              pressEnabled: true,
@@ -129,23 +129,23 @@ extension ReservationIndividualCardComponent {
     
     private var titleSubtitle: some View {
         VStack (spacing: 10){
-            Text("Reserva Confirmada")
+            Text("Reserva Confirmada".localized)
                 .font(.madridInGameiOSFont(size: 20))
                 .foregroundColor(.white)
             
-            Text("Localización: \(viewModel.getIfReservationIscenterOrVirtualText())")
+            Text("Localización: %@".localized(viewModel.getIfReservationIscenterOrVirtualText()))
                 .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
-            Text("Plataforma: \(viewModel.getReservationConsole())")
+            Text("Plataforma: %@".localized(viewModel.getReservationConsole()))
                 .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
-            Text("Fecha: \(viewModel.parseReservationDate())")
+            Text("Fecha: %@".localized(viewModel.parseReservationDate()))
                 .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
-            Text("Horas: \(viewModel.formatTimes())")
+            Text("Horas: %@".localized(viewModel.formatTimes()))
                 .font(.madridInGameiOSFont(size: 15))
                 .foregroundColor(.white.opacity(0.8))
             
@@ -153,48 +153,67 @@ extension ReservationIndividualCardComponent {
     }
     
     private func imageReservationQr(_ imageSize: CGFloat) -> some View {
-        let qrValue = viewModel.reservation.qrImage;
-        
-        let environmentManager = EnvironmentManager()
-        
-        return AnyView(
-            AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(qrValue ?? "")")) { phase in
-                switch phase {
-                case .empty:
-                    VStack {
-                        Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+        if let qrValue = viewModel.reservation.qrImage {
+            let environmentManager = EnvironmentManager()
+            return AnyView(
+                AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(qrValue)")) { phase in
+                    switch phase {
+                    case .empty:
+                        VStack {
+                            Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 50)
+                            
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+                                .scaleEffect(1.5)
+                                .padding()
+                            
+                            Text("Cargando QR...".localized)
+                                .font(.madridInGameiOSFont(size: 15))
+                                .foregroundColor(.white)
+                                .opacity(0.7)
+                        }
+                    case .success(let image):
+                        image
                             .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 50)
-                        
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
-                            .scaleEffect(1.5)
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: imageSize, height: imageSize)
+                            .clipShape(RoundedRectangle(cornerRadius: 10.0))
                             .padding()
-                        
-                        Text("Cargando QR....")
-                            .font(.madridInGameiOSFont(size: 15))
-                            .foregroundColor(.white)
-                            .opacity(0.7)
+                    case .failure:
+                        Image(systemName: "photo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: imageSize, height: imageSize)
+                            .foregroundColor(.gray)
+                    @unknown default:
+                        EmptyView()
                     }
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: imageSize, height: imageSize)
-                        .clipShape(RoundedRectangle(cornerRadius: 10.0))
-                        .padding()
-                case .failure:
-                    Image(systemName: "photo")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: imageSize, height: imageSize)
-                        .foregroundColor(.gray)
-                @unknown default:
-                    EmptyView()
                 }
-            }
-        )
+            )
+        } else {
+            return AnyView(
+                Group {
+                    if let qrValue = viewModel.reservation.qrValue,
+                       let image = QRCodeGenerator.generateQRCode(with: qrValue) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: imageSize, height: imageSize)
+                            .clipShape(RoundedRectangle(cornerRadius: 10.0))
+                            .padding()
+                    } else {
+                        Image(systemName: "photo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: imageSize, height: imageSize)
+                            .foregroundColor(.gray)
+                    }
+                }
+            )
+        }
     }
     
     private func imageNormasUso(_ imageSize: CGFloat) -> some View {
@@ -214,7 +233,7 @@ extension ReservationIndividualCardComponent {
                             .scaleEffect(1.5)
                             .padding()
                         
-                        Text("Cargando Normas de Uso....")
+                        Text("Cargando Normas de Uso...".localized)
                             .font(.madridInGameiOSFont(size: 15))
                             .foregroundColor(.white)
                             .opacity(0.7)
@@ -237,3 +256,4 @@ extension ReservationIndividualCardComponent {
         
     }
 }
+

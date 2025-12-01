@@ -61,7 +61,7 @@ extension IndividualReservationsCellComponent {
     private var titleAndDeleteReservation: some View {
         HStack {
             
-            Text("Reserva - \(viewModel.getReservationConsole())")
+            Text("Reserva - %@".localized(viewModel.getReservationConsole()))
                 .font(.madridInGameiOSFont(size: 15))
                 .fontWeight(.bold)
                 .foregroundColor(.white)
@@ -94,7 +94,7 @@ extension IndividualReservationsCellComponent {
                         .scaledToFit()
                         .frame(height: 15)
                         .foregroundColor(.cyan)
-                    Text("Ver reserva")
+                    Text("Ver reserva".localized)
                         .font(.madridInGameiOSFont(size: 14))
                         .foregroundColor(.cyan)
                 }
@@ -109,7 +109,7 @@ extension IndividualReservationsCellComponent {
 //            Button {
 //                // onReservationPressed(.seeReservation, reservation)
 //            } label: {
-//                Text("Ver reserva")
+//                Text("Ver reserva".localized)
 //                    .font(.system(size: 14, weight: .bold))
 //                    .foregroundColor(.cyan)
 //                    .padding(.horizontal, 12)
