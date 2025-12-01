@@ -88,7 +88,7 @@ extension ReservationComponentView {
                 viewModel.addRemoveHours(hour: hour)
             }
             
-            Text("Máximo 3 spots consecutivos")
+            Text("Máximo 3 spots consecutivos".localized)
                 .font(.body)
                 .foregroundStyle(Color.white)
                 .padding()
@@ -107,7 +107,7 @@ extension ReservationComponentView {
     
     private var makeReservationButton: some View {
         VStack {
-            CustomButton(text: "Reservar",
+            CustomButton(text: "Reservar".localized,
                          needsBackground: true,
                          backgroundColor: viewModel.dateSelected != "" && !viewModel.hoursSelected.isEmpty && viewModel.consoleSelected != "" ? Color.cyan : Color.gray,
                          pressEnabled: true,

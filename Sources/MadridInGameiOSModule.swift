@@ -40,7 +40,7 @@ public struct MadridInGameiOSModule: View {
                 .ignoresSafeArea(.all)
             
             if viewModel.isLoading {
-                LoadingView(message: "Preparando tu experiencia...")
+                LoadingView(message: "Preparando tu experiencia...".localized)
             } else if let errorMessage = viewModel.errorMessage {
                 errorView(errorMessage)
             } else if let user = viewModel.user {
@@ -57,7 +57,7 @@ public struct MadridInGameiOSModule: View {
     
     private func errorView(_ message: String) -> some View {
         VStack {
-            Text("Error al cargar el módulo")
+            Text("Error al cargar el módulo".localized)
                 .foregroundColor(.red)
             Text(message)
                 .foregroundColor(.white)
@@ -85,11 +85,11 @@ public struct MadridInGameiOSModule: View {
                 }
                 .padding(.trailing, 10)
                 
-                tabButton(title: "Dashboard", tab: 0)
+                tabButton(title: "Dashboard".localized, tab: 0)
                 if !viewModel.getUserTeams().isEmpty {
-                    tabButton(title: "Equipos", tab: 1)
+                    tabButton(title: "Equipos".localized, tab: 1)
                 }
-                tabButton(title: "Competiciones", tab: 2)
+                tabButton(title: "Competiciones".localized, tab: 2)
             }
             .padding(.horizontal, 10)
             

@@ -18,7 +18,7 @@ struct TeamsApplyForAdmisionComponentView: View {
 
 extension TeamsApplyForAdmisionComponentView {
     private var titleComponent: some View {
-        Text("BUSCA EQUIPOS")
+        Text("BUSCA EQUIPOS".localized)
             .font(.largeTitle)
             .fontWeight(.bold)
             .foregroundStyle(Color.white)

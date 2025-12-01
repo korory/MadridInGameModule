@@ -27,7 +27,7 @@
 //
 //extension CardDetailNewsView {
 //    private var titleBanner: some View {
-//        Text("NOTICIAS")
+//        Text("NOTICIAS".localized)
 //            .font(.largeTitle)
 //            .foregroundStyle(Color.white)
 //    }

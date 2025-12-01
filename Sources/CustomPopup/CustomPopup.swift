@@ -86,14 +86,14 @@ struct CustomPopup<Content: View>: View {
 //    
 //    var body: some View {
 //        VStack {
-//            Button("Mostrar Popup") {
+//            Button("Mostrar Popup".localized) {
 //                isPopupPresented = true
 //            }
 //            .padding()
 //            
 //            CustomPopup(isPresented: $isPopupPresented) {
 //                VStack {
-//                    Text("Hola")
+//                    Text("Hola".localized)
 //                }
 //            }
 //        }

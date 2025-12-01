@@ -32,7 +32,7 @@ extension IndividualReservationCellComponent {
                 .frame(width: 20, height: 20)
                 .foregroundStyle(Color.yellow)
             
-            Text("ENTRENAMIENTO \(viewModel.getTrainingLocationText())")
+            Text("ENTRENAMIENTO %@".localized(viewModel.getTrainingLocationText()))
                 .font(.system(size: 18))
                 .foregroundStyle(Color.white)
             
@@ -51,7 +51,7 @@ extension IndividualReservationCellComponent {
                 .font(.system(size: 15).weight(.bold))
                 .foregroundStyle(Color.white.opacity(0.7))
             
-            Text("\(viewModel.dateSelected) - \(viewModel.hourSelected)")
+            Text("%@ - %@".localized(viewModel.dateSelected, viewModel.hourSelected))
                 .font(.system(size: 15))
                 .foregroundStyle(Color.white.opacity(0.7))
         }

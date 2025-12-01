@@ -33,7 +33,7 @@ struct NewsFlowComponent: View {
 extension NewsFlowComponent {
     private var titleBanner: some View {
         HStack {
-            Text("Noticias")
+            Text("Noticias".localized)
                 .font(.madridInGameiOSFont(size: 25))
                 .foregroundColor(.white)
                 .padding(.leading, 5)
@@ -88,7 +88,7 @@ extension NewsFlowComponent {
                             .scaleEffect(1.5)
                             .padding()
                         
-                        Text("Cargando Imagen")
+                        Text("Cargando Imagen".localized)
                             .font(.madridInGameiOSFont(size: 15))
                             .foregroundColor(.white)
                             .opacity(0.7)

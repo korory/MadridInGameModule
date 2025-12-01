@@ -17,8 +17,13 @@ struct SelectTeamsCellComponent: View {
                 teamImage
                 titleSubtitle
                 Spacer()
-                arrowPress
+                if UserManager.shared.getSelectedTeam()?.id == team.id {
+                    selectedTeam
+                }
             }
+            .padding()
+                .cornerRadius(20)
+                .background(Color.gray.opacity(0.5))
         }
         .background(Color.black.opacity(0.9))
         .cornerRadius(20)
@@ -60,33 +65,29 @@ extension SelectTeamsCellComponent {
                         EmptyView()
                     }
                 }
-                .padding(.leading, 10)
-                .padding(.trailing, 2)
             )
         } else {
             return AnyView(
-            VStack (spacing: 20){
-                Image(systemName: "person.2.circle.fill")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 70, height: 70)
-                    .clipShape(Circle())
-                    .padding()
-            }
-            .padding(.leading, 10)
-            .padding(.trailing, 2)
+                VStack (spacing: 20){
+                    Image(systemName: "person.2.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 70, height: 70)
+                        .clipShape(Circle())
+                        .padding()
+                }
             )
         }
     }
     
     private var titleSubtitle: some View {
         VStack (alignment: .leading, spacing: 10){
-            Text(team.name ?? "Equipo sin nombre")
+            Text(team.name ?? "Equipo sin nombre".localized)
                 .font(.madridInGameiOSFont(size: 17))
                 .foregroundColor(.white)
                 .padding(.leading, 8)
             
-            Text(team.description ?? "Sin Descripción")
+            Text(team.description ?? "Sin Descripción".localized)
                 .font(.system(size: 14))
                 .lineLimit(4)
                 .foregroundColor(.white)
@@ -94,13 +95,13 @@ extension SelectTeamsCellComponent {
         }
     }
     
-    private var arrowPress: some View {
-        Image(systemName: "chevron.right") // Flecha que indica interacción
+    private var selectedTeam: some View {
+        Image(systemName: "checkmark.circle")
             .resizable()
-            .frame(width: 5, height: 10)
+            .frame(width: 30, height: 30)
             .foregroundColor(.white)
             .padding(.leading, 10)
             .padding(.trailing, 10)
-
+        
     }
 }

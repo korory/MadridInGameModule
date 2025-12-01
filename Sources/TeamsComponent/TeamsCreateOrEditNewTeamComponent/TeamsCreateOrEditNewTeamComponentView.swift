@@ -40,7 +40,7 @@
 //    
 //    private var sucessTeamCreateTextComponent: some View {
 //        VStack (alignment: .leading) {
-//            Text("Una vez aprobemos la creación del equipo este aparecerá en tu lista de equipo")
+//            Text("Una vez aprobemos la creación del equipo este aparecerá en tu lista de equipo".localized)
 //                .font(.body)
 //                .fontWeight(.bold)
 //                .foregroundStyle(Color.white)

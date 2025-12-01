@@ -197,7 +197,7 @@ class ReservationService {
     
     func getReservesByUser(userId: String, completion: @escaping (Result<[IndividualReservation], Error>) -> Void) {
         let parameters: [String: String] = [
-            "fields": "id, date, slot.*, qrImage, times.gaming_space_times_id.time",
+            "fields": "id, date, slot.*,qrImage,qrValue,times.gaming_space_times_id.time",
             "filter[user][_eq]": userId,
             "filter[status][_neq]": "cancelled",
             "filter[date][_gte]": "$NOW",

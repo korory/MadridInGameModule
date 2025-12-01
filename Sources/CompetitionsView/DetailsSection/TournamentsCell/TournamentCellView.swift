@@ -87,7 +87,7 @@ extension TournamentCellView {
 
         } label: {
             HStack (alignment: .center, spacing: 5){
-                Text("Inscríbete")
+                Text("Inscríbete".localized)
                     .font(.madridInGameiOSFont(size: 15))
                     .foregroundColor(.white)
                     .padding(.leading, 8)

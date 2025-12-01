@@ -12,11 +12,11 @@ struct ConfirmDNIView: View {
                 titleAndSubtitleComponent
 
                 VStack(alignment: .leading, spacing: 8) {
-                    FloatingTextField(text: dni, placeholderText: "DNI")
+                    FloatingTextField(text: dni, placeholderText: "DNI".localized)
                         .onTextChange { oldValue, newValue in
                             dni = newValue
                             isDNIValid = validateDNI(newValue)
-                            errorMessage = isDNIValid ? nil : "El DNI debe tener 8 dígitos seguidos de una letra mayúscula."
+                            errorMessage = isDNIValid ? nil : "El DNI debe tener 8 dígitos seguidos de una letra mayúscula.".localized
                         }
 
                     if let error = errorMessage {
@@ -46,18 +46,18 @@ struct ConfirmDNIView: View {
 extension ConfirmDNIView {
     private var titleAndSubtitleComponent: some View {
         VStack(spacing: 8) {
-            Text("Confirma tu DNI")
+            Text("Confirma tu DNI".localized)
                 .font(.madridInGameiOSFont(size: 25))
                 .foregroundStyle(Color.white)
 
-            Text("Introduce y confirma tu DNI")
+            Text("Introduce y confirma tu DNI".localized)
                 .font(.subheadline)
                 .foregroundStyle(Color.white.opacity(0.85))
         }
     }
 
     private var textComponent: some View {
-        Text("Importante: Debes llevar tu DNI contigo para poder acceder al centro la primera vez y validar tu usuario.")
+        Text("Importante: Debes llevar tu DNI contigo para poder acceder al centro la primera vez y validar tu usuario.".localized)
             .font(.madridInGameiOSFont(size: 12))
             .foregroundStyle(.white)
             .multilineTextAlignment(.center)
@@ -66,7 +66,7 @@ extension ConfirmDNIView {
 
     private var acceptButton: some View {
         CustomButton(
-            text: "Aceptar",
+            text: "Aceptar".localized,
             needsBackground: true,
             backgroundColor: isDNIValid ? Color.cyan : Color.gray,
             pressEnabled: isDNIValid,
@@ -80,7 +80,7 @@ extension ConfirmDNIView {
 
     private var cancelButton: some View {
         CustomButton(
-            text: "Cancel",
+            text: "Cancelar".localized,
             needsBackground: true,
             backgroundColor: Color.cyan,
             pressEnabled: true,

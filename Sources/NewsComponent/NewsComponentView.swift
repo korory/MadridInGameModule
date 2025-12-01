@@ -16,7 +16,7 @@ struct NewsComponentView: View {
                 .ignoresSafeArea(.all)
             
             if viewModel.isLoading {
-                LoadingView(message: "Cargando Noticias....")
+                LoadingView(message: "Cargando Noticias...")
             } else {
                 VStack {
                     titleAndPlusButtonBanner
@@ -42,7 +42,7 @@ struct NewsComponentView: View {
 extension NewsComponentView {
     private var titleAndPlusButtonBanner: some View {
         HStack {
-            Text("NOTICIAS")
+            Text("NOTICIAS".localized)
                 .font(.madridInGameiOSFont(size: 25))
                 .foregroundStyle(Color.white)
             
@@ -64,7 +64,7 @@ extension NewsComponentView {
     private var noNewsComponent: some View {
         VStack {
             Spacer()
-            Text("No hay noticias en este equipo actualmente")
+            Text("No hay noticias en este equipo actualmente".localized)
                 .font(.madridInGameiOSFont(size: 15))
                 .foregroundStyle(Color.gray)
                 .padding()

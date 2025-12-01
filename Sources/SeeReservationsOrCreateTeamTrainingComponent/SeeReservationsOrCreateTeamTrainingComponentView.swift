@@ -16,12 +16,12 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
                 .ignoresSafeArea(.all)
             
             if viewModel.showToastDeleteSuccess {
-                ToastMessage(message: "Reserva Eliminada", duration: 2, success: true) {
+                ToastMessage(message: "Reserva Eliminada".localized, duration: 2, success: true) {
                     self.viewModel.showToastDeleteSuccess = false
                 }
                 .zIndex(1)
             } else if viewModel.showToastDeleteFailure {
-                ToastMessage(message: "Problema al eliminar una reserva", duration: 2, success: false) {
+                ToastMessage(message: "Problema al eliminar una reserva".localized, duration: 2, success: false) {
                     self.viewModel.showToastDeleteFailure = false
                 }
                 .zIndex(1)
@@ -34,7 +34,7 @@ struct SeeReservationsOrCreateTeamTrainingComponentView: View {
             }
             
             if viewModel.isLoading {
-                LoadingView(message: "Preparando tu calendario...")
+                LoadingView(message: "Preparando tu calendario...".localized)
                 
             } else {
                 VStack (alignment: .leading) {
@@ -109,7 +109,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
     private var nextTrainingBanner: some View {
         VStack {
             HStack (spacing: 8){
-                TextWithUnderlineComponent(title: viewModel.isDateSelected ? "Entrenamientos" : "Próximos entrenamientos", underlineColor: Color.cyan)
+                TextWithUnderlineComponent(title: viewModel.isDateSelected ? "Entrenamientos".localized : "Próximos entrenamientos".localized, underlineColor: Color.cyan)
                     .padding(.top, viewModel.isUserMode ? 10 : 0)
                     .padding(.leading, viewModel.isUserMode ? 5 : 0)
                 
@@ -136,7 +136,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
         VStack(alignment: .leading, spacing: 20) {
             
             if !viewModel.allIndividualReservations.isEmpty {
-                Text("Reservas Individuales")
+                Text("Reservas Individuales".localized)
                     .font(.madridInGameiOSFont(size: 13))
                     .foregroundColor(.white)
                     .opacity(0.7)
@@ -150,7 +150,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             }
             
             if !viewModel.allReservations.isEmpty {
-                Text("Reservas De Equipo")
+                Text("Reservas De Equipo".localized)
                     .font(.madridInGameiOSFont(size: 13))
                     .foregroundColor(.white)
                     .opacity(0.7)
@@ -164,7 +164,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             
             
             if viewModel.allIndividualReservations.isEmpty && viewModel.allReservations.isEmpty {
-                Text("No hay entrenamientos programados")
+                Text("No hay entrenamientos programados".localized)
                     .font(.madridInGameiOSFont(size: 14))
                     .foregroundColor(.white)
                     .opacity(0.7)

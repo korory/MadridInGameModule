@@ -32,6 +32,7 @@ extension CompetitionsCarouselComponentView {
     private var titleBanner: some View {
         VStack (alignment: .leading, spacing: 12){
             Text(leagueInformation.title)
+                .font(.madridInGameiOSFont(size: 24))
                 .font(.system(size: 25).weight(.bold))
                 .foregroundStyle(Color.white)
             

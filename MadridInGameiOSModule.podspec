@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'MadridInGameiOSModule'
-  s.version      = '1.0.6'
+  s.version      = '1.0.5'
   s.summary      = 'Un módulo para integrar MadridInGame con funcionalidades avanzadas.'
   s.description  = <<-DESC
     MadridInGameiOSModule es un módulo diseñado para facilitar la integración de experiencias interactivas de juego en aplicaciones iOS.
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.source_files = 'Sources/**/*.{swift}'
   
   s.resource_bundles = {
-    'MadridInGameiOSModule' => ['Resources/**/*.{ttf,otf}']
+    'MadridInGameiOSModule' => ['Resources/**/*.{ttf,otf,strings}', 'Resources/*.lproj/*.strings']
   }
   
   s.swift_versions = ['5.0']

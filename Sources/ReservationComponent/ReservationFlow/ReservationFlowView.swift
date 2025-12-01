@@ -57,7 +57,7 @@ struct ReservationFlowView: View {
                 .padding(.horizontal)
                 .padding(.top, 5)
                 
-                Text("Reservar espacio")
+                Text("Reservar espacio".localized)
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(.white)
                     .padding(.top, 8)
@@ -72,6 +72,11 @@ struct ReservationFlowView: View {
                         .tag(2)
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                .highPriorityGesture(
+                    DragGesture()
+                        .onChanged { _ in }
+                        .onEnded { _ in }
+                )
                 
                 Spacer()
             }
@@ -87,7 +92,7 @@ struct ReservationFlowView: View {
 //    
 //    var body: some View {
 //        VStack(spacing: 24) {
-//            Text("Seleccionar Jugador")
+//            Text("Seleccionar Jugador".localized)
 //                .font(.system(size: 24, weight: .bold))
 //                .foregroundColor(.white)
 //            
@@ -111,7 +116,7 @@ struct ReservationFlowView: View {
 //            Button(action: {
 //                currentStep += 1
 //            }) {
-//                Text("Siguiente")
+//                Text("Siguiente".localized)
 //                    .font(.system(size: 18, weight: .bold))
 //                    .frame(maxWidth: .infinity, maxHeight: 44)
 //                    .background(Color.gray.opacity(0.8))
@@ -131,7 +136,7 @@ struct SelectDateView: View {
     
     var body: some View {
         VStack {
-            Text("Selecciona una fecha")
+            Text("Selecciona una fecha".localized)
                 .font(.headline)
                 .foregroundColor(.white)
                 .padding(.bottom, 20)
@@ -148,7 +153,7 @@ struct SelectDateView: View {
                         .scaleEffect(1.5)
                         .padding()
                     
-                    Text("Cargando fechas disponibles...")
+                    Text("Cargando fechas disponibles...".localized)
                         .font(.madridInGameiOSFont(size: 15))
                         .foregroundColor(.white)
                         .opacity(0.7)
@@ -178,7 +183,7 @@ struct SelectSlotView: View {
     
     var body: some View {
         VStack {
-            Text("Selecciona franja horaria")
+            Text("Selecciona franja horaria".localized)
                 .font(.headline)
                 .foregroundColor(.white)
                 .padding(.bottom, 10)
@@ -200,7 +205,7 @@ struct SelectSlotView: View {
                         .scaleEffect(1.5)
                         .padding()
                     
-                    Text("Cargando horarios disponibles...")
+                    Text("Cargando horarios disponibles...".localized)
                         .font(.madridInGameiOSFont(size: 15))
                         .foregroundColor(.white)
                         .opacity(0.7)
@@ -222,7 +227,7 @@ struct SelectSlotView: View {
                     .padding(.horizontal)
                 }
             }
-            Text("Máximo 3 spots consecutivos")
+            Text("Máximo 3 spots consecutivos".localized)
                 .font(.caption)
                 .foregroundColor(.white)
                 .padding(.bottom, 20)
@@ -233,7 +238,7 @@ struct SelectSlotView: View {
             Button(action: {
                 currentStep += 1 // Avanzar al siguiente paso
             }) {
-                Text("Siguiente")
+                Text("Siguiente".localized)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(viewModel.selectedSlots.isEmpty ? Color.gray : Color.cyan)
@@ -298,7 +303,7 @@ struct SelectSpaceView: View {
                     .scaleEffect(1.5)
                     .padding()
                 
-                Text("Creando la reserva...")
+                Text("Creando la reserva...".localized)
                     .font(.madridInGameiOSFont(size: 15))
                     .foregroundColor(.white)
                     .opacity(0.7)
@@ -306,7 +311,7 @@ struct SelectSpaceView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             VStack {
-                Text("Selecciona un espacio")
+                Text("Selecciona un espacio".localized)
                     .font(.headline)
                     .foregroundColor(.white)
                     .padding(.bottom, 20)
@@ -323,7 +328,7 @@ struct SelectSpaceView: View {
                             .scaleEffect(1.5)
                             .padding()
                         
-                        Text("Cargando espacios disponibles...")
+                        Text("Cargando espacios disponibles...".localized)
                             .font(.madridInGameiOSFont(size: 15))
                             .foregroundColor(.white)
                             .opacity(0.7)
@@ -353,7 +358,7 @@ struct SelectSpaceView: View {
                 Button(action: {
                     viewModel.createReservation()
                 }) {
-                    Text("Reservar")
+                    Text("Reservar".localized)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil ? Color.gray : Color.cyan)
@@ -386,3 +391,4 @@ struct SelectSpaceView: View {
         }
     }
 }
+

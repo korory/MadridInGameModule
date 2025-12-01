@@ -35,8 +35,8 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
     
     @Published var isCalendarVisible: Bool = true
     @Published var isTrainingsVisible: Bool = true
-    @Published var calendarArrowRotation: Double = 0
-    @Published var trainingArrowRotation: Double = 0
+    @Published var calendarArrowRotation: Double = 180
+    @Published var trainingArrowRotation: Double = 180
     
     @Published var isLoading = true
     

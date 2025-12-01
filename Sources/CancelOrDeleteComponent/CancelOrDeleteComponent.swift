@@ -41,7 +41,7 @@ extension CancelOrDeleteComponent {
     
     private var confirmCancelButtonsComponent: some View {
         HStack {
-            CustomButton(text: acceptTitle ?? "Aceptar",
+            CustomButton(text: acceptTitle ?? "Aceptar".localized,
                          needsBackground: true,
                          backgroundColor: Color.cyan,
                          pressEnabled: true,
@@ -49,7 +49,7 @@ extension CancelOrDeleteComponent {
                 acceptedAction()
             }
                          .padding(.trailing, 10)
-            CustomButton(text: cancelTitle ?? "Rechazar",
+            CustomButton(text: cancelTitle ?? "Rechazar".localized,
                          needsBackground: true,
                          backgroundColor: Color.cyan,
                          pressEnabled: true,

@@ -22,7 +22,7 @@ class ReservationIndividualCardViewModel: ObservableObject {
     }
     
     func getIfReservationIscenterOrVirtualText() -> String {
-        return "ESPORTS CENTER"
+        return "ESPORTS MADRID CENTER"
     }
     
     func formatTimes() -> String {

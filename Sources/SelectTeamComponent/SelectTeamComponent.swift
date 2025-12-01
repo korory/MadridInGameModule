@@ -19,7 +19,7 @@ struct SelectTeamComponent: View {
             VStack {
                 Spacer()
                 
-                Text("¿Qué equipo quieres gestionar?")
+                Text("¿Qué equipo quieres gestionar?".localized)
                     .font(.madridInGameiOSFont(size: 20))
                     .bold()
                     .foregroundColor(.white)
@@ -27,11 +27,7 @@ struct SelectTeamComponent: View {
                     .padding(.horizontal)
                     .padding(.bottom, 15)
                     .padding(.top, 20)
-                
-                RoundedRectangle(cornerRadius: 10.0)
-                    .frame(height: 2)
-                    .foregroundStyle(.white.opacity(0.1))
-                
+
                 ScrollView {
                     VStack(spacing: 15) {
                         ForEach(allTeams, id: \.id) { team in
@@ -40,12 +36,6 @@ struct SelectTeamComponent: View {
                                     onTeamSelected(teamSelected)
                                 }
                                 .padding(.leading, 10)
-                                
-                                RoundedRectangle(cornerRadius: 10.0)
-                                    .frame(height: 2)
-                                    .foregroundStyle(.white.opacity(0.1))
-                                    .padding(.leading, 10)
-                                    .padding(.trailing, 10)
                             }
                         }
                     }

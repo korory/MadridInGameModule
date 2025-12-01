@@ -33,7 +33,7 @@ struct TextWithUnderlineComponent: View {
 }
 
 #Preview {
-    TextWithUnderlineComponent(title: "Jugadores", underlineColor: Color.cyan)
+    TextWithUnderlineComponent(title: "Jugadores".localized, underlineColor: Color.cyan)
         .padding()
         .background(Color.black)
 }

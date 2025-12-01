@@ -32,25 +32,25 @@ extension ReservationQRView {
     private var titleSubtitleComponent: some View {
         VStack (alignment: .leading, spacing: 12) {
             
-            Text("ESPACIO RESERVADO")
+            Text("ESPACIO RESERVADO".localized)
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundStyle(Color.white)
             
-            Text("Fecha: \(dateSelected)")
+            Text("Fecha: %@".localized(dateSelected))
                 .font(.headline)
                 .foregroundStyle(Color.white)
                 .padding(.leading, 10)
             
             Text(hoursSelected.count > 1
-                 ? "Horas: \(hoursSelected.joined(separator: ", "))"
-                 : "Hora: \(hoursSelected.joined(separator: ", "))")
+                 ? "Horas: %@".localized(hoursSelected.joined(separator: ", "))
+                 : "Hora: %@".localized(hoursSelected.joined(separator: ", ")))
             .font(.headline)
             .foregroundStyle(Color.white)
             .padding(.leading, 10)
             
             
-            Text("Consola: \(consoleSelected)")
+            Text("Consola: %@".localized(consoleSelected))
                 .font(.headline)
                 .foregroundStyle(Color.white)
                 .padding(.leading, 10)
@@ -60,7 +60,7 @@ extension ReservationQRView {
     
     private var qrImageComponent: some View {
         VStack (spacing: 25){
-            Text("Puedes usar este QR para acceder.")
+            Text("Puedes usar este QR para acceder.".localized)
                 .font(.body)
                 .foregroundStyle(Color.white)
                 .padding(.top, 10)
@@ -75,7 +75,7 @@ extension ReservationQRView {
                         .frame(width: 200, height: 200)
                 )
             
-            Text("Código: \(code)")
+            Text("Código: %@".localized(code))
                 .font(.body)
                 .foregroundStyle(Color.white)
                 .padding(.bottom, 15)
@@ -83,7 +83,7 @@ extension ReservationQRView {
     }
     
     private var rulesDropdownComponent: some View {
-        DropdownComponentView(dropdownText: "Normas de uso")
+        DropdownComponentView(dropdownText: "Normas de uso".localized)
             .padding(.bottom, 15)
     }
     
@@ -99,7 +99,7 @@ extension ReservationQRView {
             }
             
             
-            Text("Importante: Debes llevar tu DNI contigo para poder acceder al centro la primera vez para validar tu usuario")
+            Text("Importante: Debes llevar tu DNI contigo para poder acceder al centro la primera vez para validar tu usuario".localized)
                 .font(.body)
                 .foregroundStyle(Color.white)
         }
@@ -107,7 +107,7 @@ extension ReservationQRView {
     }
     
     private var acceptButton: some View {
-        CustomButton(text: "Aceptar",
+        CustomButton(text: "Aceptar".localized,
                      needsBackground: true,
                      backgroundColor: Color.cyan,
                      pressEnabled: true,
