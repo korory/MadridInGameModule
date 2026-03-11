@@ -56,12 +56,12 @@ struct GamingSpace: Codable {
 }
 
 struct Translation: Codable {
-    let description: String
+    let description: String?
     let device: String
     let gamingSpaceId: Int
     let id: Int
     let languagesCode: String
-
+    
     enum CodingKeys: String, CodingKey {
         case description, device, id
         case gamingSpaceId = "gaming_space_id"
@@ -89,17 +89,37 @@ struct Reservation: Codable {
     }
 }
 
-class ReservationService {
 
+// MARK: - Nuevos modelos para Training
+
+struct TrainingRequest {
+    let status: String
+    let type: String
+    let startDate: String       // "yyyy-MM-dd"
+    let time: String            // "HH:mm"
+    let teamId: String
+    let notes: String
+    let playerIds: [String]     // IDs de usuarios
+    let reserveId: Int          // ID de la gaming_space_reserve ya creada
+}
+
+struct TrainingResponseModel: Codable {
+    let data: TrainingResponse
+}
+
+struct TrainingResponse: Codable {
+    let id: String?
+}
+
+class ReservationService {
+    
     func createReservation(reservation: Reservation, completion: @escaping (Result<ReserveResponse, Error>) -> Void) {
         
-        // Configuramos el codificador para fechas
         let encoder = JSONEncoder()
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd" // Formato esperado para la fecha
+        dateFormatter.dateFormat = "yyyy-MM-dd"
         encoder.dateEncodingStrategy = .formatted(dateFormatter)
-
-        // Creamos un diccionario con los datos de la reserva
+        
         var reservationDict = [
             "status": reservation.status ?? "active",
             "slot": reservation.slot.id,
@@ -108,29 +128,136 @@ class ReservationService {
             "peripheral_loans": reservation.peripheralLoans ?? [],
         ] as [String: Any]
         
-        let timesMapped = reservation.times.map { ["gaming_space_times_id": ["id": $0.id]] }
+        // Añade team solo si existe
+        if let team = reservation.team {
+            reservationDict["team"] = team
+        }
         
+        let timesMapped = reservation.times.map { ["gaming_space_times_id": ["id": $0.id]] }
         reservationDict["times"] = timesMapped
         
         Task {
-                do {
-                    let reserveResponseModel: ReserveResponseModel = try await DirectusService.shared.sendRequest(
-                        endpoint: "gaming_space_reserves",
-                        method: .POST,
-                        body: reservationDict
-                    )
-                    if reserveResponseModel.data.id != 0 {
-                        Logger.shared.log("Reserva registrada con éxito: \(reserveResponseModel.data)")
-                        completion(.success(reserveResponseModel.data))
-                    } else {
-                        Logger.shared.log("Error: No se recibieron datos válidos.")
-                        completion(.failure(NSError(domain: "com.example.error", code: 0, userInfo: [NSLocalizedDescriptionKey: "No se recibieron datos válidos."])))
-                    }
-                } catch {
-                    Logger.shared.log("Error al hacer un registro: \(error)")
-                    completion(.failure(error))
+            do {
+                let reserveResponseModel: ReserveResponseModel = try await DirectusService.shared.sendRequest(
+                    endpoint: "gaming_space_reserves",
+                    method: .POST,
+                    body: reservationDict
+                )
+                if reserveResponseModel.data.id != 0 {
+                    Logger.shared.log("Reserva registrada con éxito: \(reserveResponseModel.data)")
+                    completion(.success(reserveResponseModel.data))
+                } else {
+                    Logger.shared.log("Error: No se recibieron datos válidos.")
+                    completion(.failure(NSError(domain: "com.example.error", code: 0, userInfo: [NSLocalizedDescriptionKey: "No se recibieron datos válidos."])))
                 }
+            } catch {
+                Logger.shared.log("Error al hacer un registro: \(error)")
+                completion(.failure(error))
             }
+        }
+    }
+    
+    func createTraining(request: TrainingRequest, completion: @escaping (Result<TrainingResponse, Error>) -> Void) {
+        
+        // Directus espera los players como array de objetos con la FK anidada
+        let playersMapped = request.playerIds.map { ["users_id": $0] }
+        
+        // La reserva se enlaza como array de objetos con el ID
+        let reservesMapped = [["id": request.reserveId]]
+        
+        let body: [String: Any] = [
+            "status":     request.status,
+            "type":       request.type,
+            "start_date": request.startDate,
+            "time":       request.time,
+            "team":       request.teamId,
+            "notes":      request.notes,
+            "players":    playersMapped,
+            "reserves":   reservesMapped
+        ]
+        
+        Task {
+            do {
+                let response: TrainingResponseModel = try await DirectusService.shared.sendRequest(
+                    endpoint: "trainings",
+                    method: .POST,
+                    body: body
+                )
+                Logger.shared.log("Training creado con éxito: \(response.data)")
+                completion(.success(response.data))
+            } catch {
+                Logger.shared.log("Error al crear el training: \(error)")
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func updateExistingReserveForTeam(
+        reserveId: Int,
+        date: Date,
+        slot: Slot,
+        times: [GamingSpaceTime],
+        completion: @escaping (Result<ReserveResponse, Error>) -> Void
+    ) {
+        let dateFmt = DateFormatter()
+        dateFmt.dateFormat = "yyyy-MM-dd"
+
+        let timesMapped = times.map { ["gaming_space_times_id": ["id": $0.id]] }
+
+        let body: [String: Any] = [
+            "date":  dateFmt.string(from: date),
+            "slot":  slot.id,
+            "times": timesMapped
+        ]
+
+        Task {
+            do {
+                let response: ReserveResponseModel = try await DirectusService.shared.sendRequest(
+                    endpoint: "gaming_space_reserves/\(reserveId)",
+                    method: .PATCH,
+                    body: body
+                )
+                completion(.success(response.data))
+            } catch {
+                Logger.shared.log("Error al actualizar reserve de equipo: \(error)")
+                completion(.failure(error))
+            }
+        }
+    }
+
+    func updateTraining(
+        trainingId: String,
+        type: String,
+        startDate: String,
+        time: String,
+        notes: String,
+        playerIds: [String],
+        completion: @escaping (Result<TrainingResponse, Error>) -> Void
+    ) {
+        let playersMapped = playerIds.map { ["users_id": $0] }
+
+        let body: [String: Any] = [
+            "type":       type,
+            "start_date": startDate,
+            "time":       time,
+            "notes":      notes,
+            "players":    playersMapped
+        ]
+
+        Task {
+            do {
+                let response: TrainingResponseModel = try await DirectusService.shared.sendRequest(
+                    endpoint: "trainings/\(trainingId)",
+                    method: .PATCH,
+                    body: body
+                )
+                Logger.shared.log("Training actualizado con éxito: \(response.data)")
+                completion(.success(response.data))
+            } catch {
+                Logger.shared.log("Error al actualizar el training: \(error)")
+                completion(.failure(error))
+            }
+        }
     }
     
     func updateExistingReservation(reservationId: Int, qrImage: String, reservation: Reservation, completion: @escaping (Result<ReserveResponse, Error>) -> Void) {
@@ -140,7 +267,7 @@ class ReservationService {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd" // Formato esperado para la fecha
         encoder.dateEncodingStrategy = .formatted(dateFormatter)
-
+        
         // Crear el diccionario con los datos de la reserva
         var reservationDict: [String: Any] = [
             "qrImage": qrImage,
@@ -148,10 +275,10 @@ class ReservationService {
         
         let timesMapped = reservation.times.map { ["gaming_space_times_id": ["id": $0.id]] }
         reservationDict["times"] = timesMapped
-
+        
         // Endpoint para actualizar la reserva específica
         let endpoint = "gaming_space_reserves/\(reservationId)"
-
+        
         Task {
             do {
                 let reserveResponseModel: ReserveResponseModel = try await DirectusService.shared.sendRequest(
@@ -173,7 +300,7 @@ class ReservationService {
             }
         }
     }
-
+    
     func getAllTrainings(teamId: String, userId: String, completion: @escaping (Result<[EventModel], Error>) -> Void) {
         let parameters: [String: String] = [
             "fields": "id, status, start_date, time, players.users_id.id, players.users_id.avatar, players.users_id.email, players.users_id.first_name, type, reserves.*, reserves.team.name, reserves.team.picture, reserves.times.gaming_space_times_id.time, notes",
@@ -264,21 +391,68 @@ class ReservationService {
         }
     }
     
-    func deleteReservation(id: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+    //    func deleteReservation(id: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+    //        Task {
+    //            do {
+    //                // Realizamos la solicitud DELETE sin cuerpo
+    //                try await DirectusService.shared.sendRequestWithoutDecode(
+    //                    endpoint: "gaming_space_reserves/\(id)",
+    //                    method: .DELETE,
+    //                    body: [:]
+    //                )
+    //
+    //                // Llamamos a completion con un Success vacío si la operación es exitosa
+    //                completion(.success(()))
+    //            } catch {
+    //                // Llamamos a completion con un Failure si ocurre un error
+    //                Logger.shared.log("Error al eliminar la reserva: \(error)")
+    //                completion(.failure(error))
+    //            }
+    //        }
+    //    }
+    
+    func deleteReservation(id: String, completion: @escaping (Result<Void, Error>) -> Void) {
         Task {
             do {
-                // Realizamos la solicitud DELETE sin cuerpo
                 try await DirectusService.shared.sendRequestWithoutDecode(
                     endpoint: "gaming_space_reserves/\(id)",
                     method: .DELETE,
                     body: [:]
                 )
-                
-                // Llamamos a completion con un Success vacío si la operación es exitosa
                 completion(.success(()))
             } catch {
-                // Llamamos a completion con un Failure si ocurre un error
                 Logger.shared.log("Error al eliminar la reserva: \(error)")
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func deleteTraining(
+        trainingId: String,
+        reserveId: Int?,             // nil si es virtual
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        Task {
+            do {
+                // Siempre borramos el training
+                try await DirectusService.shared.sendRequestWithoutDecode(
+                    endpoint: "trainings/\(trainingId)",
+                    method: .DELETE,
+                    body: [:]
+                )
+
+                // Solo borramos la reserve si existe (tipo centre)
+                if let reserveId {
+                    try await DirectusService.shared.sendRequestWithoutDecode(
+                        endpoint: "gaming_space_reserves/\(reserveId)",
+                        method: .DELETE,
+                        body: [:]
+                    )
+                }
+
+                completion(.success(()))
+            } catch {
+                Logger.shared.log("Error al eliminar el training: \(error)")
                 completion(.failure(error))
             }
         }

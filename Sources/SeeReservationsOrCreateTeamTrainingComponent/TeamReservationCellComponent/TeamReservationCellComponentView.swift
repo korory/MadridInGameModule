@@ -40,7 +40,7 @@ extension TeamReservationCellComponentView {
             
             Spacer()
             
-            if viewModel.showDeleteOption {
+            if viewModel.showDeleteAndEditOption {
                 Button {
                     action(.removeCell)
                 } label: {
@@ -134,15 +134,6 @@ extension TeamReservationCellComponentView {
         .padding(7)
     }
 
-    // Horas de la reserva
-//    private var hoursComponent: some View {
-////        Text(viewModel.reservation.times.count > 1
-////             ? "Horas: \(viewModel.reservation.times.map { $0.time }.joined(separator: ", "))"
-////             : "Hora: \(viewModel.reservation.times.map { $0.time }.joined(separator: ", "))")
-////            .font(.body)
-////            .foregroundColor(.white)
-//    }
-
     // Botones de acciones (ver detalles y editar)
     private var buttonsComponent: some View {
         HStack {
@@ -162,21 +153,25 @@ extension TeamReservationCellComponentView {
                 }
             }
             Spacer()
-//            Button {
-//                action(.editTraining)
-//            } label: {
-//                HStack {
-//                    Image(systemName: "pencil")
-//                        .resizable()
-//                        .scaledToFit()
-//                        .frame(height: 12)
-//                        .foregroundColor(.red)
-//                    Text("Editar".localized)
-//                        .font(.madridInGameiOSFont(size: 14))
-//                        .foregroundColor(.red)
-//                }
-//            }
-//            Spacer()
+            
+            if viewModel.showDeleteAndEditOption {
+                Button {
+                    action(.editBooking)
+                } label: {
+                    HStack {
+                        Image(systemName: "pencil")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 12)
+                            .foregroundColor(.red)
+                        Text("Editar reserva".localized)
+                            .font(.madridInGameiOSFont(size: 14))
+                            .foregroundColor(.red)
+                    }
+                }
+                Spacer()
+            }
+            
         }
         .padding(.top, 10)
     }

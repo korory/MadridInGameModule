@@ -12,6 +12,7 @@ struct Space: Identifiable, Codable {
     let device: String
     let description: String
     let slots: [Slot]
+    let type: String? // "virtual" o "esports_center"
 }
 
 struct Slot: Codable, Identifiable {

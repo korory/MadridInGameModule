@@ -44,6 +44,12 @@ extension TeamsScreenView {
                         }
                         .tag(TabBarTeamsBottom.trainning)
                     
+                        ReservationsComponentView(viewModel: ReservationComponentViewModel(personalReservations: false))
+                        .tabItem {
+                        Label("Reservas".localized, systemImage: "calendar.badge.checkmark")
+                    }
+                        .tag(TabBarTeamsBottom.reservation)
+                    
                     NewsComponentView()
                         .tabItem {
                             Label("Noticias".localized, systemImage: "newspaper.circle.fill")

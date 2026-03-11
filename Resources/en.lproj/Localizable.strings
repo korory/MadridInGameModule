@@ -44,6 +44,7 @@
 "Mostrar Popup" = "Show Popup";
 "Máximo 2 spots consecutivos" = "Maximum 2 consecutive slots";
 "Máximo 3 spots consecutivos" = "Maximum 3 consecutive slots";
+"Máximo 1 spot" = "Maximum 1 slot";
 "NOTICIAS" = "NEWS";
 "No hay entrenamientos programados" = "There are no scheduled trainings";
 "No hay información disponible." = "No information available.";
@@ -59,6 +60,7 @@
 "Puedes usar este QR para acceder." = "You can use this QR to access.";
 "Pulsar para cambiar" = "Tap to change";
 "RESERVAS INDIVIDUALES" = "INDIVIDUAL BOOKINGS";
+"RESERVAS DE EQUIPO" = "TEAM BOOKINGS";
 "Reglas" = "Rules";
 "Reserva - %@" = "Booking - %@";
 "Reserva Confirmada" = "Reservation Confirmed";
@@ -75,11 +77,14 @@
 "Selecciona una fecha" = "Select a date";
 "Selecciona una opción" = "Select an option";
 "Seleccionar Jugador" = "Select Player";
+"Seleccionar Espacio" = "Select Space";
+"Seleccionar Hora" = "Select Hour";
 "Siguiente" = "Next";
 "Sobre Mi" = "About Me";
 "Torneos" = "Tournaments";
 "Una vez aprobemos la creación del equipo este aparecerá en tu lista de equipo" = "Once we approve the creation of the team, it will appear in your team list";
 "Ver reserva" = "View booking";
+"Editar reserva" = "Edit booking";
 "calendar" = "Calendar";
 "legend" = "Legend";
 "¿Qué equipo quieres gestionar?" = "Which team do you want to manage?";

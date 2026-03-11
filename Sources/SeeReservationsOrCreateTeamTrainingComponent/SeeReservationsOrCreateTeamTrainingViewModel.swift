@@ -229,6 +229,8 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
             self.teamSelectedInformation = teamSelectedInformation
             //Logger.shared.log("See Details for \(teamSelectedInformation.dateSelected)")
             break
+        case .editBooking:
+            break
         }
     }
     
@@ -246,13 +248,15 @@ class SeeReservationsOrCreateTeamTrainingViewModel: ObservableObject {
             //self.teamSelectedInformation = teamSelectedInformation
             //Logger.shared.log("See Details for \(teamSelectedInformation.dateSelected)")
             break
+        case .editBooking:
+            break
         }
     }
     
     func deleteReservation() {
         guard let id = individualSelectedInformation?.id else { return }
         self.isLoading = true
-            reservationService.deleteReservation(id: id) { [weak self] result in
+            reservationService.deleteReservation(id: String(id)) { [weak self] result in
                 DispatchQueue.main.async {
                     self?.isLoading = false
                     switch result {

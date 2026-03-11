@@ -27,7 +27,7 @@ extension DashboardScreenView {
                         .tag(TabBarDashboardBottom.calendar)
 
                     
-                    IndividualReservationsComponentView(viewModel: IndividualReservationComponentViewModel())
+                    ReservationsComponentView(viewModel: ReservationComponentViewModel(personalReservations: true))
                         .tabItem {
                             Label("Reservas".localized, systemImage: "calendar.badge.checkmark")
                         }

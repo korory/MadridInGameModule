@@ -143,7 +143,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                     .padding(.leading, 2)
                 
                 ForEach(viewModel.allIndividualReservations, id: \.id) { individualReservation in
-                    IndividualReservationsCellComponent(viewModel: IndividualReservationsCellViewModel(reservation: individualReservation, showDeleteOption: false)) { optionSelected in
+                    IndividualReservationsCellComponent(viewModel: IndividualReservationsCellViewModel(reservation: individualReservation, showDeleteAndEditOption: false)) { optionSelected in
                         viewModel.trainingIndividualListCellPressed(individualSelectedInformation: individualReservation, optionSelected: optionSelected)
                     }
                 }
@@ -156,7 +156,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                     .opacity(0.7)
                 
                 ForEach(viewModel.allReservations, id: \.id) { reservation in
-                    TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation, showDeleteOption: false)) { optionSelected in
+                    TeamReservationCellComponentView(viewModel: TeamReservationCellComponentViewModel(reservation: reservation, showDeleteAndEditOption: false)) { optionSelected in
                         viewModel.trainingTeamListCellPressed(teamSelectedInformation: reservation, optionSelected: optionSelected)
                     }
                 }

@@ -45,6 +45,7 @@
 "Mostrar Popup" = "Mostrar Popup";
 "Máximo 2 spots consecutivos" = "Máximo 2 spots consecutivos";
 "Máximo 3 spots consecutivos" = "Máximo 3 spots consecutivos";
+"Máximo 1 spot" = "Máximo 1 spot";
 "NOTICIAS" = "NOTICIAS";
 "No hay entrenamientos programados" = "No hay entrenamientos programados";
 "No hay información disponible." = "No hay información disponible.";
@@ -60,6 +61,7 @@
 "Puedes usar este QR para acceder." = "Puedes usar este QR para acceder.";
 "Pulsar para cambiar" = "Pulsar para cambiar";
 "RESERVAS INDIVIDUALES" = "RESERVAS INDIVIDUALES";
+"RESERVAS DE EQUIPO" = "RESERVAS DE EQUIPO";
 "Reglas" = "Reglas";
 "Reserva - %@" = "Reserva - %@";
 "Reserva Confirmada" = "Reserva Confirmada";
@@ -76,11 +78,14 @@
 "Selecciona una fecha" = "Selecciona una fecha";
 "Selecciona una opción" = "Selecciona una opción";
 "Seleccionar Jugador" = "Seleccionar Jugador";
+"Seleccionar Espacio" = "Seleccionar Espacio";
+"Seleccionar Hora" = "Seleccionar Hora";
 "Siguiente" = "Siguiente";
 "Sobre Mi" = "Sobre Mi";
 "Torneos" = "Torneos";
 "Una vez aprobemos la creación del equipo este aparecerá en tu lista de equipo" = "Una vez aprobemos la creación del equipo este aparecerá en tu lista de equipo";
 "Ver reserva" = "Ver reserva";
+"Editar reserva" = "Editar reserva";
 "calendar" = "Calendario";
 "legend" = "Leyenda";
 "¿Qué equipo quieres gestionar?" = "¿Qué equipo quieres gestionar?";

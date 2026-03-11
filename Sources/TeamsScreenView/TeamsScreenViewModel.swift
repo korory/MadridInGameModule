@@ -9,6 +9,7 @@ import SwiftUI
 
 enum TabBarTeamsBottom: Hashable {
     case trainning
+    case reservation
     case news
     case team
     case players
