@@ -1,10 +1,3 @@
-//
-//  ReservationFlowViewModel.swift
-//  Pods
-//
-//  Created by Hamza El Hamdaoui on 24/1/25.
-//
-
 import SwiftUI
 
 class ReservationFlowViewModel: ObservableObject {
@@ -29,6 +22,7 @@ class ReservationFlowViewModel: ObservableObject {
     @Published var selectedTime: String = ""
     @Published var individualSelectedInformation: IndividualReservation?
     @Published var teamSelectedInformation: EventModel?
+    @Published var showLegendPopup = false
 
     var onReservationSuccess: () -> Void
     var onReservationFail: () -> Void
@@ -76,12 +70,12 @@ class ReservationFlowViewModel: ObservableObject {
         self.getBlockedDays()
         self.getTeamsUsers()
         self.fetchTeamReservationsByUser { self.isLoading = false }
+        self.fetchTeamTrainingDates()
         self.populateFromExistingInformation()
     }
 
     // MARK: - Mapeo spaceType backend ↔ UI
 
-    /// Backend → UI  ("centre" → "E-Sports Center", "virtual" → "Virtual")
     static func spaceTypeToUI(_ backendValue: String?) -> String? {
         switch backendValue?.lowercased() {
         case "centre":  return "E-Sports Center"
@@ -90,7 +84,6 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
-    /// UI → Backend  ("E-Sports Center" → "centre", "Virtual" → "virtual")
     static func spaceTypeToBackend(_ uiValue: String?) -> String {
         switch uiValue?.lowercased() {
         case "e-sports center": return "centre"
@@ -111,7 +104,7 @@ class ReservationFlowViewModel: ObservableObject {
 
     private func populateFromTeamReservation(_ event: EventModel) {
         reservationNotes  = event.notes ?? ""
-        selectedSpaceType = ReservationFlowViewModel.spaceTypeToUI(event.type) // 👈 backend → UI
+        selectedSpaceType = ReservationFlowViewModel.spaceTypeToUI(event.type)
         selectedTime      = event.time
         selectedDate      = Utils.createDate(from: event.startDate)
 
@@ -192,6 +185,27 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
+    func fetchTeamTrainingDates() {
+        guard let userId = userManager.getUser()?.id,
+              let teamId = userManager.getSelectedTeam()?.id else { return }
+
+        reservationService.getAllTrainings(teamId: teamId, userId: userId) { [weak self] result in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let trainings):
+                    let marked = trainings.compactMap { training -> MarkTrainingDatesAndReservations? in
+                        guard let date = Utils.createDate(from: training.startDate) else { return nil }
+                        return MarkTrainingDatesAndReservations(date: date, individualReservation: false)
+                    }
+                    self.markedDates.append(contentsOf: marked)
+                case .failure(let error):
+                    Logger.shared.log("Error al obtener entrenos de equipo: \(error)")
+                }
+            }
+        }
+    }
+
     func getBlockedDays() {
         isLoading = true
         reservationService.getAllBlockedDays { [weak self] result in
@@ -230,12 +244,19 @@ class ReservationFlowViewModel: ObservableObject {
     func fetchAvailableSpaces(completion: (() -> Void)? = nil) {
         SpaceService.shared.fetchSpaces { [weak self] result in
             DispatchQueue.main.async {
+                guard let self else { completion?(); return }
                 switch result {
                 case .success(let spaces):
                     for space in spaces {
                         guard let t = space.translations.first(where: { $0.languagesCode == "es" }) else { continue }
+
+                        // Si es equipo, no mostrar simuladores
+                        if !self.personalReservations && t.device.lowercased().contains("simulador") {
+                            continue
+                        }
+
                         let mapped = Space(id: UUID().hashValue, device: t.device, description: t.description ?? "", slots: space.slots, type: "")
-                        self?.availableSpaces.append(mapped)
+                        self.availableSpaces.append(mapped)
                     }
                 case .failure(let error):
                     Logger.shared.log("Error fetching spaces: \(error.localizedDescription)")
@@ -244,7 +265,6 @@ class ReservationFlowViewModel: ObservableObject {
             }
         }
     }
-
     func selectSpace(_ space: Space) {
         if selectedSpace?.id == space.id {
             selectedSpace = nil
@@ -398,70 +418,170 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Crear reserva de equipo (Training nuevo)
+    // MARK: - Crear reserva de equipo (Training centre)
 
     func createTeamReservation() {
         guard let date = selectedDate,
               let space = selectedSpace,
-              let userId = userManager.getUser()?.id,
               let teamId = userManager.getSelectedTeam()?.id,
               !selectedSlots.isEmpty else {
             Logger.shared.log("Datos incompletos para crear la reserva de equipo")
             return
         }
+
         let playerIds = selectedPlayers.compactMap { username in
             teamPlayers.first { $0.usersId?.username == username }?.usersId?.id
         }
+
         let dateFmt = DateFormatter()
         dateFmt.dateFormat = "yyyy-MM-dd"
         let dateString = dateFmt.string(from: date)
         let timeString = selectedSlots.sorted { $0.value < $1.value }.first?.time ?? selectedTime
-        let typeValue = ReservationFlowViewModel.spaceTypeToBackend(selectedSpaceType) // 👈 UI → backend
+        let typeValue = ReservationFlowViewModel.spaceTypeToBackend(selectedSpaceType)
+        let slotToUse = space.slots.first ?? Slot(id: 0, position: "", space: 0)
 
         isCreatingReservation = true
-        let reservation = Reservation(
-            id: 0, status: "active",
-            slot: space.slots.first ?? Slot(id: 0, position: "", space: 0),
-            date: date, user: userId, team: teamId,
-            training: nil, qrImage: nil, qrValue: nil,
-            times: selectedSlots, peripheralLoans: []
+
+        // ── PASO 1: Crear el training (sin reserves) ──
+        let trainingRequest = TrainingRequest(
+            status: "active", type: typeValue,
+            startDate: dateString, time: timeString,
+            teamId: teamId, notes: reservationNotes,
+            playerIds: playerIds, reserveIds: []
         )
-        reservationService.createReservation(reservation: reservation) { [weak self] result in
+
+        reservationService.createTraining(request: trainingRequest) { [weak self] result in
             guard let self else { return }
             DispatchQueue.main.async {
                 switch result {
-                case .success(let reserveResponse):
-                    guard let reserveId = reserveResponse.id else {
+                case .success(let trainingResponse):
+                    guard let trainingId = trainingResponse.id else {
                         self.isCreatingReservation = false
                         self.onReservationFail()
                         return
                     }
-                    let trainingRequest = TrainingRequest(
-                        status: "active", type: typeValue,
-                        startDate: dateString, time: timeString,
-                        teamId: teamId, notes: self.reservationNotes,
-                        playerIds: playerIds, reserveId: reserveId
-                    )
-                    self.reservationService.createTraining(request: trainingRequest) { [weak self] result in
-                        guard let self else { return }
-                        DispatchQueue.main.async {
-                            self.isCreatingReservation = false
-                            switch result {
-                            case .success:
-                                self.reservationSuccess = true
-                                self.onReservationSuccess()
-                            case .failure(let error):
-                                self.reservationSuccess = false
-                                self.onReservationFail()
-                                Logger.shared.log("Error al crear el training: \(error.localizedDescription)")
+
+                    // ── PASO 2: Crear una reserve por jugador CON trainingId ──
+                    let group = DispatchGroup()
+                    var reserveIds: [Int] = []
+                    var hasError = false
+
+                    for playerId in playerIds {
+                        group.enter()
+
+                        let reservation = Reservation(
+                            id: 0, status: "active",
+                            slot: slotToUse,
+                            date: date, user: playerId, team: teamId,
+                            training: trainingId,
+                            qrImage: nil, qrValue: nil,
+                            times: self.selectedSlots, peripheralLoans: []
+                        )
+
+                        self.reservationService.createReservation(reservation: reservation) { [weak self] result in
+                            guard let self else { group.leave(); return }
+                            DispatchQueue.main.async {
+                                switch result {
+                                case .success(let reserveResponse):
+                                    guard let reserveId = reserveResponse.id else {
+                                        hasError = true
+                                        group.leave()
+                                        return
+                                    }
+                                    reserveIds.append(reserveId)
+
+                                    // Generar y subir QR
+                                    self.generateAndUploadQR(for: reserveResponse) {
+                                        group.leave()
+                                    }
+
+                                case .failure(let error):
+                                    hasError = true
+                                    Logger.shared.log("Error al crear reserve para jugador: \(error.localizedDescription)")
+                                    group.leave()
+                                }
                             }
                         }
                     }
+
+                    // ── PASO 3: Vincular reserves al training ──
+                    group.notify(queue: .main) { [weak self] in
+                        guard let self else { return }
+
+                        if hasError || reserveIds.isEmpty {
+                            self.isCreatingReservation = false
+                            self.onReservationFail()
+                            return
+                        }
+
+                        self.reservationService.linkReservesToTraining(
+                            trainingId: trainingId,
+                            reserveIds: reserveIds
+                        ) { [weak self] result in
+                            guard let self else { return }
+                            DispatchQueue.main.async {
+                                self.isCreatingReservation = false
+                                switch result {
+                                case .success:
+                                    self.reservationSuccess = true
+                                    self.onReservationSuccess()
+                                    Logger.shared.log("Training centre creado con \(reserveIds.count) reserves")
+                                case .failure(let error):
+                                    self.reservationSuccess = false
+                                    self.onReservationFail()
+                                    Logger.shared.log("Error al vincular reserves: \(error.localizedDescription)")
+                                }
+                            }
+                        }
+                    }
+
                 case .failure(let error):
                     self.isCreatingReservation = false
                     self.onReservationFail()
-                    Logger.shared.log("Error al crear la reserve de equipo: \(error.localizedDescription)")
+                    Logger.shared.log("Error al crear el training: \(error.localizedDescription)")
                 }
+            }
+        }
+    }
+
+    // MARK: - Helper: Generar y subir QR
+
+    private func generateAndUploadQR(for reserveResponse: ReserveResponse, completion: @escaping () -> Void) {
+        guard let reserveId = reserveResponse.id,
+              let qrValue = reserveResponse.qrValue,
+              let qrImage = QRCodeGenerator.generateQRCode(with: qrValue) else {
+            completion()
+            return
+        }
+
+        UploadImageService().uploadImage(image: qrImage, fileName: "\(qrValue).jpg") { [weak self] result in
+            guard let self else { completion(); return }
+            switch result {
+            case .success(let response):
+                guard let data = response.data(using: .utf8),
+                      let decoded = try? JSONDecoder().decode(SendImageResponse.self, from: data) else {
+                    completion()
+                    return
+                }
+                let fileId = decoded.data.id
+
+                self.reservationService.updateExistingReservation(
+                    reservationId: reserveId,
+                    qrImage: fileId,
+                    reservation: Reservation(
+                        id: reserveId, status: "active",
+                        slot: Slot(id: 0, position: "", space: 0),
+                        date: Date(), user: nil, team: nil,
+                        training: nil, qrImage: fileId, qrValue: qrValue,
+                        times: self.selectedSlots, peripheralLoans: []
+                    )
+                ) { _ in
+                    completion()
+                }
+
+            case .failure(let error):
+                Logger.shared.log("Error al subir QR: \(error.localizedDescription)")
+                completion()
             }
         }
     }
@@ -481,7 +601,7 @@ class ReservationFlowViewModel: ObservableObject {
         dateFmt.dateFormat = "yyyy-MM-dd"
         let dateString = dateFmt.string(from: date)
         let timeString = selectedSlots.sorted { $0.value < $1.value }.first?.time ?? selectedTime
-        let typeValue = ReservationFlowViewModel.spaceTypeToBackend(selectedSpaceType) // 👈 UI → backend
+        let typeValue = ReservationFlowViewModel.spaceTypeToBackend(selectedSpaceType)
         let playerIds = selectedPlayers.compactMap { username in
             teamPlayers.first { $0.usersId?.username == username }?.usersId?.id
         }
@@ -524,7 +644,9 @@ class ReservationFlowViewModel: ObservableObject {
             }
         }
     }
-    
+
+    // MARK: - Crear training virtual
+
     func createVirtualTeamReservation() {
         guard let date = selectedDate,
               let teamId = userManager.getSelectedTeam()?.id,
@@ -575,7 +697,9 @@ class ReservationFlowViewModel: ObservableObject {
             }
         }
     }
-    
+
+    // MARK: - Editar training virtual
+
     func updateVirtualTeamReservation() {
         guard let date = selectedDate,
               let trainingId = teamSelectedInformation?.id,

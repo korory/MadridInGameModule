@@ -335,58 +335,77 @@ struct SelectDateView: View {
     @ObservedObject var viewModel: ReservationFlowViewModel
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Selecciona una fecha".localized)
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-                .padding(.bottom, 10)
-            
-            if viewModel.isLoading {
-                VStack {
-                    Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 50)
-                    
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
-                        .scaleEffect(1.5)
-                        .padding()
-                    
-                    Text("Cargando fechas disponibles...".localized)
-                        .font(.madridInGameiOSFont(size: 15))
+        ZStack {
+            if viewModel.showLegendPopup {
+                CustomPopup(isPresented: $viewModel.showLegendPopup) {
+                    ColorLegendView()
+                }
+                .transition(.scale)
+                .zIndex(1)
+            }
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("Selecciona una fecha".localized)
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundColor(.white)
-                        .opacity(0.7)
+                        .padding(.bottom, 10)
+                    
+                    Spacer()
+                    
+                    Button {
+                        self.viewModel.showLegendPopup.toggle()
+                    } label: {
+                        Text("legend".localized)
+                    }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .onAppear {
-                    viewModel.getBlockedDays()
+                
+                if viewModel.isLoading {
+                    VStack {
+                        Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 50)
+                        
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.purple))
+                            .scaleEffect(1.5)
+                            .padding()
+                        
+                        Text("Cargando fechas disponibles...".localized)
+                            .font(.madridInGameiOSFont(size: 15))
+                            .foregroundColor(.white)
+                            .opacity(0.7)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .onAppear {
+                        viewModel.getBlockedDays()
+                    }
+                } else {
+                    CustomCalendarView(canUserInteract: true, markedDates: viewModel.markedDates,     initialSelectedDate: viewModel.selectedDate   // 👈
+                    ) { stringDate in
+                        viewModel.checkSelectedDate(stringDate)
+                    }
+                    .frame(height: 350)
                 }
-            } else {
-                CustomCalendarView(canUserInteract: true, markedDates: viewModel.markedDates,     initialSelectedDate: viewModel.selectedDate   // 👈
-                ) { stringDate in
-                    viewModel.checkSelectedDate(stringDate)
+                
+                Spacer()
+                
+                Button(action: {
+                    currentStep += 1
+                }) {
+                    Text("Siguiente".localized)
+                        .font(.system(size: 16, weight: .bold))
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(viewModel.selectedDate == nil ? Color.gray.opacity(0.4) : Color.cyan)
+                        .foregroundColor(viewModel.selectedDate == nil ? Color.white.opacity(0.4) : .white)
+                        .cornerRadius(14)
                 }
-                .frame(height: 350)
+                .disabled(viewModel.selectedDate == nil)
             }
-            
-            Spacer()
-            
-            Button(action: {
-                currentStep += 1
-            }) {
-                Text("Siguiente".localized)
-                    .font(.system(size: 16, weight: .bold))
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(viewModel.selectedDate == nil ? Color.gray.opacity(0.4) : Color.cyan)
-                    .foregroundColor(viewModel.selectedDate == nil ? Color.white.opacity(0.4) : .white)
-                    .cornerRadius(14)
-            }
-            .disabled(viewModel.selectedDate == nil)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
     }
 }
 struct SelectTimeView: View {

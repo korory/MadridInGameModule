@@ -184,7 +184,7 @@ class ReservationComponentViewModel: ObservableObject {
             let reserveId: Int? = isVirtual ? nil : training.reserves?.first?.id
 
             self.isLoading = true
-            reservationService.deleteTraining(trainingId: trainingId, reserveId: reserveId) { [weak self] result in
+            reservationService.deleteTraining(trainingId: trainingId, reserveIds: [reserveId ?? 0]) { [weak self] result in
                 DispatchQueue.main.async {
                     self?.isLoading = false
                     switch result {
@@ -276,5 +276,11 @@ extension ReservationComponentViewModel {
         } else {
             isReservationFlowPresented = true
         }
+    }
+    
+    func resetScreen() {
+        getAndRefreshReservationsData()
+        self.teamSelectedInformation = nil
+        self.individualSelectedInformation = nil
     }
 }

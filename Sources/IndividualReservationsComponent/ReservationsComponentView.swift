@@ -65,7 +65,9 @@ struct ReservationsComponentView: View {
                 CustomPopup(isPresented: Binding(
                     get: { viewModel.cancelReservation },
                     set: { viewModel.cancelReservation = $0 }
-                )) {
+                ), onDismiss: {
+                    self.viewModel.resetScreen()
+                }) {
                     Group {
                         let isTeam = viewModel.teamSelectedInformation != nil && viewModel.individualSelectedInformation == nil
 
@@ -82,15 +84,21 @@ struct ReservationsComponentView: View {
                             cancelTitle: "No".localized
                         ) {
                             viewModel.cancelReservation = false
+                            self.viewModel.resetScreen()
                         } acceptedAction: {
                             viewModel.deleteReservation(isTeamSelected: isTeam)
+                            self.viewModel.teamSelectedInformation = nil
+                            self.viewModel.individualSelectedInformation = nil
                         }
                     }
                 }
                 .transition(.scale)
                 .zIndex(1)
 
-                CustomPopup(isPresented: $viewModel.noReservationAllowed) {
+                CustomPopup(isPresented: $viewModel.noReservationAllowed,
+                onDismiss: {
+                    self.viewModel.resetScreen()
+                }) {
                     VStack(spacing: 10) {
                         Text("Se ha alcanzado el máximo de reservas solicitadas".localized)
                             .font(.madridInGameiOSFont(size: 17))
@@ -101,7 +109,9 @@ struct ReservationsComponentView: View {
                 .transition(.scale)
                 .zIndex(1)
 
-                CustomPopup(isPresented: $viewModel.noReservationAllowedWithoutDNI) {
+                CustomPopup(isPresented: $viewModel.noReservationAllowedWithoutDNI, onDismiss: {
+                    self.viewModel.resetScreen()
+                })  {
                     VStack(spacing: 10) {
                         Text("Se ha alcanzado el máximo de reservas solicitadas para usuarios no verificados. Por favor, verifica tu DNI y vuelve a intentarlo.".localized)
                             .font(.madridInGameiOSFont(size: 17))
@@ -113,7 +123,9 @@ struct ReservationsComponentView: View {
                 .zIndex(1)
             }
         }
-        .sheet(isPresented: $viewModel.isReservationFlowPresented) {
+        .sheet(isPresented: $viewModel.isReservationFlowPresented , onDismiss: {
+            self.viewModel.resetScreen()
+        }) {
             ReservationFlowView(
                 isPresented: $viewModel.isReservationFlowPresented,
                 viewModel: ReservationFlowViewModel(personalReservations: self.viewModel.personalReservations, teamReservationInformation: self.viewModel.teamSelectedInformation, individualReservationInformation: self.viewModel.individualSelectedInformation, onReservationSuccess: {
@@ -139,11 +151,11 @@ struct ReservationsComponentView: View {
             }
         }
         .onAppear {
-            self.viewModel.getAndRefreshReservationsData()
+            self.viewModel.resetScreen()
         }
         .onChange(of: viewModel.showToastSuccess) { newValue in
-            if newValue {
-                viewModel.getAndRefreshReservationsData()
+            if newValue && !viewModel.personalReservations{
+                self.viewModel.resetScreen()
             }
         }
         .overlay {
