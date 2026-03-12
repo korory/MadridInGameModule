@@ -136,15 +136,23 @@ class ReservationFlowViewModel: ObservableObject {
 
     private func populateFromIndividualReservation(_ reservation: IndividualReservation) {
         selectedDate = Utils.createDate(from: reservation.date)
-        if let gamingSpace = reservation.gamingSpaces.first,
-           let translation = gamingSpace.translations.first(where: { $0.languagesCode == "es" }) {
-            selectedSpace = Space(
-                id: gamingSpace.id,
-                device: translation.device,
-                description: translation.description ?? "",
-                slots: [reservation.slot],
-                type: ""
-            )
+
+        fetchAvailableSpaces { [weak self] in
+            guard let self else { return }
+
+            self.selectedSpace = self.availableSpaces.first(where: {
+                $0.slots.contains(where: { $0.id == reservation.slot.id })
+            })
+
+            let dayValue = self.calculateDayValue(for: self.selectedDate)
+            self.fetchAvailableSlots(for: dayValue) { [weak self] in
+                guard let self else { return }
+                let reserveTimes = Set(
+                    reservation.times.compactMap { $0.gamingSpaceTimesID?.time }
+                )
+                self.selectedSlots = self.availableSlots.filter { reserveTimes.contains($0.time) }
+                self.updateEnabledSlots()
+            }
         }
     }
 
@@ -250,7 +258,6 @@ class ReservationFlowViewModel: ObservableObject {
                     for space in spaces {
                         guard let t = space.translations.first(where: { $0.languagesCode == "es" }) else { continue }
 
-                        // Si es equipo, no mostrar simuladores
                         if !self.personalReservations && t.device.lowercased().contains("simulador") {
                             continue
                         }
@@ -265,6 +272,7 @@ class ReservationFlowViewModel: ObservableObject {
             }
         }
     }
+
     func selectSpace(_ space: Space) {
         if selectedSpace?.id == space.id {
             selectedSpace = nil
@@ -365,6 +373,55 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Actualizar reserva individual (edición)
+
+    func updateIndividualReservation() {
+        guard let reservationId = individualSelectedInformation?.id,
+              let date = selectedDate,
+              let space = selectedSpace,
+              !selectedSlots.isEmpty else {
+            Logger.shared.log("Datos incompletos para actualizar la reserva individual")
+            return
+        }
+
+        isCreatingReservation = true
+
+        let slotToUse = space.slots.first ?? Slot(id: 0, position: "", space: 0)
+        let timesMapped = selectedSlots.map { ["gaming_space_times_id": ["id": $0.id]] }
+
+        let dateFmt = DateFormatter()
+        dateFmt.dateFormat = "yyyy-MM-dd"
+
+        let body: [String: Any] = [
+            "date": dateFmt.string(from: date),
+            "slot": slotToUse.id,
+            "times": timesMapped
+        ]
+
+        Task {
+            do {
+                let _: ReserveResponseModel = try await DirectusService.shared.sendRequest(
+                    endpoint: "gaming_space_reserves/\(reservationId)",
+                    method: .PATCH,
+                    body: body
+                )
+                await MainActor.run {
+                    self.isCreatingReservation = false
+                    self.reservationSuccess = true
+                    self.onReservationSuccess()
+                    Logger.shared.log("Reserva individual actualizada correctamente")
+                }
+            } catch {
+                await MainActor.run {
+                    self.isCreatingReservation = false
+                    self.reservationSuccess = false
+                    self.onReservationFail()
+                    Logger.shared.log("Error al actualizar reserva individual: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
     func updateReservationWithQR(reservationInfo: ReserveResponse) {
         guard let reservationId = reservationInfo.id,
               let qrValue = reservationInfo.qrValue,
@@ -442,7 +499,6 @@ class ReservationFlowViewModel: ObservableObject {
 
         isCreatingReservation = true
 
-        // ── PASO 1: Crear el training (sin reserves) ──
         let trainingRequest = TrainingRequest(
             status: "active", type: typeValue,
             startDate: dateString, time: timeString,
@@ -461,7 +517,6 @@ class ReservationFlowViewModel: ObservableObject {
                         return
                     }
 
-                    // ── PASO 2: Crear una reserve por jugador CON trainingId ──
                     let group = DispatchGroup()
                     var reserveIds: [Int] = []
                     var hasError = false
@@ -489,12 +544,9 @@ class ReservationFlowViewModel: ObservableObject {
                                         return
                                     }
                                     reserveIds.append(reserveId)
-
-                                    // Generar y subir QR
                                     self.generateAndUploadQR(for: reserveResponse) {
                                         group.leave()
                                     }
-
                                 case .failure(let error):
                                     hasError = true
                                     Logger.shared.log("Error al crear reserve para jugador: \(error.localizedDescription)")
@@ -504,7 +556,6 @@ class ReservationFlowViewModel: ObservableObject {
                         }
                     }
 
-                    // ── PASO 3: Vincular reserves al training ──
                     group.notify(queue: .main) { [weak self] in
                         guard let self else { return }
 
