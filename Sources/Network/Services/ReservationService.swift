@@ -425,6 +425,28 @@ class ReservationService {
             }
         }
     }
+    
+    func updateTrainingPlayers(
+        trainingId: String,
+        playerIds: [String],
+        completion: @escaping (Result<TrainingResponse, Error>) -> Void
+    ) {
+        let playersMapped = playerIds.map { ["users_id": $0] }
+        let body: [String: Any] = ["players": playersMapped]
+
+        Task {
+            do {
+                let response: TrainingResponseModel = try await DirectusService.shared.sendRequest(
+                    endpoint: "trainings/\(trainingId)",
+                    method: .PATCH,
+                    body: body
+                )
+                completion(.success(response.data))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
 
     // MARK: - Eliminar reserve
 

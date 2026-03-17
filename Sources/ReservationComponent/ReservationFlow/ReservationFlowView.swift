@@ -7,7 +7,9 @@ struct ReservationSummaryView: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text("Reservar espacio".localized)
+            Text(viewModel.teamSelectedInformation != nil && !viewModel.personalReservations
+                 ? "Editar jugadores".localized
+                 : "Reservar espacio".localized)
                 .font(.system(size: 22, weight: .bold))
                 .foregroundColor(.white)
 
@@ -31,6 +33,11 @@ struct ReservationFlowView: View {
     @Binding var isPresented: Bool
     @ObservedObject var viewModel: ReservationFlowViewModel
 
+    /// true cuando editamos un training de equipo (solo jugadores por ahora)
+    private var isEditingTeamTraining: Bool {
+        viewModel.teamSelectedInformation != nil && !viewModel.personalReservations
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             Color.black.ignoresSafeArea(.all)
@@ -38,21 +45,30 @@ struct ReservationFlowView: View {
             VStack(spacing: 0) {
                 // Cabecera
                 HStack {
-                    // Invisible placeholder para centrar los dots
                     Image(systemName: "xmark")
                         .foregroundColor(.clear)
                         .padding()
 
                     Spacer()
 
+                    // MARK: Dots — 1 dot si editamos equipo
                     HStack(spacing: 6) {
-                        let stepCount = viewModel.personalReservations ? 3 : 5
+                        let stepCount: Int = isEditingTeamTraining ? 1 : (viewModel.personalReservations ? 3 : 5)
                         ForEach(0..<stepCount, id: \.self) { index in
                             Circle()
                                 .fill(index <= viewModel.currentStep ? Color.white : Color.white.opacity(0.25))
                                 .frame(width: 8, height: 8)
                         }
                     }
+                    // MARK: Edición completa dots — descomentar cuando se habilite edición completa
+                    // HStack(spacing: 6) {
+                    //     let stepCount = viewModel.personalReservations ? 3 : 5
+                    //     ForEach(0..<stepCount, id: \.self) { index in
+                    //         Circle()
+                    //             .fill(index <= viewModel.currentStep ? Color.white : Color.white.opacity(0.25))
+                    //             .frame(width: 8, height: 8)
+                    //     }
+                    // }
 
                     Spacer()
 
@@ -68,40 +84,87 @@ struct ReservationFlowView: View {
 
                 ReservationSummaryView(viewModel: viewModel)
 
+                // MARK: TabView — si editamos equipo, solo SelectPlayerView
                 TabView(selection: $viewModel.currentStep) {
-                    if !viewModel.personalReservations {
-                        SelectPlaceAndNotesView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                    if isEditingTeamTraining {
+                        // Edición equipo: solo jugadores
+                        SelectPlayerView(currentStep: $viewModel.currentStep, viewModel: viewModel)
                             .tag(0)
                             .contentShape(Rectangle())
                             .simultaneousGesture(DragGesture())
-
-                        SelectPlayerView(currentStep: $viewModel.currentStep, viewModel: viewModel)
-                            .tag(1)
-                            .contentShape(Rectangle())
-                            .simultaneousGesture(DragGesture())
-                    }
-
-                    SelectDateView(currentStep: $viewModel.currentStep, viewModel: viewModel)
-                        .tag(viewModel.personalReservations ? 0 : 2)
-                        .contentShape(Rectangle())
-                        .simultaneousGesture(DragGesture())
-
-                    if viewModel.selectedSpaceType == "" || viewModel.selectedSpaceType?.lowercased() != "virtual" {
-                        SelectSpaceView(currentStep: $viewModel.currentStep, viewModel: viewModel)
-                            .tag(viewModel.personalReservations ? 1 : 3)
-                            .contentShape(Rectangle())
-                            .simultaneousGesture(DragGesture())
-
-                        SelectSlotView(currentStep: $viewModel.currentStep, viewModel: viewModel)
-                            .tag(viewModel.personalReservations ? 2 : 4)
-                            .contentShape(Rectangle())
-                            .simultaneousGesture(DragGesture())
                     } else {
-                        SelectTimeView(currentStep: $viewModel.currentStep, viewModel: viewModel)
-                            .tag(viewModel.personalReservations ? 1 : 3)
+                        // Creación: flow completo
+                        if !viewModel.personalReservations {
+                            SelectPlaceAndNotesView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                                .tag(0)
+                                .contentShape(Rectangle())
+                                .simultaneousGesture(DragGesture())
+
+                            SelectPlayerView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                                .tag(1)
+                                .contentShape(Rectangle())
+                                .simultaneousGesture(DragGesture())
+                        }
+
+                        SelectDateView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                            .tag(viewModel.personalReservations ? 0 : 2)
                             .contentShape(Rectangle())
                             .simultaneousGesture(DragGesture())
+
+                        if viewModel.selectedSpaceType == "" || viewModel.selectedSpaceType?.lowercased() != "virtual" {
+                            SelectSpaceView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                                .tag(viewModel.personalReservations ? 1 : 3)
+                                .contentShape(Rectangle())
+                                .simultaneousGesture(DragGesture())
+
+                            SelectSlotView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                                .tag(viewModel.personalReservations ? 2 : 4)
+                                .contentShape(Rectangle())
+                                .simultaneousGesture(DragGesture())
+                        } else {
+                            SelectTimeView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                                .tag(viewModel.personalReservations ? 1 : 3)
+                                .contentShape(Rectangle())
+                                .simultaneousGesture(DragGesture())
+                        }
                     }
+
+                    // MARK: Edición completa TabView — descomentar cuando se habilite edición completa
+                    // (y eliminar el bloque isEditingTeamTraining de arriba)
+                    //
+                    // if !viewModel.personalReservations {
+                    //     SelectPlaceAndNotesView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                    //         .tag(0)
+                    //         .contentShape(Rectangle())
+                    //         .simultaneousGesture(DragGesture())
+                    //
+                    //     SelectPlayerView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                    //         .tag(1)
+                    //         .contentShape(Rectangle())
+                    //         .simultaneousGesture(DragGesture())
+                    // }
+                    //
+                    // SelectDateView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                    //     .tag(viewModel.personalReservations ? 0 : 2)
+                    //     .contentShape(Rectangle())
+                    //     .simultaneousGesture(DragGesture())
+                    //
+                    // if viewModel.selectedSpaceType == "" || viewModel.selectedSpaceType?.lowercased() != "virtual" {
+                    //     SelectSpaceView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                    //         .tag(viewModel.personalReservations ? 1 : 3)
+                    //         .contentShape(Rectangle())
+                    //         .simultaneousGesture(DragGesture())
+                    //
+                    //     SelectSlotView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                    //         .tag(viewModel.personalReservations ? 2 : 4)
+                    //         .contentShape(Rectangle())
+                    //         .simultaneousGesture(DragGesture())
+                    // } else {
+                    //     SelectTimeView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                    //         .tag(viewModel.personalReservations ? 1 : 3)
+                    //         .contentShape(Rectangle())
+                    //         .simultaneousGesture(DragGesture())
+                    // }
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             }
@@ -264,6 +327,11 @@ struct SelectPlayerView: View {
     @Binding var currentStep: Int
     @ObservedObject var viewModel: ReservationFlowViewModel
 
+    /// true cuando editamos un training de equipo
+    private var isEditingTeamTraining: Bool {
+        viewModel.teamSelectedInformation != nil && !viewModel.personalReservations
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Seleccionar Jugador".localized)
@@ -331,12 +399,35 @@ struct SelectPlayerView: View {
 
             Spacer()
 
-            SecondaryButton(title: "Atrás".localized) {
-                currentStep -= 1
+            // MARK: Edición equipo — solo Guardar
+            if isEditingTeamTraining {
+                PrimaryButton(title: "Guardar".localized, enabled: !viewModel.selectedPlayers.isEmpty) {
+                    if viewModel.selectedSpaceType?.lowercased() == "virtual"
+                        || viewModel.teamSelectedInformation?.type.lowercased() == "virtual" {
+                        viewModel.updateVirtualTeamReservation()
+                    } else {
+                        viewModel.updateCenterTeamReservation()
+                    }
+                }
+            } else {
+                // Creación: Atrás + Siguiente
+                SecondaryButton(title: "Atrás".localized) {
+                    currentStep -= 1
+                }
+                PrimaryButton(title: "Siguiente".localized, enabled: !viewModel.selectedPlayers.isEmpty) {
+                    currentStep += 1
+                }
             }
-            PrimaryButton(title: "Siguiente".localized, enabled: !viewModel.selectedPlayers.isEmpty) {
-                currentStep += 1
-            }
+
+            // MARK: Edición completa botones — descomentar cuando se habilite edición completa
+            // (y eliminar el bloque isEditingTeamTraining de arriba)
+            //
+            // SecondaryButton(title: "Atrás".localized) {
+            //     currentStep -= 1
+            // }
+            // PrimaryButton(title: "Siguiente".localized, enabled: !viewModel.selectedPlayers.isEmpty) {
+            //     currentStep += 1
+            // }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
