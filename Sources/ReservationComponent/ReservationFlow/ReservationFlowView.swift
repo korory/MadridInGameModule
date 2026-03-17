@@ -6,28 +6,21 @@ struct ReservationSummaryView: View {
     @ObservedObject var viewModel: ReservationFlowViewModel
 
     var body: some View {
-        VStack {
+        VStack(spacing: 4) {
             Text("Reservar espacio".localized)
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: 22, weight: .bold))
                 .foregroundColor(.white)
-                .padding(.bottom, 10)
 
             if !viewModel.summaryTokens.isEmpty {
-                FlowLayout(spacing: 6) {
-                    ForEach(viewModel.summaryTokens, id: \.self) { token in
-                        Text(token)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color.white.opacity(0.15))
-                            .cornerRadius(100)
-                    }
-                }
-                .padding(.horizontal, 10)
-                .transition(.opacity.combined(with: .move(edge: .top)))
+                Text(viewModel.summaryTokens.joined(separator: " · "))
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundColor(.white.opacity(0.6))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .transition(.opacity)
             }
         }
+        .padding(.bottom, 8)
         .animation(.easeInOut(duration: 0.25), value: viewModel.summaryTokens)
     }
 }
@@ -40,48 +33,38 @@ struct ReservationFlowView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            LinearGradient(
-                gradient: Gradient(colors: [.black, .black, .black, Color.white.opacity(0.15)]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(.all)
+            Color.black.ignoresSafeArea(.all)
 
-            VStack {
+            VStack(spacing: 0) {
+                // Cabecera
                 HStack {
-                    Button(action: {
-                        if viewModel.currentStep > 0 {
-                            viewModel.currentStep -= 1
-                        }
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(viewModel.currentStep == 0 ? .black : .white)
-                            .padding()
-                    }
+                    // Invisible placeholder para centrar los dots
+                    Image(systemName: "xmark")
+                        .foregroundColor(.clear)
+                        .padding()
 
                     Spacer()
 
-                    HStack {
+                    HStack(spacing: 6) {
                         let stepCount = viewModel.personalReservations ? 3 : 5
                         ForEach(0..<stepCount, id: \.self) { index in
                             Circle()
-                                .fill(index == viewModel.currentStep ? Color.white : Color.clear)
-                                .frame(width: 10, height: 10)
-                                .overlay(Circle().stroke(Color.white, lineWidth: 1))
+                                .fill(index <= viewModel.currentStep ? Color.white : Color.white.opacity(0.25))
+                                .frame(width: 8, height: 8)
                         }
                     }
-                    .padding(.top, 16)
 
                     Spacer()
 
                     Button(action: { isPresented = false }) {
                         Image(systemName: "xmark")
-                            .foregroundColor(.white)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
                             .padding()
                     }
                 }
-                .padding(.horizontal)
-                .padding(.top, 5)
+                .padding(.horizontal, 4)
+                .padding(.top, 8)
 
                 ReservationSummaryView(viewModel: viewModel)
 
@@ -121,11 +104,81 @@ struct ReservationFlowView: View {
                     }
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                Spacer()
             }
         }
     }
 }
+
+// MARK: - Botones reutilizables
+
+private struct PrimaryButton: View {
+    let title: String
+    let enabled: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 15, weight: .semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(enabled ? Color.cyan : Color.clear)
+                .foregroundColor(enabled ? .black : .white.opacity(0.4))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(enabled ? Color.clear : Color.white.opacity(0.2), lineWidth: 1)
+                )
+                .cornerRadius(12)
+        }
+        .disabled(!enabled)
+    }
+}
+
+private struct SecondaryButton: View {
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 15, weight: .medium))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(Color.clear)
+                .foregroundColor(.white.opacity(0.7))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                )
+                .cornerRadius(12)
+        }
+    }
+}
+
+private struct PillButton: View {
+    let title: String
+    let isSelected: Bool
+    let isEnabled: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 14, weight: .medium))
+                .frame(width: 100, height: 44)
+                .background(isSelected ? Color.cyan : Color.clear)
+                .foregroundColor(isSelected ? .black : isEnabled ? .white : .white.opacity(0.25))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 22)
+                        .stroke(isSelected ? Color.clear : isEnabled ? Color.white.opacity(0.4) : Color.white.opacity(0.12), lineWidth: 1)
+                )
+                .cornerRadius(22)
+        }
+        .disabled(!isEnabled)
+    }
+}
+
+// MARK: - SelectPlaceAndNotesView
 
 struct SelectPlaceAndNotesView: View {
     @Binding var currentStep: Int
@@ -137,14 +190,12 @@ struct SelectPlaceAndNotesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Seleccionar Espacio".localized)
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: 20, weight: .bold))
                 .foregroundColor(.white)
 
             Menu {
                 ForEach(spaceTypes, id: \.self) { type in
-                    Button(action: {
-                        viewModel.selectedSpaceType = type
-                    }) {
+                    Button(action: { viewModel.selectedSpaceType = type }) {
                         HStack {
                             Text(type)
                             if viewModel.selectedSpaceType == type {
@@ -155,20 +206,20 @@ struct SelectPlaceAndNotesView: View {
                 }
             } label: {
                 HStack {
-                    Text(viewModel.selectedSpaceType ?? "")
-                        .foregroundColor(.white)
+                    Text(viewModel.selectedSpaceType ?? "Selecciona tipo".localized)
+                        .foregroundColor(viewModel.selectedSpaceType == nil ? .white.opacity(0.4) : .white)
                     Spacer()
-                    Image(systemName: "chevron.down.circle")
-                        .foregroundColor(.white)
-                        .font(.system(size: 20))
+                    Image(systemName: "chevron.down")
+                        .foregroundColor(.white.opacity(0.4))
+                        .font(.system(size: 14))
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 18)
-                .background(Color.white.opacity(0.07))
+                .padding(.vertical, 16)
+                .background(Color.white.opacity(0.06))
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.cyan, lineWidth: 1.5)
+                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
                 )
             }
             .simultaneousGesture(TapGesture().onEnded { notesIsFocused = false })
@@ -176,54 +227,47 @@ struct SelectPlaceAndNotesView: View {
             ZStack(alignment: .topLeading) {
                 if viewModel.reservationNotes.isEmpty {
                     Text("Notas (Opcional)".localized)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white.opacity(0.3))
                         .padding(.horizontal, 16)
-                        .padding(.vertical, 18)
+                        .padding(.vertical, 16)
                 }
                 TextEditor(text: $viewModel.reservationNotes)
                     .foregroundColor(.white)
                     .scrollContentBackground(.hidden)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 12)
-                    .frame(minHeight: 120)
+                    .frame(minHeight: 100)
                     .focused($notesIsFocused)
             }
-            .background(Color.white.opacity(0.07))
+            .background(Color.white.opacity(0.06))
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.cyan, lineWidth: 1.5)
+                    .stroke(Color.white.opacity(0.15), lineWidth: 1)
             )
 
             Spacer()
 
-            Button(action: {
+            PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedSpaceType != nil) {
                 notesIsFocused = false
                 currentStep += 1
-            }) {
-                Text("Siguiente".localized)
-                    .font(.system(size: 16, weight: .bold))
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(viewModel.selectedSpaceType == nil ? Color.gray.opacity(0.4) : Color.cyan)
-                    .foregroundColor(viewModel.selectedSpaceType == nil ? Color.white.opacity(0.4) : .white)
-                    .cornerRadius(14)
             }
-            .disabled(viewModel.selectedSpaceType == nil)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
     }
 }
 
+// MARK: - SelectPlayerView
+
 struct SelectPlayerView: View {
     @Binding var currentStep: Int
     @ObservedObject var viewModel: ReservationFlowViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
+        VStack(alignment: .leading, spacing: 20) {
             Text("Seleccionar Jugador".localized)
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: 20, weight: .bold))
                 .foregroundColor(.white)
 
             Menu {
@@ -244,18 +288,19 @@ struct SelectPlayerView: View {
             } label: {
                 HStack {
                     Text("Selecciona un jugador".localized)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white.opacity(0.4))
                     Spacer()
                     Image(systemName: "chevron.down")
-                        .foregroundColor(.gray)
+                        .foregroundColor(.white.opacity(0.4))
+                        .font(.system(size: 14))
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 18)
-                .background(Color.white.opacity(0.07))
+                .padding(.vertical, 16)
+                .background(Color.white.opacity(0.06))
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.cyan, lineWidth: 1.5)
+                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
                 )
             }
 
@@ -264,45 +309,42 @@ struct SelectPlayerView: View {
                     ForEach(viewModel.selectedPlayers, id: \.self) { player in
                         HStack(spacing: 6) {
                             Text(player)
-                                .font(.system(size: 14, weight: .medium))
+                                .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.white)
                             Button(action: {
                                 viewModel.selectedPlayers.removeAll { $0 == player }
                             }) {
                                 Image(systemName: "xmark")
-                                    .font(.system(size: 11, weight: .bold))
-                                    .foregroundColor(.white)
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.white.opacity(0.6))
                             }
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(100)
+                        .background(Color.white.opacity(0.1))
+                        .cornerRadius(20)
                         .transition(.opacity.combined(with: .scale(scale: 0.9)))
                     }
                 }
-                .padding(.horizontal, 16)
                 .animation(.easeInOut, value: viewModel.selectedPlayers)
             }
 
             Spacer()
 
-            Button(action: { currentStep += 1 }) {
-                Text("Siguiente".localized)
-                    .font(.system(size: 16, weight: .bold))
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(viewModel.selectedPlayers.isEmpty ? Color.gray : Color.cyan)
-                    .foregroundColor(viewModel.selectedPlayers.isEmpty ? Color.white.opacity(0.5) : .white)
-                    .cornerRadius(14)
+            SecondaryButton(title: "Atrás".localized) {
+                currentStep -= 1
             }
-            .disabled(viewModel.selectedPlayers.isEmpty)
+            PrimaryButton(title: "Siguiente".localized, enabled: !viewModel.selectedPlayers.isEmpty) {
+                currentStep += 1
+            }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .animation(.easeInOut, value: viewModel.selectedPlayers)
     }
 }
+
+// MARK: - SelectDateView
 
 struct SelectDateView: View {
     @Binding var currentStep: Int
@@ -317,17 +359,18 @@ struct SelectDateView: View {
                 .transition(.scale)
                 .zIndex(1)
             }
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Text("Selecciona una fecha".localized)
-                        .font(.system(size: 24, weight: .bold))
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.white)
-                        .padding(.bottom, 10)
                     Spacer()
                     Button {
-                        self.viewModel.showLegendPopup.toggle()
+                        viewModel.showLegendPopup.toggle()
                     } label: {
                         Text("legend".localized)
+                            .font(.system(size: 13))
+                            .foregroundColor(.cyan)
                     }
                 }
 
@@ -342,9 +385,8 @@ struct SelectDateView: View {
                             .scaleEffect(1.5)
                             .padding()
                         Text("Cargando fechas disponibles...".localized)
-                            .font(.madridInGameiOSFont(size: 15))
-                            .foregroundColor(.white)
-                            .opacity(0.7)
+                            .font(.system(size: 14))
+                            .foregroundColor(.white.opacity(0.5))
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .onAppear { viewModel.getBlockedDays() }
@@ -357,22 +399,22 @@ struct SelectDateView: View {
 
                 Spacer()
 
-                Button(action: { currentStep += 1 }) {
-                    Text("Siguiente".localized)
-                        .font(.system(size: 16, weight: .bold))
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(viewModel.selectedDate == nil ? Color.gray.opacity(0.4) : Color.cyan)
-                        .foregroundColor(viewModel.selectedDate == nil ? Color.white.opacity(0.4) : .white)
-                        .cornerRadius(14)
+                if viewModel.currentStep > 0 {
+                    SecondaryButton(title: "Atrás".localized) {
+                        viewModel.currentStep -= 1
+                    }
                 }
-                .disabled(viewModel.selectedDate == nil)
+                PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedDate != nil) {
+                    viewModel.currentStep += 1
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
         }
     }
 }
+
+// MARK: - SelectTimeView
 
 struct SelectTimeView: View {
     @Binding var currentStep: Int
@@ -382,27 +424,27 @@ struct SelectTimeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Seleccionar Hora".localized)
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: 20, weight: .bold))
                 .foregroundColor(.white)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Fecha seleccionada".localized)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.cyan.opacity(0.8))
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white.opacity(0.4))
                 Text(viewModel.selectedDate?.toUIDateString() ?? "")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.system(size: 24, weight: .bold))
                     .foregroundColor(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
-            .padding(.vertical, 18)
-            .background(Color.white.opacity(0.07))
+            .padding(.vertical, 16)
+            .background(Color.white.opacity(0.06))
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.cyan, lineWidth: 1.5)
+                    .stroke(Color.white.opacity(0.15), lineWidth: 1)
             )
 
             DatePicker("", selection: $pickerTime, displayedComponents: .hourAndMinute)
@@ -411,11 +453,11 @@ struct SelectTimeView: View {
                 .colorScheme(.dark)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
-                .background(Color.white.opacity(0.07))
+                .background(Color.white.opacity(0.06))
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.cyan, lineWidth: 1.5)
+                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
                 )
                 .environment(\.locale, Locale(identifier: "es"))
                 .onChange(of: pickerTime) { newValue in
@@ -435,26 +477,23 @@ struct SelectTimeView: View {
 
             Spacer()
 
-            Button(action: {
+            SecondaryButton(title: "Atrás".localized) {
+                viewModel.currentStep -= 1
+            }
+            PrimaryButton(title: "Reservar".localized, enabled: true) {
                 if viewModel.teamSelectedInformation != nil {
                     viewModel.updateVirtualTeamReservation()
                 } else {
                     viewModel.createVirtualTeamReservation()
                 }
-            }) {
-                Text("Reservar".localized)
-                    .font(.system(size: 16, weight: .bold))
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.cyan)
-                    .foregroundColor(Color.white)
-                    .cornerRadius(14)
             }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
     }
 }
+
+// MARK: - SelectSlotView
 
 struct SelectSlotView: View {
     @Binding var currentStep: Int
@@ -464,8 +503,12 @@ struct SelectSlotView: View {
         viewModel.individualSelectedInformation != nil || viewModel.teamSelectedInformation != nil
     }
 
+    private var canReserve: Bool {
+        viewModel.selectedSpace != nil && !viewModel.selectedSlots.isEmpty && viewModel.selectedDate != nil
+    }
+
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 12) {
             if viewModel.isCreatingReservation {
                 VStack {
                     Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!)
@@ -477,16 +520,14 @@ struct SelectSlotView: View {
                         .scaleEffect(1.5)
                         .padding()
                     Text("Creando la reserva...".localized)
-                        .font(.madridInGameiOSFont(size: 15))
-                        .foregroundColor(.white)
-                        .opacity(0.7)
+                        .font(.system(size: 14))
+                        .foregroundColor(.white.opacity(0.5))
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 Text("Selecciona franja horaria".localized)
-                    .font(.system(size: 24, weight: .bold))
+                    .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.white)
-                    .padding(.bottom, 10)
 
                 if viewModel.availableSlots.isEmpty {
                     VStack {
@@ -499,9 +540,8 @@ struct SelectSlotView: View {
                             .scaleEffect(1.5)
                             .padding()
                         Text("Cargando horarios disponibles...".localized)
-                            .font(.madridInGameiOSFont(size: 15))
-                            .foregroundColor(.white)
-                            .opacity(0.7)
+                            .font(.system(size: 14))
+                            .foregroundColor(.white.opacity(0.5))
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .onAppear {
@@ -511,28 +551,28 @@ struct SelectSlotView: View {
                     ScrollView {
                         LazyVGrid(
                             columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
-                            spacing: 20
+                            spacing: 14
                         ) {
                             ForEach(viewModel.availableSlots) { slot in
                                 slotButton(for: slot, selectedDate: viewModel.selectedDate)
                             }
                         }
-                        .padding(.horizontal)
+                        .padding(.horizontal, 4)
                     }
                 }
 
-                VStack(alignment: .center) {
-                    let isSimulador = self.viewModel.selectedSpace?.device.lowercased().contains("simulador") ?? false
-                    Text(isSimulador ? "Máximo 1 spots consecutivos".localized : (self.viewModel.personalReservations ? "Máximo 3 spots consecutivos".localized : "Máximo 2 spots consecutivos".localized))
-                        .font(.caption)
-                        .foregroundColor(.white)
-                        .padding(.bottom, 10)
-                }
+                let isSimulador = viewModel.selectedSpace?.device.lowercased().contains("simulador") ?? false
+                Text(isSimulador ? "Máximo 1 spots consecutivos".localized : (viewModel.personalReservations ? "Máximo 3 spots consecutivos".localized : "Máximo 2 spots consecutivos".localized))
+                    .font(.system(size: 12))
+                    .foregroundColor(.white.opacity(0.35))
+                    .frame(maxWidth: .infinity)
 
                 Spacer()
 
-                // Botón "Reservar" / "Guardar"
-                Button(action: {
+                SecondaryButton(title: "Atrás".localized) {
+                    viewModel.currentStep -= 1
+                }
+                PrimaryButton(title: isEditing ? "Guardar".localized : "Reservar".localized, enabled: canReserve) {
                     if viewModel.personalReservations {
                         if viewModel.individualSelectedInformation != nil {
                             viewModel.updateIndividualReservation()
@@ -544,16 +584,7 @@ struct SelectSlotView: View {
                     } else {
                         viewModel.createTeamReservation()
                     }
-                }) {
-                    Text(isEditing ? "Guardar".localized : "Reservar".localized)
-                        .font(.system(size: 16, weight: .bold))
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil ? Color.gray : Color.cyan)
-                        .foregroundColor(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil ? Color.white.opacity(0.5) : .white)
-                        .cornerRadius(14)
                 }
-                .disabled(viewModel.selectedSpace == nil || viewModel.selectedSlots.isEmpty || viewModel.selectedDate == nil || viewModel.isLoading)
             }
         }
         .padding(.horizontal, 20)
@@ -563,41 +594,29 @@ struct SelectSlotView: View {
     private func slotButton(for slot: GamingSpaceTime, selectedDate: Date?) -> some View {
         let isEnabled = viewModel.enabledSlots.contains(where: { $0.id == slot.id })
         let isSelected = viewModel.selectedSlots.contains(where: { $0.id == slot.id })
-
         let calendar = Calendar.current
         let currentHourPlus2 = calendar.component(.hour, from: Date()) + 1
         let isSlotDateToday = if let selectedDate { Calendar.current.isDateInToday(selectedDate) } else { false }
         let isSlotTimeValid = slot.value > currentHourPlus2
         let computedEnabled = isSlotDateToday ? (isSlotTimeValid && isEnabled) : isEnabled
 
-        return Button(action: {
+        return PillButton(title: slot.time, isSelected: isSelected, isEnabled: computedEnabled) {
             if computedEnabled { viewModel.toggleSlotSelection(slot) }
-        }) {
-            Text(slot.time)
-                .font(.system(size: 16, weight: .medium))
-                .frame(width: 95, height: 50)
-                .background(isSelected ? Color.white : Color.clear)
-                .foregroundColor(isSelected ? Color.black : computedEnabled ? Color.white : Color.gray)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 100)
-                        .stroke(isSelected ? Color.clear : computedEnabled ? Color.white : Color.gray, lineWidth: 1)
-                )
-                .cornerRadius(100)
         }
-        .disabled(!computedEnabled)
     }
 }
+
+// MARK: - SelectSpaceView
 
 struct SelectSpaceView: View {
     @Binding var currentStep: Int
     @ObservedObject var viewModel: ReservationFlowViewModel
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Selecciona un espacio".localized)
-                .font(.system(size: 24, weight: .bold))
+                .font(.system(size: 20, weight: .bold))
                 .foregroundColor(.white)
-                .padding(.bottom, 10)
 
             if viewModel.availableSpaces.isEmpty {
                 VStack {
@@ -610,9 +629,8 @@ struct SelectSpaceView: View {
                         .scaleEffect(1.5)
                         .padding()
                     Text("Cargando espacios disponibles...".localized)
-                        .font(.madridInGameiOSFont(size: 15))
-                        .foregroundColor(.white)
-                        .opacity(0.7)
+                        .font(.system(size: 14))
+                        .foregroundColor(.white.opacity(0.5))
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .onAppear { viewModel.fetchAvailableSpaces() }
@@ -620,28 +638,24 @@ struct SelectSpaceView: View {
                 ScrollView {
                     LazyVGrid(
                         columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
-                        spacing: 20
+                        spacing: 14
                     ) {
                         ForEach(viewModel.availableSpaces) { space in
                             spaceButton(for: space)
                         }
                     }
-                    .padding(.horizontal)
+                    .padding(.horizontal, 4)
                 }
             }
 
             Spacer()
 
-            Button(action: { currentStep += 1 }) {
-                Text("Siguiente".localized)
-                    .font(.system(size: 16, weight: .bold))
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(viewModel.selectedSpace == nil ? Color.gray : Color.cyan)
-                    .foregroundColor(viewModel.selectedSpace == nil ? Color.white.opacity(0.5) : .white)
-                    .cornerRadius(14)
+            SecondaryButton(title: "Atrás".localized) {
+                currentStep -= 1
             }
-            .disabled(viewModel.selectedSpace == nil)
+            PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedSpace != nil) {
+                currentStep += 1
+            }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
@@ -649,21 +663,13 @@ struct SelectSpaceView: View {
 
     private func spaceButton(for space: Space) -> some View {
         let isSelected = viewModel.selectedSpace?.id == space.id
-
-        return Button(action: { viewModel.selectSpace(space) }) {
-            Text(space.device)
-                .font(.system(size: 16, weight: .medium))
-                .frame(width: 95, height: 50)
-                .background(isSelected ? Color.white : Color.clear)
-                .foregroundColor(isSelected ? Color.black : Color.white)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 100)
-                        .stroke(isSelected ? Color.clear : Color.white, lineWidth: 1)
-                )
-                .cornerRadius(100)
+        return PillButton(title: space.device, isSelected: isSelected, isEnabled: true) {
+            viewModel.selectSpace(space)
         }
     }
 }
+
+// MARK: - FlowLayout
 
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8

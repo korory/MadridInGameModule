@@ -101,7 +101,8 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                     viewModel.dateSelected = stringDate
                     viewModel.isDateSelected = true
                 }
-                .frame(height: 300)
+                .frame(minHeight: 280, maxHeight: 360)
+                .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
