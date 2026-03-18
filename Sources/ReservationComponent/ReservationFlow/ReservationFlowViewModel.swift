@@ -24,8 +24,28 @@ class ReservationFlowViewModel: ObservableObject {
     @Published var teamSelectedInformation: EventModel?
     @Published var showLegendPopup = false
 
+    // MARK: - Simulator add-on (solo individual)
+    @Published var wantsSimulator: Bool = false
+    @Published var simulatorSelectedSlots: [GamingSpaceTime] = []
+    @Published var availableSimulatorSlots: [GamingSpaceTime] = []
+    @Published var simulatorSpace: Space?
+
     var onReservationSuccess: () -> Void
     var onReservationFail: () -> Void
+
+    var isSelectedSpaceSimulator: Bool {
+        selectedSpace?.device.lowercased().contains("simulador") ?? false
+    }
+
+    var personalStepCount: Int {
+        if isSelectedSpaceSimulator {
+            return 3
+        } else if wantsSimulator {
+            return 5
+        } else {
+            return 4
+        }
+    }
 
     // MARK: - Summary tokens
 
@@ -339,6 +359,112 @@ class ReservationFlowViewModel: ObservableObject {
         return weekday == 1 ? 7 : weekday - 1
     }
 
+    // MARK: - Simulator add-on
+
+    func findSimulatorSpace() {
+        simulatorSpace = availableSpaces.first(where: { $0.device.lowercased().contains("simulador") })
+    }
+
+    func fetchSimulatorSlots(completion: (() -> Void)? = nil) {
+        let dayValue = calculateDayValue(for: selectedDate)
+        WeekTimeService.shared.fetchWeekTimeByDay(dayValue: dayValue) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let slots):
+                    var newSlots: [GamingSpaceTime] = []
+                    for slot in slots { for time in slot.times { newSlots.append(time.gamingSpaceTime) } }
+                    let fmt = DateFormatter()
+                    fmt.dateFormat = "HH:mm"
+                    fmt.locale = Locale(identifier: "es_ES")
+                    self?.availableSimulatorSlots = newSlots.sorted {
+                        guard let d1 = fmt.date(from: $0.time), let d2 = fmt.date(from: $1.time) else { return false }
+                        return d1 < d2
+                    }
+                case .failure(let error):
+                    Logger.shared.log("Error fetching simulator slots: \(error)")
+                }
+                completion?()
+            }
+        }
+    }
+
+    func toggleSimulatorSlotSelection(_ slot: GamingSpaceTime) {
+        if simulatorSelectedSlots.contains(where: { $0.id == slot.id }) {
+            simulatorSelectedSlots.removeAll { $0.id == slot.id }
+        } else {
+            simulatorSelectedSlots = [slot]
+        }
+    }
+
+    func resetSimulatorSelection() {
+        wantsSimulator = false
+        simulatorSelectedSlots = []
+        availableSimulatorSlots = []
+    }
+
+    // MARK: - Enviar email de reserva
+
+    private func formatDateForEmail(_ date: Date) -> String {
+        let fmt = DateFormatter()
+        fmt.dateFormat = "dd/MM/yyyy"
+        return fmt.string(from: date)
+    }
+
+    private func formatTimesForEmail(_ slots: [GamingSpaceTime]) -> String {
+        slots.sorted { $0.value < $1.value }.map { $0.time }.joined(separator: " - ")
+    }
+
+    /// Email de reserva individual (con posible simulador extra)
+    private func sendIndividualReservationEmail() {
+        guard let date = selectedDate,
+              let device = selectedSpace?.device,
+              let user = userManager.getUser(),
+              let email = user.email, !email.isEmpty else { return }
+
+        let firstName = user.firstName ?? ""
+        let dateStr = formatDateForEmail(date)
+        let timesStr = formatTimesForEmail(selectedSlots)
+
+        var extraBlock = ""
+        if wantsSimulator, !simulatorSelectedSlots.isEmpty, let simDevice = simulatorSpace?.device {
+            let simTimes = simulatorSelectedSlots.sorted { $0.value < $1.value }.map { $0.time }.joined(separator: " - ")
+            extraBlock = "<p><strong><u>Reserva extra incluida:</u></strong><br><strong>Fecha:</strong> \(dateStr)<br><strong>Hora:</strong> \(simTimes)<br><strong>Dispositivo:</strong> \(simDevice)</p>"
+        }
+
+        reservationService.sendReservationEmail(
+            email: email, firstName: firstName,
+            date: dateStr, times: timesStr,
+            device: device, extraBlock: extraBlock
+        )
+    }
+
+    /// Email de reserva de equipo centre a un jugador (sin simulador)
+    private func sendTeamReservationEmail(playerEmail: String, playerName: String) {
+        guard let date = selectedDate,
+              let device = selectedSpace?.device,
+              !playerEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+        reservationService.sendReservationEmail(
+            email: playerEmail, firstName: playerName,
+            date: formatDateForEmail(date),
+            times: formatTimesForEmail(selectedSlots),
+            device: device, extraBlock: ""
+        )
+    }
+
+    /// Email de training virtual a un jugador
+    private func sendVirtualTrainingEmail(playerEmail: String, playerName: String) {
+        guard let date = selectedDate,
+              !playerEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+        reservationService.sendReservationEmail(
+            email: playerEmail, firstName: playerName,
+            date: formatDateForEmail(date),
+            times: selectedTime,
+            device: "Virtual", extraBlock: ""
+        )
+    }
+
     // MARK: - Crear reserva individual
 
     func createReservation() {
@@ -457,11 +583,7 @@ class ReservationFlowViewModel: ObservableObject {
                         self.isLoading = false
                         switch result {
                         case .success:
-                            // ✅ Enviar email al usuario tras completar reserva individual + QR
-                            let userEmail = self.userManager.getUser()?.email ?? ""
-                            if !userEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                self.reservationService.sendReservationEmail(email: userEmail)
-                            }
+                            self.sendIndividualReservationEmail()
                             self.isCreatingReservation = true
                             self.reservationSuccess = true
                             self.onReservationSuccess()
@@ -519,90 +641,88 @@ class ReservationFlowViewModel: ObservableObject {
         )
 
         reservationService.createTraining(request: trainingRequest) { [weak self] result in
-            guard let self else { return }
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let trainingResponse):
-                    guard let trainingId = trainingResponse.id else {
+            guard let self = self else { return }
+            switch result {
+            case .success(let trainingResponse):
+                guard let trainingId = trainingResponse.id else {
+                    DispatchQueue.main.async {
+                        self.isCreatingReservation = false
+                        self.onReservationFail()
+                    }
+                    return
+                }
+
+                let group = DispatchGroup()
+                var reserveIds: [Int] = []
+                var hasError = false
+
+                for player in playerIdsAndEmails {
+                    group.enter()
+
+                    let reservation = Reservation(
+                        id: 0, status: "active",
+                        slot: slotToUse,
+                        date: date, user: player.id, team: teamId,
+                        training: trainingId,
+                        qrImage: nil, qrValue: nil,
+                        times: self.selectedSlots, peripheralLoans: []
+                    )
+
+                    self.reservationService.createReservation(reservation: reservation) { [weak self] result in
+                        guard let self = self else { group.leave(); return }
+                        switch result {
+                        case .success(let reserveResponse):
+                            guard let reserveId = reserveResponse.id else {
+                                hasError = true
+                                group.leave()
+                                return
+                            }
+                            reserveIds.append(reserveId)
+                            self.generateAndUploadQR(for: reserveResponse) {
+                                let playerName = self.teamPlayers.first(where: { $0.usersId?.id == player.id })?.usersId?.username ?? ""
+                                self.sendTeamReservationEmail(playerEmail: player.email, playerName: playerName)
+                                group.leave()
+                            }
+                        case .failure(let error):
+                            hasError = true
+                            Logger.shared.log("Error al crear reserve para jugador: \(error.localizedDescription)")
+                            group.leave()
+                        }
+                    }
+                }
+
+                group.notify(queue: .main) { [weak self] in
+                    guard let self = self else { return }
+
+                    if hasError || reserveIds.isEmpty {
                         self.isCreatingReservation = false
                         self.onReservationFail()
                         return
                     }
 
-                    let group = DispatchGroup()
-                    var reserveIds: [Int] = []
-                    var hasError = false
-
-                    for player in playerIdsAndEmails {
-                        group.enter()
-
-                        let reservation = Reservation(
-                            id: 0, status: "active",
-                            slot: slotToUse,
-                            date: date, user: player.id, team: teamId,
-                            training: trainingId,
-                            qrImage: nil, qrValue: nil,
-                            times: self.selectedSlots, peripheralLoans: []
-                        )
-
-                        self.reservationService.createReservation(reservation: reservation) { [weak self] result in
-                            guard let self else { group.leave(); return }
-                            DispatchQueue.main.async {
-                                switch result {
-                                case .success(let reserveResponse):
-                                    guard let reserveId = reserveResponse.id else {
-                                        hasError = true
-                                        group.leave()
-                                        return
-                                    }
-                                    reserveIds.append(reserveId)
-                                    self.generateAndUploadQR(for: reserveResponse) {
-                                        // ✅ Enviar email de equipo solo si el jugador tiene email válido
-                                        if !player.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                            self.reservationService.sendTeamReservationEmail(email: player.email)
-                                        }
-                                        group.leave()
-                                    }
-                                case .failure(let error):
-                                    hasError = true
-                                    Logger.shared.log("Error al crear reserve para jugador: \(error.localizedDescription)")
-                                    group.leave()
-                                }
-                            }
-                        }
-                    }
-
-                    group.notify(queue: .main) { [weak self] in
-                        guard let self else { return }
-
-                        if hasError || reserveIds.isEmpty {
+                    self.reservationService.linkReservesToTraining(
+                        trainingId: trainingId,
+                        reserveIds: reserveIds
+                    ) { [weak self] result in
+                        guard let self = self else { return }
+                        DispatchQueue.main.async {
                             self.isCreatingReservation = false
-                            self.onReservationFail()
-                            return
-                        }
-
-                        self.reservationService.linkReservesToTraining(
-                            trainingId: trainingId,
-                            reserveIds: reserveIds
-                        ) { [weak self] result in
-                            guard let self else { return }
-                            DispatchQueue.main.async {
-                                self.isCreatingReservation = false
-                                switch result {
-                                case .success:
-                                    self.reservationSuccess = true
-                                    self.onReservationSuccess()
-                                    Logger.shared.log("Training centre creado con \(reserveIds.count) reserves")
-                                case .failure(let error):
-                                    self.reservationSuccess = false
-                                    self.onReservationFail()
-                                    Logger.shared.log("Error al vincular reserves: \(error.localizedDescription)")
-                                }
+                            switch result {
+                            case .success:
+                                self.reservationSuccess = true
+                                self.onReservationSuccess()
+                                Logger.shared.log("Training centre creado con \(reserveIds.count) reserves")
+                            case .failure(let error):
+                                self.reservationSuccess = false
+                                self.onReservationFail()
+                                Logger.shared.log("Error al vincular reserves: \(error.localizedDescription)")
                             }
                         }
                     }
+                }
 
-                case .failure(let error):
+            case .failure(let error):
+                DispatchQueue.main.async {
                     self.isCreatingReservation = false
                     self.onReservationFail()
                     Logger.shared.log("Error al crear el training: \(error.localizedDescription)")
@@ -653,7 +773,7 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Editar reserva de equipo centre (Training existente)
+    // MARK: - Editar reserva de equipo centre (solo jugadores)
 
     func updateCenterTeamReservation() {
         guard let trainingId = teamSelectedInformation?.id else {
@@ -734,11 +854,9 @@ class ReservationFlowViewModel: ObservableObject {
                     self.onReservationSuccess()
                     Logger.shared.log("Training virtual creado correctamente")
 
-                    // ✅ Enviar email de equipo a cada jugador con email válido
                     for player in playerIdsAndEmails {
-                        if !player.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            self.reservationService.sendTeamReservationEmail(email: player.email)
-                        }
+                        let playerName = self.teamPlayers.first(where: { $0.usersId?.id == player.id })?.usersId?.username ?? ""
+                        self.sendVirtualTrainingEmail(playerEmail: player.email, playerName: playerName)
                     }
                 }
             } catch {
@@ -752,7 +870,7 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Editar training virtual
+    // MARK: - Editar training virtual (solo jugadores)
 
     func updateVirtualTeamReservation() {
         guard let trainingId = teamSelectedInformation?.id else { return }

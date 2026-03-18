@@ -105,7 +105,6 @@ class ReservationService {
     // MARK: - Crear reserve individual
 
     func createReservation(reservation: Reservation, completion: @escaping (Result<ReserveResponse, Error>) -> Void) {
-        // ⚠️ El email NO se envía aquí. Se envía desde el ViewModel después de generar el QR.
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
@@ -354,12 +353,28 @@ class ReservationService {
 
     // MARK: - Enviar email de reserva individual via Directus Flow
 
-    func sendReservationEmail(email: String) {
+    func sendReservationEmail(
+        email: String,
+        firstName: String,
+        date: String,
+        times: String,
+        device: String,
+        extraBlock: String = ""
+    ) {
+        let body: [String: Any] = [
+            "email": email,
+            "first_name": firstName,
+            "date": date,
+            "times": times,
+            "device": device,
+            "extra_block": extraBlock
+        ]
+
         Task {
             do {
                 try await DirectusService.shared.triggerFlow(
                     flowId: individualReservationFlowId,
-                    body: ["email": email]
+                    body: body
                 )
                 Logger.shared.log("Email de reserva individual enviado a \(email)")
             } catch {
@@ -370,12 +385,26 @@ class ReservationService {
 
     // MARK: - Enviar email de reserva de equipo via Directus Flow
 
-    func sendTeamReservationEmail(email: String) {
+    func sendTeamReservationEmail(
+        email: String,
+        firstName: String,
+        date: String,
+        times: String,
+        device: String
+    ) {
+        let body: [String: Any] = [
+            "email": email,
+            "first_name": firstName,
+            "date": date,
+            "times": times,
+            "device": device
+        ]
+
         Task {
             do {
                 try await DirectusService.shared.triggerFlow(
                     flowId: teamReservationFlowId,
-                    body: ["email": email]
+                    body: body
                 )
                 Logger.shared.log("Email de reserva de equipo enviado a \(email)")
             } catch {
