@@ -1,6 +1,7 @@
 import SwiftUI
 
 class ReservationFlowViewModel: ObservableObject {
+    // MARK: - UI State
     @Published var currentStep: Int = 0
     @Published var selectedDate: Date?
     @Published var availableSlots: [GamingSpaceTime] = []
@@ -12,7 +13,6 @@ class ReservationFlowViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isCreatingReservation: Bool = false
     @Published var reservationSuccess: Bool = false
-    @Published var userManager = UserManager.shared
     @Published var personalReservations: Bool = false
     @Published var selectedPlayers: [String] = []
     @Published var teamPlayers: [TeamUser] = []
@@ -24,21 +24,26 @@ class ReservationFlowViewModel: ObservableObject {
     @Published var teamSelectedInformation: EventModel?
     @Published var showLegendPopup = false
 
-    // MARK: - Simulator add-on (solo individual)
+    // MARK: - Simulator add-on
     @Published var wantsSimulator: Bool = false
     @Published var simulatorSelectedSlots: [GamingSpaceTime] = []
     @Published var availableSimulatorSlots: [GamingSpaceTime] = []
     @Published var simulatorSpace: Space?
 
-    // MARK: - Extra space add-on (cuando elige simulador, ofrecer consola extra)
+    // MARK: - Extra space add-on
     @Published var wantsExtraSpace: Bool = false
     @Published var extraSpace: Space?
     @Published var extraSpaceSelectedSlots: [GamingSpaceTime] = []
     @Published var availableExtraSpaceSlots: [GamingSpaceTime] = []
     @Published var enabledExtraSpaceSlots: [GamingSpaceTime] = []
 
+    // MARK: - Dependencies
+    private let apiManager = ReservationAPIManager()
+    private let userManager = UserManager.shared
     var onReservationSuccess: () -> Void
     var onReservationFail: () -> Void
+
+    // MARK: - Computed
 
     var isSelectedSpaceSimulator: Bool {
         selectedSpace?.device.lowercased().contains("simulador") ?? false
@@ -46,46 +51,33 @@ class ReservationFlowViewModel: ObservableObject {
 
     var personalStepCount: Int {
         if isSelectedSpaceSimulator {
-            if wantsExtraSpace {
-                return 6 // date, space, slot, ask, extra space, extra slot
-            } else {
-                return 4 // date, space, slot, ask
-            }
+            return wantsExtraSpace ? 6 : 4
         } else {
-            if wantsSimulator {
-                return 5 // date, space, slot, ask, sim slot
-            } else {
-                return 4 // date, space, slot, ask
-            }
+            return wantsSimulator ? 5 : 4
         }
     }
-
-    // MARK: - Summary tokens
 
     var summaryTokens: [String] {
         var result: [String] = []
         let step = currentStep
         let isPersonal = personalReservations
-
-        if !isPersonal, step > 0, let type = selectedSpaceType {
-            result.append(type)
-        }
-        if !isPersonal, step > 1, !selectedPlayers.isEmpty {
-            result.append(selectedPlayers.joined(separator: ", "))
-        }
-        let dateThreshold = isPersonal ? 0 : 2
-        if step > dateThreshold, let date = selectedDate {
-            result.append(date.toUIDateString())
-        }
-        let spaceThreshold = isPersonal ? 1 : 3
-        if step > spaceThreshold, let space = selectedSpace {
-            result.append(space.device)
-        }
+        if !isPersonal, step > 0, let type = selectedSpaceType { result.append(type) }
+        if !isPersonal, step > 1, !selectedPlayers.isEmpty { result.append(selectedPlayers.joined(separator: ", ")) }
+        if step > (isPersonal ? 0 : 2), let date = selectedDate { result.append(date.toUIDateString()) }
+        if step > (isPersonal ? 1 : 3), let space = selectedSpace { result.append(space.device) }
         return result
     }
 
-    private let reservationService = ReservationService()
-    let dateFormatter = DateFormatter()
+    var filteredSpaces: [Space] {
+        guard let type = selectedSpaceType else { return availableSpaces }
+        return availableSpaces.filter { $0.type == type }
+    }
+
+    var nonSimulatorSpaces: [Space] {
+        availableSpaces.filter { !$0.device.lowercased().contains("simulador") }
+    }
+
+    // MARK: - Init
 
     init(
         personalReservations: Bool,
@@ -125,6 +117,44 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Carga inicial de datos
+
+    func getBlockedDays() {
+        isLoading = true
+        apiManager.fetchBlockedDays { [weak self] result in
+            DispatchQueue.main.async {
+                if case .success(let marked) = result { self?.markedDates.append(contentsOf: marked) }
+                self?.isLoading = false
+            }
+        }
+    }
+
+    func getTeamsUsers() {
+        self.teamPlayers = userManager.getSelectedTeam()?.users ?? []
+    }
+
+    func fetchTeamReservationsByUser(completion: @escaping () -> Void) {
+        guard let userId = userManager.getUser()?.id else { return }
+        isLoading = true
+        apiManager.fetchUserReservations(userId: userId) { [weak self] result in
+            DispatchQueue.main.async {
+                if case .success(let marked) = result { self?.markedDates.append(contentsOf: marked) }
+                self?.isLoading = false
+                completion()
+            }
+        }
+    }
+
+    func fetchTeamTrainingDates() {
+        guard let userId = userManager.getUser()?.id,
+              let teamId = userManager.getSelectedTeam()?.id else { return }
+        apiManager.fetchTeamTrainings(teamId: teamId, userId: userId) { [weak self] result in
+            DispatchQueue.main.async {
+                if case .success(let marked) = result { self?.markedDates.append(contentsOf: marked) }
+            }
+        }
+    }
+
     // MARK: - Pre-relleno desde información existente
 
     private func populateFromExistingInformation() {
@@ -137,14 +167,13 @@ class ReservationFlowViewModel: ObservableObject {
 
     private func populateFromTeamReservation(_ event: EventModel) {
         reservationNotes  = event.notes ?? ""
-        selectedSpaceType = ReservationFlowViewModel.spaceTypeToUI(event.type)
+        selectedSpaceType = Self.spaceTypeToUI(event.type)
         selectedTime      = event.time
         selectedDate      = Utils.createDate(from: event.startDate)
 
         selectedPlayers = event.players?.compactMap { playerModel -> String? in
             guard let playerId = playerModel.userId?.id else { return nil }
-            return teamPlayers.first(where: { $0.usersId?.id == playerId })?.usersId?.username
-                ?? playerModel.userId?.name
+            return teamPlayers.first(where: { $0.usersId?.id == playerId })?.usersId?.username ?? playerModel.userId?.name
         } ?? []
 
         guard event.type.lowercased() != "virtual",
@@ -152,15 +181,10 @@ class ReservationFlowViewModel: ObservableObject {
 
         fetchAvailableSpaces { [weak self] in
             guard let self else { return }
-            self.selectedSpace = self.availableSpaces.first(where: {
-                $0.slots.contains(where: { $0.id == reserveSlotId })
-            })
-            let dayValue = self.calculateDayValue(for: self.selectedDate)
-            self.fetchAvailableSlots(for: dayValue) { [weak self] in
+            self.selectedSpace = self.availableSpaces.first(where: { $0.slots.contains(where: { $0.id == reserveSlotId }) })
+            self.fetchAvailableSlots(for: self.calculateDayValue(for: self.selectedDate)) { [weak self] in
                 guard let self else { return }
-                let reserveTimes = Set(
-                    event.reserves?.first?.times?.compactMap { $0.gamingSpaceTimesID?.time } ?? []
-                )
+                let reserveTimes = Set(event.reserves?.first?.times?.compactMap { $0.gamingSpaceTimesID?.time } ?? [])
                 self.selectedSlots = self.availableSlots.filter { reserveTimes.contains($0.time) }
                 self.updateEnabledSlots()
             }
@@ -169,99 +193,14 @@ class ReservationFlowViewModel: ObservableObject {
 
     private func populateFromIndividualReservation(_ reservation: IndividualReservation) {
         selectedDate = Utils.createDate(from: reservation.date)
-
         fetchAvailableSpaces { [weak self] in
             guard let self else { return }
-
-            self.selectedSpace = self.availableSpaces.first(where: {
-                $0.slots.contains(where: { $0.id == reservation.slot.id })
-            })
-
-            let dayValue = self.calculateDayValue(for: self.selectedDate)
-            self.fetchAvailableSlots(for: dayValue) { [weak self] in
+            self.selectedSpace = self.availableSpaces.first(where: { $0.slots.contains(where: { $0.id == reservation.slot.id }) })
+            self.fetchAvailableSlots(for: self.calculateDayValue(for: self.selectedDate)) { [weak self] in
                 guard let self else { return }
-                let reserveTimes = Set(
-                    reservation.times.compactMap { $0.gamingSpaceTimesID?.time }
-                )
+                let reserveTimes = Set(reservation.times.compactMap { $0.gamingSpaceTimesID?.time })
                 self.selectedSlots = self.availableSlots.filter { reserveTimes.contains($0.time) }
                 self.updateEnabledSlots()
-            }
-        }
-    }
-
-    // MARK: - Navegación
-
-    func goToNextStep() { if currentStep < 2 { currentStep += 1 } }
-    func goToPreviousStep() { if currentStep > 0 { currentStep -= 1 } }
-
-    // MARK: - Equipo
-
-    var filteredSpaces: [Space] {
-        guard let type = selectedSpaceType else { return availableSpaces }
-        return availableSpaces.filter { $0.type == type }
-    }
-
-    func getTeamsUsers() {
-        self.teamPlayers = userManager.getSelectedTeam()?.users ?? []
-    }
-
-    func fetchTeamReservationsByUser(completion: @escaping () -> Void) {
-        guard let user = userManager.getUser(), let userId = user.id else { return }
-        isLoading = true
-        reservationService.getReservesByUser(userId: userId) { [weak self] result in
-            guard let self else { return }
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let reservations):
-                    let marked = reservations
-                        .compactMap { Utils.createDate(from: $0.date) }
-                        .map { MarkTrainingDatesAndReservations(date: $0, individualReservation: true) }
-                    self.markedDates.append(contentsOf: marked)
-                case .failure(let error):
-                    Logger.shared.log("Error al obtener reservas: \(error)")
-                }
-                self.isLoading = false
-                completion()
-            }
-        }
-    }
-
-    func fetchTeamTrainingDates() {
-        guard let userId = userManager.getUser()?.id,
-              let teamId = userManager.getSelectedTeam()?.id else { return }
-
-        reservationService.getAllTrainings(teamId: teamId, userId: userId) { [weak self] result in
-            guard let self else { return }
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let trainings):
-                    let marked = trainings.compactMap { training -> MarkTrainingDatesAndReservations? in
-                        guard let date = Utils.createDate(from: training.startDate) else { return nil }
-                        return MarkTrainingDatesAndReservations(date: date, individualReservation: false)
-                    }
-                    self.markedDates.append(contentsOf: marked)
-                case .failure(let error):
-                    Logger.shared.log("Error al obtener entrenos de equipo: \(error)")
-                }
-            }
-        }
-    }
-
-    func getBlockedDays() {
-        isLoading = true
-        reservationService.getAllBlockedDays { [weak self] result in
-            guard let self else { return }
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let blockedDays):
-                    let marked = blockedDays
-                        .compactMap { $0.date.flatMap { Utils.createDate(from: $0) } }
-                        .map { MarkTrainingDatesAndReservations(date: $0, blockedDays: true) }
-                    self.markedDates.append(contentsOf: marked)
-                case .failure(let error):
-                    Logger.shared.log("Error al obtener los dias bloqueados: \(error)")
-                }
-                self.isLoading = false
             }
         }
     }
@@ -269,38 +208,24 @@ class ReservationFlowViewModel: ObservableObject {
     // MARK: - Fecha
 
     func checkSelectedDate(_ stringDate: String) {
-        let date = convertToDate(from: stringDate)
-        if let matchingDate = markedDates.first(where: { $0.date == date }), matchingDate.blockedDays { return }
+        let f = DateFormatter(); f.dateFormat = "dd/MM/yyyy"
+        let date = f.date(from: stringDate)
+        if let matching = markedDates.first(where: { $0.date == date }), matching.blockedDays { return }
         self.selectedDate = date
     }
 
-    func convertToDate(from dateString: String) -> Date? {
-        let f = DateFormatter()
-        f.dateFormat = "dd/MM/yyyy"
-        return f.date(from: dateString)
+    func calculateDayValue(for date: Date?) -> Int {
+        guard let date else { return 0 }
+        let weekday = Calendar.current.component(.weekday, from: date)
+        return weekday == 1 ? 7 : weekday - 1
     }
 
     // MARK: - Espacios
 
     func fetchAvailableSpaces(completion: (() -> Void)? = nil) {
-        SpaceService.shared.fetchSpaces { [weak self] result in
+        apiManager.fetchSpaces(isPersonal: personalReservations) { [weak self] result in
             DispatchQueue.main.async {
-                guard let self else { completion?(); return }
-                switch result {
-                case .success(let spaces):
-                    for space in spaces {
-                        guard let t = space.translations.first(where: { $0.languagesCode == "es" }) else { continue }
-
-                        if !self.personalReservations && t.device.lowercased().contains("simulador") {
-                            continue
-                        }
-
-                        let mapped = Space(id: UUID().hashValue, device: t.device, description: t.description ?? "", slots: space.slots, type: "")
-                        self.availableSpaces.append(mapped)
-                    }
-                case .failure(let error):
-                    Logger.shared.log("Error fetching spaces: \(error.localizedDescription)")
-                }
+                if case .success(let spaces) = result { self?.availableSpaces = spaces }
                 completion?()
             }
         }
@@ -311,33 +236,19 @@ class ReservationFlowViewModel: ObservableObject {
             selectedSpace = nil
         } else {
             selectedSpace = space
-            availableSlots = []
-            selectedSlots = []
-            enabledSlots = []
+            availableSlots = []; selectedSlots = []; enabledSlots = []
         }
     }
 
     // MARK: - Slots
 
     func fetchAvailableSlots(for dayValue: Int, completion: (() -> Void)? = nil) {
-        WeekTimeService.shared.fetchWeekTimeByDay(dayValue: dayValue) { [weak self] result in
+        let isSim = selectedSpace?.device.lowercased().contains("simulador") ?? false
+        apiManager.fetchSlots(dayValue: dayValue, isSimulator: isSim) { [weak self] result in
             DispatchQueue.main.async {
-                switch result {
-                case .success(let slots):
-                    var newSlots: [GamingSpaceTime] = []
-                    for slot in slots { for time in slot.times { newSlots.append(time.gamingSpaceTime) } }
-                    let fmt = DateFormatter()
-                    fmt.dateFormat = "HH:mm"
-                    fmt.locale = Locale(identifier: "es_ES")
-                    let sorted = newSlots.sorted {
-                        guard let d1 = fmt.date(from: $0.time), let d2 = fmt.date(from: $1.time) else { return false }
-                        return d1 < d2
-                    }
-                    let isSimulador = self?.selectedSpace?.device.lowercased().contains("simulador") ?? false
-                    self?.availableSlots = isSimulador ? sorted : sorted.filter { !$0.time.hasSuffix(":30") }
+                if case .success(let slots) = result {
+                    self?.availableSlots = slots
                     self?.updateEnabledSlots()
-                case .failure(let error):
-                    Logger.shared.log("Error fetching slots: \(error)")
                 }
                 completion?()
             }
@@ -346,13 +257,13 @@ class ReservationFlowViewModel: ObservableObject {
 
     func updateEnabledSlots() {
         guard !selectedSlots.isEmpty else { enabledSlots = availableSlots; return }
-        let isSimulador = selectedSpace?.device.lowercased().contains("simulador") ?? false
-        let maxSlots = isSimulador ? 1 : (personalReservations ? 3 : 2)
-        let sortedSelected = selectedSlots.sorted { $0.value < $1.value }
-        let minValue = sortedSelected.first?.value ?? 0
-        let maxValue = sortedSelected.last?.value ?? 0
+        let isSim = selectedSpace?.device.lowercased().contains("simulador") ?? false
+        let maxSlots = isSim ? 1 : (personalReservations ? 3 : 2)
+        let sorted = selectedSlots.sorted { $0.value < $1.value }
+        let minVal = sorted.first?.value ?? 0
+        let maxVal = sorted.last?.value ?? 0
         enabledSlots = availableSlots.filter { slot in
-            (slot.value >= minValue && slot.value <= maxValue + 1 && slot.value <= minValue + (maxSlots - 1))
+            (slot.value >= minVal && slot.value <= maxVal + 1 && slot.value <= minVal + (maxSlots - 1))
             || selectedSlots.contains(where: { $0.id == slot.id })
         }
     }
@@ -360,16 +271,8 @@ class ReservationFlowViewModel: ObservableObject {
     func toggleSlotSelection(_ slot: GamingSpaceTime) {
         if selectedSlots.contains(where: { $0.id == slot.id }) {
             selectedSlots.removeAll { $0.id == slot.id }
-        } else {
-            selectedSlots.append(slot)
-        }
+        } else { selectedSlots.append(slot) }
         updateEnabledSlots()
-    }
-
-    func calculateDayValue(for date: Date?) -> Int {
-        guard let date else { return 0 }
-        let weekday = Calendar.current.component(.weekday, from: date)
-        return weekday == 1 ? 7 : weekday - 1
     }
 
     // MARK: - Simulator add-on
@@ -379,23 +282,9 @@ class ReservationFlowViewModel: ObservableObject {
     }
 
     func fetchSimulatorSlots(completion: (() -> Void)? = nil) {
-        let dayValue = calculateDayValue(for: selectedDate)
-        WeekTimeService.shared.fetchWeekTimeByDay(dayValue: dayValue) { [weak self] result in
+        apiManager.fetchSlots(dayValue: calculateDayValue(for: selectedDate), isSimulator: true) { [weak self] result in
             DispatchQueue.main.async {
-                switch result {
-                case .success(let slots):
-                    var newSlots: [GamingSpaceTime] = []
-                    for slot in slots { for time in slot.times { newSlots.append(time.gamingSpaceTime) } }
-                    let fmt = DateFormatter()
-                    fmt.dateFormat = "HH:mm"
-                    fmt.locale = Locale(identifier: "es_ES")
-                    self?.availableSimulatorSlots = newSlots.sorted {
-                        guard let d1 = fmt.date(from: $0.time), let d2 = fmt.date(from: $1.time) else { return false }
-                        return d1 < d2
-                    }
-                case .failure(let error):
-                    Logger.shared.log("Error fetching simulator slots: \(error)")
-                }
+                if case .success(let slots) = result { self?.availableSimulatorSlots = slots }
                 completion?()
             }
         }
@@ -404,60 +293,30 @@ class ReservationFlowViewModel: ObservableObject {
     func toggleSimulatorSlotSelection(_ slot: GamingSpaceTime) {
         if simulatorSelectedSlots.contains(where: { $0.id == slot.id }) {
             simulatorSelectedSlots.removeAll { $0.id == slot.id }
-        } else {
-            simulatorSelectedSlots = [slot]
-        }
+        } else { simulatorSelectedSlots = [slot] }
     }
 
     func resetSimulatorSelection() {
-        wantsSimulator = false
-        simulatorSelectedSlots = []
-        availableSimulatorSlots = []
+        wantsSimulator = false; simulatorSelectedSlots = []; availableSimulatorSlots = []
     }
 
-    // MARK: - Extra space add-on (inverso: simulador → añadir consola)
-
-    /// Espacios disponibles excepto simulador
-    var nonSimulatorSpaces: [Space] {
-        availableSpaces.filter { !$0.device.lowercased().contains("simulador") }
-    }
+    // MARK: - Extra space add-on
 
     func selectExtraSpace(_ space: Space) {
         if extraSpace?.id == space.id {
-            extraSpace = nil
-            availableExtraSpaceSlots = []
-            extraSpaceSelectedSlots = []
-            enabledExtraSpaceSlots = []
+            extraSpace = nil; availableExtraSpaceSlots = []; extraSpaceSelectedSlots = []; enabledExtraSpaceSlots = []
         } else {
-            extraSpace = space
-            availableExtraSpaceSlots = []
-            extraSpaceSelectedSlots = []
-            enabledExtraSpaceSlots = []
+            extraSpace = space; availableExtraSpaceSlots = []; extraSpaceSelectedSlots = []; enabledExtraSpaceSlots = []
         }
     }
 
-    /// Carga los slots para el espacio extra (sin medias horas, como consolas normales)
     func fetchExtraSpaceSlots(completion: (() -> Void)? = nil) {
-        let dayValue = calculateDayValue(for: selectedDate)
-        WeekTimeService.shared.fetchWeekTimeByDay(dayValue: dayValue) { [weak self] result in
+        apiManager.fetchSlots(dayValue: calculateDayValue(for: selectedDate), isSimulator: false) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self else { completion?(); return }
-                switch result {
-                case .success(let slots):
-                    var newSlots: [GamingSpaceTime] = []
-                    for slot in slots { for time in slot.times { newSlots.append(time.gamingSpaceTime) } }
-                    let fmt = DateFormatter()
-                    fmt.dateFormat = "HH:mm"
-                    fmt.locale = Locale(identifier: "es_ES")
-                    let sorted = newSlots.sorted {
-                        guard let d1 = fmt.date(from: $0.time), let d2 = fmt.date(from: $1.time) else { return false }
-                        return d1 < d2
-                    }
-                    // Consola normal: sin medias horas
-                    self.availableExtraSpaceSlots = sorted.filter { !$0.time.hasSuffix(":30") }
-                    self.enabledExtraSpaceSlots = self.availableExtraSpaceSlots
-                case .failure(let error):
-                    Logger.shared.log("Error fetching extra space slots: \(error)")
+                if case .success(let slots) = result {
+                    self.availableExtraSpaceSlots = slots
+                    self.enabledExtraSpaceSlots = slots
                 }
                 completion?()
             }
@@ -467,669 +326,233 @@ class ReservationFlowViewModel: ObservableObject {
     func toggleExtraSpaceSlotSelection(_ slot: GamingSpaceTime) {
         if extraSpaceSelectedSlots.contains(where: { $0.id == slot.id }) {
             extraSpaceSelectedSlots.removeAll { $0.id == slot.id }
-        } else {
-            extraSpaceSelectedSlots.append(slot)
-        }
+        } else { extraSpaceSelectedSlots.append(slot) }
         updateEnabledExtraSpaceSlots()
     }
 
     func updateEnabledExtraSpaceSlots() {
-        guard !extraSpaceSelectedSlots.isEmpty else {
-            enabledExtraSpaceSlots = availableExtraSpaceSlots
-            return
-        }
-        let maxSlots = 3 // individual max
-        let sortedSelected = extraSpaceSelectedSlots.sorted { $0.value < $1.value }
-        let minValue = sortedSelected.first?.value ?? 0
-        let maxValue = sortedSelected.last?.value ?? 0
+        guard !extraSpaceSelectedSlots.isEmpty else { enabledExtraSpaceSlots = availableExtraSpaceSlots; return }
+        let sorted = extraSpaceSelectedSlots.sorted { $0.value < $1.value }
+        let minVal = sorted.first?.value ?? 0
+        let maxVal = sorted.last?.value ?? 0
         enabledExtraSpaceSlots = availableExtraSpaceSlots.filter { slot in
-            (slot.value >= minValue && slot.value <= maxValue + 1 && slot.value <= minValue + (maxSlots - 1))
+            (slot.value >= minVal && slot.value <= maxVal + 1 && slot.value <= minVal + 2)
             || extraSpaceSelectedSlots.contains(where: { $0.id == slot.id })
         }
     }
 
     func resetExtraSpaceSelection() {
-        wantsExtraSpace = false
-        extraSpace = nil
-        extraSpaceSelectedSlots = []
-        availableExtraSpaceSlots = []
-        enabledExtraSpaceSlots = []
+        wantsExtraSpace = false; extraSpace = nil; extraSpaceSelectedSlots = []; availableExtraSpaceSlots = []; enabledExtraSpaceSlots = []
     }
 
     // MARK: - Cross-blocking entre reserva principal y add-on
 
-    /// Extrae la hora (Int) de un string "HH:mm"
     private func hourFromTime(_ time: String) -> Int? {
-        guard let hourStr = time.split(separator: ":").first else { return nil }
-        return Int(hourStr)
+        guard let h = time.split(separator: ":").first else { return nil }
+        return Int(h)
     }
 
-    /// Horas ocupadas por la reserva principal → bloquea slots del simulador
-    /// Ej: si seleccionas Xbox 18:00, 19:00, 20:00 → en simulador se bloquean 18:00, 18:30, 19:00, 19:30, 20:00, 20:30
     func isSimulatorSlotBlockedByMain(_ slot: GamingSpaceTime) -> Bool {
-        let blockedHours = Set(selectedSlots.compactMap { hourFromTime($0.time) })
-        guard let slotHour = hourFromTime(slot.time) else { return false }
-        return blockedHours.contains(slotHour)
+        let blocked = Set(selectedSlots.compactMap { hourFromTime($0.time) })
+        guard let h = hourFromTime(slot.time) else { return false }
+        return blocked.contains(h)
     }
 
-    /// Horas ocupadas por el simulador → bloquea slots del espacio extra
-    /// Ej: si seleccionas Simulador 17:00 (o 17:30) → en espacio extra se bloquea 17:00
     func isExtraSpaceSlotBlockedBySimulator(_ slot: GamingSpaceTime) -> Bool {
-        let blockedHours = Set(selectedSlots.compactMap { hourFromTime($0.time) })
-        guard let slotHour = hourFromTime(slot.time) else { return false }
-        return blockedHours.contains(slotHour)
+        let blocked = Set(selectedSlots.compactMap { hourFromTime($0.time) })
+        guard let h = hourFromTime(slot.time) else { return false }
+        return blocked.contains(h)
     }
 
-    // MARK: - Enviar email de reserva
-
-    private func formatDateForEmail(_ date: Date) -> String {
-        let fmt = DateFormatter()
-        fmt.dateFormat = "dd/MM/yyyy"
-        return fmt.string(from: date)
-    }
-
-    private func formatTimesForEmail(_ slots: [GamingSpaceTime]) -> String {
-        slots.sorted { $0.value < $1.value }.map { $0.time }.joined(separator: " - ")
-    }
-
-    /// Email de reserva individual (con posible simulador extra O espacio extra)
-    private func sendIndividualReservationEmail() {
-        guard let date = selectedDate,
-              let device = selectedSpace?.device,
-              let user = userManager.getUser(),
-              let email = user.email, !email.isEmpty else { return }
-
-        let firstName = user.firstName ?? ""
-        let dateStr = formatDateForEmail(date)
-        let timesStr = formatTimesForEmail(selectedSlots)
-
-        var extraBlock = ""
-
-        // Caso 1: Consola normal + simulador extra
-        if wantsSimulator, !simulatorSelectedSlots.isEmpty, let simDevice = simulatorSpace?.device {
-            let simTimes = simulatorSelectedSlots.sorted { $0.value < $1.value }.map { $0.time }.joined(separator: " - ")
-            extraBlock = "<p><strong><u>Reserva extra incluida:</u></strong><br><strong>Fecha:</strong> \(dateStr)<br><strong>Hora:</strong> \(simTimes)<br><strong>Dispositivo:</strong> \(simDevice)</p>"
-        }
-        // Caso 2: Simulador + espacio extra
-        else if wantsExtraSpace, !extraSpaceSelectedSlots.isEmpty, let extraDevice = extraSpace?.device {
-            let extraTimes = extraSpaceSelectedSlots.sorted { $0.value < $1.value }.map { $0.time }.joined(separator: " - ")
-            extraBlock = "<p><strong><u>Reserva extra incluida:</u></strong><br><strong>Fecha:</strong> \(dateStr)<br><strong>Hora:</strong> \(extraTimes)<br><strong>Dispositivo:</strong> \(extraDevice)</p>"
-        }
-
-        reservationService.sendReservationEmail(
-            email: email, firstName: firstName,
-            date: dateStr, times: timesStr,
-            device: device, extraBlock: extraBlock
-        )
-    }
-
-    /// Email de reserva de equipo centre a un jugador (sin simulador)
-    private func sendTeamReservationEmail(playerEmail: String, playerName: String) {
-        guard let date = selectedDate,
-              let device = selectedSpace?.device,
-              !playerEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-
-        reservationService.sendReservationEmail(
-            email: playerEmail, firstName: playerName,
-            date: formatDateForEmail(date),
-            times: formatTimesForEmail(selectedSlots),
-            device: device, extraBlock: ""
-        )
-    }
-
-    /// Email de training virtual a un jugador
-    private func sendVirtualTrainingEmail(playerEmail: String, playerName: String) {
-        guard let date = selectedDate,
-              !playerEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-
-        reservationService.sendReservationEmail(
-            email: playerEmail, firstName: playerName,
-            date: formatDateForEmail(date),
-            times: selectedTime,
-            device: "Virtual", extraBlock: ""
-        )
-    }
-
-    // MARK: - Crear reserva individual
+    // MARK: - Acciones de reserva
 
     func createReservation() {
         guard let date = selectedDate,
               let space = selectedSpace,
               let userId = userManager.getUser()?.id,
-              !selectedSlots.isEmpty else {
-            Logger.shared.log("Datos incompletos para crear la reserva")
-            return
-        }
+              !selectedSlots.isEmpty else { return }
+
+        isCreatingReservation = true
         let teamId = personalReservations ? nil : userManager.getSelectedTeam()?.id
-        let reservation = Reservation(
-            id: 0, status: "active",
-            slot: space.slots.first ?? Slot(id: 0, position: "", space: 0),
-            date: date, user: userId, team: teamId,
-            training: nil, qrImage: nil, qrValue: nil,
-            times: selectedSlots, peripheralLoans: []
-        )
-        self.isCreatingReservation = true
-        reservationService.createReservation(reservation: reservation) { [weak self] result in
+        let slot = space.slots.first ?? Slot(id: 0, position: "", space: 0)
+
+        apiManager.createIndividualReservation(date: date, slot: slot, userId: userId, teamId: teamId, times: selectedSlots) { [weak self] result in
             DispatchQueue.main.async {
-                self?.isLoading = false
+                guard let self else { return }
                 switch result {
-                case .success(let r): self?.updateReservationWithQR(reservationInfo: r)
-                case .failure(let error):
-                    self?.isCreatingReservation = false
-                    self?.reservationSuccess = false
-                    self?.onReservationFail()
-                    Logger.shared.log("Error al crear la reserva: \(error.localizedDescription)")
+                case .success(let reserveResponse):
+                    self.apiManager.uploadQRAndUpdateReservation(reservationInfo: reserveResponse, times: self.selectedSlots) { [weak self] qrResult in
+                        DispatchQueue.main.async {
+                            guard let self else { return }
+                            switch qrResult {
+                            case .success:
+                                self.createAddonIfNeeded { [weak self] addonSuccess in
+                                    DispatchQueue.main.async {
+                                        guard let self else { return }
+                                        self.sendEmailWithAddon()
+                                        self.isCreatingReservation = false
+                                        if addonSuccess {
+                                            self.reservationSuccess = true; self.onReservationSuccess()
+                                        } else {
+                                            self.reservationSuccess = false; self.onReservationFail()
+                                        }
+                                    }
+                                }
+                            case .failure:
+                                self.isCreatingReservation = false; self.reservationSuccess = false; self.onReservationFail()
+                            }
+                        }
+                    }
+                case .failure:
+                    self.isCreatingReservation = false; self.reservationSuccess = false; self.onReservationFail()
                 }
             }
         }
     }
-
-    // MARK: - Crear reserva add-on (simulador extra o espacio extra)
-
-    /// Determina si hay un add-on pendiente de crear y lo crea.
-    /// Llama a completion(true) si se creó correctamente o no había add-on, completion(false) si falló.
-    private func createAddonReservationIfNeeded(completion: @escaping (Bool) -> Void) {
-        guard let date = selectedDate,
-              let userId = userManager.getUser()?.id else {
-            completion(true) // no hay datos, pero no es error de add-on
-            return
-        }
-
-        let dateFmt = DateFormatter()
-        dateFmt.dateFormat = "yyyy-MM-dd"
-        let dateString = dateFmt.string(from: date)
-
-        // Caso 1: Consola normal → añadir simulador
-        if wantsSimulator, !simulatorSelectedSlots.isEmpty, let simSpace = simulatorSpace {
-            let addonSlot = simSpace.slots.first ?? Slot(id: 0, position: "", space: 0)
-            let addonTimes = simulatorSelectedSlots.map { ["gaming_space_times_id": ["id": $0.id]] }
-
-            let body: [String: Any] = [
-                "date": dateString,
-                "user": userId,
-                "slot": addonSlot.id,
-                "times": addonTimes
-            ]
-
-            Task {
-                do {
-                    let response: ReserveResponseModel = try await DirectusService.shared.sendRequest(
-                        endpoint: "gaming_space_reserves",
-                        method: .POST,
-                        body: body
-                    )
-                    // Generar QR para la reserva add-on con los times del simulador
-                    await MainActor.run {
-                        self.generateAndUploadQR(for: response.data, times: self.simulatorSelectedSlots) {
-                            Logger.shared.log("Reserva add-on simulador creada con éxito")
-                            completion(true)
-                        }
-                    }
-                } catch {
-                    await MainActor.run {
-                        Logger.shared.log("Error al crear reserva add-on simulador: \(error.localizedDescription)")
-                        completion(false)
-                    }
-                }
-            }
-            return
-        }
-
-        // Caso 2: Simulador → añadir espacio extra
-        if wantsExtraSpace, !extraSpaceSelectedSlots.isEmpty, let extra = extraSpace {
-            let addonSlot = extra.slots.first ?? Slot(id: 0, position: "", space: 0)
-            let addonTimes = extraSpaceSelectedSlots.map { ["gaming_space_times_id": ["id": $0.id]] }
-
-            let body: [String: Any] = [
-                "date": dateString,
-                "user": userId,
-                "slot": addonSlot.id,
-                "times": addonTimes
-            ]
-
-            Task {
-                do {
-                    let response: ReserveResponseModel = try await DirectusService.shared.sendRequest(
-                        endpoint: "gaming_space_reserves",
-                        method: .POST,
-                        body: body
-                    )
-                    // Generar QR para la reserva add-on con los times del espacio extra
-                    await MainActor.run {
-                        self.generateAndUploadQR(for: response.data, times: self.extraSpaceSelectedSlots) {
-                            Logger.shared.log("Reserva add-on espacio extra creada con éxito")
-                            completion(true)
-                        }
-                    }
-                } catch {
-                    await MainActor.run {
-                        Logger.shared.log("Error al crear reserva add-on espacio extra: \(error.localizedDescription)")
-                        completion(false)
-                    }
-                }
-            }
-            return
-        }
-
-        // No hay add-on → todo OK
-        completion(true)
-    }
-
-    // MARK: - Actualizar reserva individual (edición)
 
     func updateIndividualReservation() {
         guard let reservationId = individualSelectedInformation?.id,
-              let date = selectedDate,
-              let space = selectedSpace,
-              !selectedSlots.isEmpty else {
-            Logger.shared.log("Datos incompletos para actualizar la reserva individual")
-            return
-        }
+              let date = selectedDate, let space = selectedSpace, !selectedSlots.isEmpty else { return }
 
         isCreatingReservation = true
+        let slot = space.slots.first ?? Slot(id: 0, position: "", space: 0)
 
-        let slotToUse = space.slots.first ?? Slot(id: 0, position: "", space: 0)
-        let timesMapped = selectedSlots.map { ["gaming_space_times_id": ["id": $0.id]] }
-
-        let dateFmt = DateFormatter()
-        dateFmt.dateFormat = "yyyy-MM-dd"
-
-        let body: [String: Any] = [
-            "date": dateFmt.string(from: date),
-            "slot": slotToUse.id,
-            "times": timesMapped
-        ]
-
-        Task {
-            do {
-                let _: ReserveResponseModel = try await DirectusService.shared.sendRequest(
-                    endpoint: "gaming_space_reserves/\(reservationId)",
-                    method: .PATCH,
-                    body: body
-                )
-                await MainActor.run {
-                    self.isCreatingReservation = false
-                    self.reservationSuccess = true
-                    self.onReservationSuccess()
-                    Logger.shared.log("Reserva individual actualizada correctamente")
-                }
-            } catch {
-                await MainActor.run {
-                    self.isCreatingReservation = false
-                    self.reservationSuccess = false
-                    self.onReservationFail()
-                    Logger.shared.log("Error al actualizar reserva individual: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
-
-    // MARK: - Actualizar reserva con QR + add-on + envío de email
-
-    func updateReservationWithQR(reservationInfo: ReserveResponse) {
-        guard let reservationId = reservationInfo.id,
-              let qrValue = reservationInfo.qrValue,
-              let date = selectedDate,
-              let space = selectedSpace,
-              let userId = userManager.getUser()?.id,
-              !selectedSlots.isEmpty,
-              let qrImage = QRCodeGenerator.generateQRCode(with: qrValue) else {
-            Logger.shared.log("Datos incompletos para actualizar la reserva con QR")
-            return
-        }
-        UploadImageService().uploadImage(image: qrImage, fileName: "\(qrValue).jpg") { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let response):
-                guard let data = response.data(using: .utf8),
-                      let decoded = try? JSONDecoder().decode(SendImageResponse.self, from: data) else {
-                    Logger.shared.log("Error al decodificar respuesta de imagen")
-                    return
-                }
-                let fileId = decoded.data.id
-                let reservation = Reservation(
-                    id: 0, status: "active",
-                    slot: space.slots.first ?? Slot(id: 0, position: "", space: 0),
-                    date: date, user: userId, team: nil,
-                    training: nil, qrImage: fileId, qrValue: qrValue,
-                    times: self.selectedSlots, peripheralLoans: []
-                )
-                self.reservationService.updateExistingReservation(reservationId: reservationId, qrImage: fileId, reservation: reservation) { result in
-                    DispatchQueue.main.async {
-                        self.isLoading = false
-                        switch result {
-                        case .success:
-                            // Reserva principal OK → crear add-on si lo hay
-                            self.createAddonReservationIfNeeded { addonSuccess in
-                                DispatchQueue.main.async {
-                                    self.sendIndividualReservationEmail()
-                                    self.isCreatingReservation = false
-
-                                    if addonSuccess {
-                                        self.reservationSuccess = true
-                                        self.onReservationSuccess()
-                                    } else {
-                                        // La principal se creó pero el add-on falló
-                                        self.reservationSuccess = false
-                                        self.onReservationFail()
-                                        Logger.shared.log("Reserva principal creada pero el add-on falló")
-                                    }
-                                }
-                            }
-                        case .failure(let error):
-                            self.isCreatingReservation = false
-                            self.reservationSuccess = false
-                            self.onReservationFail()
-                            Logger.shared.log("Error al actualizar la reserva: \(error.localizedDescription)")
-                        }
-                    }
-                }
-            case .failure(let error):
-                Logger.shared.log("Error al subir la imagen: \(error.localizedDescription)")
+        apiManager.updateIndividualReservation(reservationId: reservationId, date: date, slot: slot, times: selectedSlots) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
                 self.isCreatingReservation = false
-                self.reservationSuccess = false
-                self.onReservationFail()
+                switch result {
+                case .success: self.reservationSuccess = true; self.onReservationSuccess()
+                case .failure: self.reservationSuccess = false; self.onReservationFail()
+                }
             }
         }
     }
-
-    // MARK: - Crear reserva de equipo (Training centre)
 
     func createTeamReservation() {
-        guard let date = selectedDate,
-              let space = selectedSpace,
-              let teamId = userManager.getSelectedTeam()?.id,
-              !selectedSlots.isEmpty else {
-            Logger.shared.log("Datos incompletos para crear la reserva de equipo")
-            return
-        }
+        guard let date = selectedDate, let space = selectedSpace,
+              let teamId = userManager.getSelectedTeam()?.id, !selectedSlots.isEmpty else { return }
 
-        let playerIdsAndEmails = selectedPlayers.compactMap { username -> (id: String, email: String)? in
-            guard let user = teamPlayers.first(where: { $0.usersId?.username == username }),
-                  let id = user.usersId?.id else { return nil }
-            let email = user.usersId?.email ?? ""
-            return (id: id, email: email)
-        }
-
-        let playerIds = playerIdsAndEmails.map { $0.id }
-
-        let dateFmt = DateFormatter()
-        dateFmt.dateFormat = "yyyy-MM-dd"
-        let dateString = dateFmt.string(from: date)
-        let timeString = selectedSlots.sorted { $0.value < $1.value }.first?.time ?? selectedTime
-        let typeValue = ReservationFlowViewModel.spaceTypeToBackend(selectedSpaceType)
-        let slotToUse = space.slots.first ?? Slot(id: 0, position: "", space: 0)
+        let players = resolvePlayerTuples()
+        let time = selectedSlots.sorted { $0.value < $1.value }.first?.time ?? selectedTime
+        let spaceType = Self.spaceTypeToBackend(selectedSpaceType)
 
         isCreatingReservation = true
-
-        let trainingRequest = TrainingRequest(
-            status: "active", type: typeValue,
-            startDate: dateString, time: timeString,
-            teamId: teamId, notes: reservationNotes,
-            playerIds: playerIds, reserveIds: []
-        )
-
-        reservationService.createTraining(request: trainingRequest) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let trainingResponse):
-                guard let trainingId = trainingResponse.id else {
-                    DispatchQueue.main.async {
-                        self.isCreatingReservation = false
-                        self.onReservationFail()
-                    }
-                    return
-                }
-
-                let group = DispatchGroup()
-                var reserveIds: [Int] = []
-                var hasError = false
-
-                for player in playerIdsAndEmails {
-                    group.enter()
-
-                    let reservation = Reservation(
-                        id: 0, status: "active",
-                        slot: slotToUse,
-                        date: date, user: player.id, team: teamId,
-                        training: trainingId,
-                        qrImage: nil, qrValue: nil,
-                        times: self.selectedSlots, peripheralLoans: []
-                    )
-
-                    self.reservationService.createReservation(reservation: reservation) { [weak self] result in
-                        guard let self = self else { group.leave(); return }
-                        switch result {
-                        case .success(let reserveResponse):
-                            guard let reserveId = reserveResponse.id else {
-                                hasError = true
-                                group.leave()
-                                return
-                            }
-                            reserveIds.append(reserveId)
-                            self.generateAndUploadQR(for: reserveResponse) {
-                                let playerName = self.teamPlayers.first(where: { $0.usersId?.id == player.id })?.usersId?.username ?? ""
-                                self.sendTeamReservationEmail(playerEmail: player.email, playerName: playerName)
-                                group.leave()
-                            }
-                        case .failure(let error):
-                            hasError = true
-                            Logger.shared.log("Error al crear reserve para jugador: \(error.localizedDescription)")
-                            group.leave()
-                        }
-                    }
-                }
-
-                group.notify(queue: .main) { [weak self] in
-                    guard let self = self else { return }
-
-                    if hasError || reserveIds.isEmpty {
-                        self.isCreatingReservation = false
-                        self.onReservationFail()
-                        return
-                    }
-
-                    self.reservationService.linkReservesToTraining(
-                        trainingId: trainingId,
-                        reserveIds: reserveIds
-                    ) { [weak self] result in
-                        guard let self = self else { return }
-                        DispatchQueue.main.async {
-                            self.isCreatingReservation = false
-                            switch result {
-                            case .success:
-                                self.reservationSuccess = true
-                                self.onReservationSuccess()
-                                Logger.shared.log("Training centre creado con \(reserveIds.count) reserves")
-                            case .failure(let error):
-                                self.reservationSuccess = false
-                                self.onReservationFail()
-                                Logger.shared.log("Error al vincular reserves: \(error.localizedDescription)")
-                            }
-                        }
-                    }
-                }
-
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.isCreatingReservation = false
-                    self.onReservationFail()
-                    Logger.shared.log("Error al crear el training: \(error.localizedDescription)")
+        apiManager.createTeamTraining(date: date, space: space, teamId: teamId, notes: reservationNotes, spaceType: spaceType, time: time, players: players, selectedSlots: selectedSlots) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.isCreatingReservation = false
+                switch result {
+                case .success: self.reservationSuccess = true; self.onReservationSuccess()
+                case .failure: self.reservationSuccess = false; self.onReservationFail()
                 }
             }
         }
     }
-
-    // MARK: - Helper: Generar y subir QR
-
-    private func generateAndUploadQR(for reserveResponse: ReserveResponse, times: [GamingSpaceTime]? = nil, completion: @escaping () -> Void) {
-        guard let reserveId = reserveResponse.id,
-              let qrValue = reserveResponse.qrValue,
-              let qrImage = QRCodeGenerator.generateQRCode(with: qrValue) else {
-            completion()
-            return
-        }
-
-        // Usar los times pasados por parámetro, o los de la reserva principal por defecto
-        let timesToUse = times ?? selectedSlots
-
-        UploadImageService().uploadImage(image: qrImage, fileName: "\(qrValue).jpg") { [weak self] result in
-            guard let self else { completion(); return }
-            switch result {
-            case .success(let response):
-                guard let data = response.data(using: .utf8),
-                      let decoded = try? JSONDecoder().decode(SendImageResponse.self, from: data) else {
-                    completion()
-                    return
-                }
-                let fileId = decoded.data.id
-
-                self.reservationService.updateExistingReservation(
-                    reservationId: reserveId,
-                    qrImage: fileId,
-                    reservation: Reservation(
-                        id: reserveId, status: "active",
-                        slot: Slot(id: 0, position: "", space: 0),
-                        date: Date(), user: nil, team: nil,
-                        training: nil, qrImage: fileId, qrValue: qrValue,
-                        times: timesToUse, peripheralLoans: []
-                    )
-                ) { _ in
-                    completion()
-                }
-
-            case .failure(let error):
-                Logger.shared.log("Error al subir QR: \(error.localizedDescription)")
-                completion()
-            }
-        }
-    }
-
-    // MARK: - Editar reserva de equipo centre (solo jugadores)
 
     func updateCenterTeamReservation() {
-        guard let trainingId = teamSelectedInformation?.id else {
-            Logger.shared.log("Datos incompletos para actualizar la reserva de equipo")
-            return
-        }
-
+        guard let trainingId = teamSelectedInformation?.id else { return }
         let playerIds = selectedPlayers.compactMap { username in
             teamPlayers.first { $0.usersId?.username == username }?.usersId?.id
         }
-
         isCreatingReservation = true
-
-        reservationService.updateTrainingPlayers(
-            trainingId: trainingId,
-            playerIds: playerIds
-        ) { [weak self] result in
-            guard let self else { return }
+        apiManager.updateTrainingPlayers(trainingId: trainingId, playerIds: playerIds) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self else { return }
                 self.isCreatingReservation = false
                 switch result {
-                case .success:
-                    self.reservationSuccess = true
-                    self.onReservationSuccess()
-                case .failure(let error):
-                    self.reservationSuccess = false
-                    self.onReservationFail()
-                    Logger.shared.log("Error al actualizar jugadores: \(error.localizedDescription)")
+                case .success: self.reservationSuccess = true; self.onReservationSuccess()
+                case .failure: self.reservationSuccess = false; self.onReservationFail()
                 }
             }
         }
     }
-
-    // MARK: - Crear training virtual
 
     func createVirtualTeamReservation() {
         guard let date = selectedDate,
-              let teamId = userManager.getSelectedTeam()?.id,
-              !selectedTime.isEmpty else {
-            Logger.shared.log("Datos incompletos para crear reserva virtual")
-            return
-        }
+              let teamId = userManager.getSelectedTeam()?.id, !selectedTime.isEmpty else { return }
 
-        let dateFmt = DateFormatter()
-        dateFmt.dateFormat = "yyyy-MM-dd"
-
-        let playerIdsAndEmails = selectedPlayers.compactMap { username -> (id: String, email: String)? in
-            guard let user = teamPlayers.first(where: { $0.usersId?.username == username }),
-                  let id = user.usersId?.id else { return nil }
-            let email = user.usersId?.email ?? ""
-            return (id: id, email: email)
-        }
-
-        let playerIds = playerIdsAndEmails.map { $0.id }
-
+        let players = resolvePlayerTuples()
         isCreatingReservation = true
 
-        let body: [String: Any] = [
-            "status":     "active",
-            "type":       "virtual",
-            "start_date": dateFmt.string(from: date),
-            "time":       selectedTime,
-            "team":       teamId,
-            "notes":      reservationNotes,
-            "players":    playerIds.map { ["users_id": $0] }
-        ]
-
-        Task {
-            do {
-                let _: TrainingResponseModel = try await DirectusService.shared.sendRequest(
-                    endpoint: "trainings",
-                    method: .POST,
-                    body: body
-                )
-                await MainActor.run {
-                    self.isCreatingReservation = false
-                    self.reservationSuccess = true
-                    self.onReservationSuccess()
-                    Logger.shared.log("Training virtual creado correctamente")
-
-                    for player in playerIdsAndEmails {
-                        let playerName = self.teamPlayers.first(where: { $0.usersId?.id == player.id })?.usersId?.username ?? ""
-                        self.sendVirtualTrainingEmail(playerEmail: player.email, playerName: playerName)
-                    }
-                }
-            } catch {
-                await MainActor.run {
-                    self.isCreatingReservation = false
-                    self.reservationSuccess = false
-                    self.onReservationFail()
-                    Logger.shared.log("Error al crear training virtual: \(error.localizedDescription)")
+        apiManager.createVirtualTraining(date: date, teamId: teamId, time: selectedTime, notes: reservationNotes, players: players) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.isCreatingReservation = false
+                switch result {
+                case .success: self.reservationSuccess = true; self.onReservationSuccess()
+                case .failure: self.reservationSuccess = false; self.onReservationFail()
                 }
             }
         }
     }
 
-    // MARK: - Editar training virtual (solo jugadores)
-
     func updateVirtualTeamReservation() {
         guard let trainingId = teamSelectedInformation?.id else { return }
-
         let playerIds = selectedPlayers.compactMap { username -> String? in
             teamPlayers.first { $0.usersId?.username == username }?.usersId?.id
         }
-
         isCreatingReservation = true
-
-        reservationService.updateTrainingPlayers(
-            trainingId: trainingId,
-            playerIds: playerIds
-        ) { [weak self] result in
-            guard let self else { return }
+        apiManager.updateTrainingPlayers(trainingId: trainingId, playerIds: playerIds) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self else { return }
                 self.isCreatingReservation = false
                 switch result {
-                case .success:
-                    self.reservationSuccess = true
-                    self.onReservationSuccess()
-                case .failure(let error):
-                    self.reservationSuccess = false
-                    self.onReservationFail()
-                    Logger.shared.log("Error al actualizar jugadores virtual: \(error.localizedDescription)")
+                case .success: self.reservationSuccess = true; self.onReservationSuccess()
+                case .failure: self.reservationSuccess = false; self.onReservationFail()
                 }
             }
         }
+    }
+
+    // MARK: - Helpers privados
+
+    private func createAddonIfNeeded(completion: @escaping (Bool) -> Void) {
+        guard let date = selectedDate, let userId = userManager.getUser()?.id else { completion(true); return }
+
+        if wantsSimulator, !simulatorSelectedSlots.isEmpty, let simSpace = simulatorSpace {
+            let slot = simSpace.slots.first ?? Slot(id: 0, position: "", space: 0)
+            apiManager.createAddonReservation(date: date, userId: userId, addonSlot: slot, addonTimes: simulatorSelectedSlots) { result in
+                completion(result.isSuccess)
+            }
+            return
+        }
+
+        if wantsExtraSpace, !extraSpaceSelectedSlots.isEmpty, let extra = extraSpace {
+            let slot = extra.slots.first ?? Slot(id: 0, position: "", space: 0)
+            apiManager.createAddonReservation(date: date, userId: userId, addonSlot: slot, addonTimes: extraSpaceSelectedSlots) { result in
+                completion(result.isSuccess)
+            }
+            return
+        }
+
+        completion(true)
+    }
+
+    private func sendEmailWithAddon() {
+        guard let date = selectedDate, let device = selectedSpace?.device else { return }
+        let extraBlock = apiManager.buildExtraBlock(
+            date: date,
+            wantsSimulator: wantsSimulator, simulatorSlots: simulatorSelectedSlots, simulatorDevice: simulatorSpace?.device,
+            wantsExtraSpace: wantsExtraSpace, extraSpaceSlots: extraSpaceSelectedSlots, extraSpaceDevice: extraSpace?.device
+        )
+        apiManager.sendIndividualReservationEmail(date: date, device: device, times: selectedSlots, extraBlock: extraBlock)
+    }
+
+    private func resolvePlayerTuples() -> [(id: String, email: String, name: String)] {
+        selectedPlayers.compactMap { username -> (id: String, email: String, name: String)? in
+            guard let user = teamPlayers.first(where: { $0.usersId?.username == username }),
+                  let id = user.usersId?.id else { return nil }
+            return (id: id, email: user.usersId?.email ?? "", name: username)
+        }
+    }
+}
+
+// MARK: - Result extension helper
+
+extension Result {
+    var isSuccess: Bool {
+        if case .success = self { return true }
+        return false
     }
 }

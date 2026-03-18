@@ -8,11 +8,11 @@ struct ReservationSummaryView: View {
         VStack(spacing: 4) {
             Text(viewModel.teamSelectedInformation != nil && !viewModel.personalReservations
                  ? "Editar jugadores".localized : "Reservar espacio".localized)
-                .font(.system(size: 22, weight: .bold))
+                .font(.madridInGameiOSFont(size: 22))
                 .foregroundColor(.white)
             if !viewModel.summaryTokens.isEmpty {
                 Text(viewModel.summaryTokens.joined(separator: " · "))
-                    .font(.system(size: 13)).foregroundColor(.white.opacity(0.6))
+                    .font(.madridInGameiOSFont(size: 13)).foregroundColor(.white.opacity(0.6))
                     .lineLimit(2).multilineTextAlignment(.center).transition(.opacity)
             }
         }
@@ -137,7 +137,7 @@ private struct PrimaryButton: View {
     let title: String; let enabled: Bool; let action: () -> Void
     var body: some View {
         Button(action: action) {
-            Text(title).font(.system(size: 15, weight: .semibold)).frame(maxWidth: .infinity)
+            Text(title).font(.madridInGameiOSFont(size: 15)).frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(enabled ? Color.cyan : Color.clear)
                 .foregroundColor(enabled ? .black : .white.opacity(0.4))
@@ -151,7 +151,7 @@ private struct SecondaryButton: View {
     let title: String; let action: () -> Void
     var body: some View {
         Button(action: action) {
-            Text(title).font(.system(size: 15, weight: .medium)).frame(maxWidth: .infinity)
+            Text(title).font(.madridInGameiOSFont(size: 15)).frame(maxWidth: .infinity)
                 .padding(.vertical, 14).background(Color.clear).foregroundColor(.white.opacity(0.7))
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.2), lineWidth: 1))
                 .cornerRadius(12)
@@ -163,7 +163,7 @@ private struct PillButton: View {
     let title: String; let isSelected: Bool; let isEnabled: Bool; let action: () -> Void
     var body: some View {
         Button(action: action) {
-            Text(title).font(.system(size: 14, weight: .medium)).frame(width: 100, height: 44)
+            Text(title).font(.madridInGameiOSFont(size: 14)).frame(width: 100, height: 44)
                 .background(isSelected ? Color.cyan : Color.clear)
                 .foregroundColor(isSelected ? .black : isEnabled ? .white : .white.opacity(0.25))
                 .overlay(RoundedRectangle(cornerRadius: 22).stroke(isSelected ? Color.clear : isEnabled ? Color.white.opacity(0.4) : Color.white.opacity(0.12), lineWidth: 1))
@@ -182,7 +182,7 @@ struct SelectPlaceAndNotesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Seleccionar Espacio".localized).font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+            Text("Seleccionar Espacio".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
             Menu {
                 ForEach(spaceTypes, id: \.self) { type in
                     Button(action: { viewModel.selectedSpaceType = type }) {
@@ -192,6 +192,7 @@ struct SelectPlaceAndNotesView: View {
             } label: {
                 HStack {
                     Text(viewModel.selectedSpaceType ?? "Selecciona tipo".localized)
+                        .font(.madridInGameiOSFont(size: 15))
                         .foregroundColor(viewModel.selectedSpaceType == nil ? .white.opacity(0.4) : .white)
                     Spacer()
                     Image(systemName: "chevron.down").foregroundColor(.white.opacity(0.4)).font(.system(size: 14))
@@ -204,9 +205,9 @@ struct SelectPlaceAndNotesView: View {
 
             ZStack(alignment: .topLeading) {
                 if viewModel.reservationNotes.isEmpty {
-                    Text("Notas (Opcional)".localized).foregroundColor(.white.opacity(0.3)).padding(.horizontal, 16).padding(.vertical, 16)
+                    Text("Notas (Opcional)".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.3)).padding(.horizontal, 16).padding(.vertical, 16)
                 }
-                TextEditor(text: $viewModel.reservationNotes).foregroundColor(.white).scrollContentBackground(.hidden)
+                TextEditor(text: $viewModel.reservationNotes).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white).scrollContentBackground(.hidden)
                     .padding(.horizontal, 12).padding(.vertical, 12).frame(minHeight: 100).focused($notesIsFocused)
             }
             .background(Color.white.opacity(0.06)).cornerRadius(12)
@@ -233,7 +234,7 @@ struct SelectPlayerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Seleccionar Jugador".localized).font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+            Text("Seleccionar Jugador".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
 
             Menu {
                 ForEach(viewModel.teamPlayers) { player in
@@ -250,7 +251,7 @@ struct SelectPlayerView: View {
                 }
             } label: {
                 HStack {
-                    Text("Selecciona un jugador".localized).foregroundColor(.white.opacity(0.4))
+                    Text("Selecciona un jugador".localized).font(.madridInGameiOSFont(size: 15)).foregroundColor(.white.opacity(0.4))
                     Spacer()
                     Image(systemName: "chevron.down").foregroundColor(.white.opacity(0.4)).font(.system(size: 14))
                 }
@@ -263,7 +264,7 @@ struct SelectPlayerView: View {
                 FlowLayout(spacing: 8) {
                     ForEach(viewModel.selectedPlayers, id: \.self) { player in
                         HStack(spacing: 6) {
-                            Text(player).font(.system(size: 13, weight: .medium)).foregroundColor(.white)
+                            Text(player).font(.madridInGameiOSFont(size: 13)).foregroundColor(.white)
                             Button(action: { viewModel.selectedPlayers.removeAll { $0 == player } }) {
                                 Image(systemName: "xmark").font(.system(size: 10, weight: .bold)).foregroundColor(.white.opacity(0.6))
                             }
@@ -309,17 +310,17 @@ struct SelectDateView: View {
             }
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("Selecciona una fecha".localized).font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+                    Text("Selecciona una fecha".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
                     Spacer()
                     Button { viewModel.showLegendPopup.toggle() } label: {
-                        Text("legend".localized).font(.system(size: 13)).foregroundColor(.cyan)
+                        Text("legend".localized).font(.madridInGameiOSFont(size: 13)).foregroundColor(.cyan)
                     }
                 }
                 if viewModel.isLoading {
                     VStack {
                         Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                         ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                        Text("Cargando fechas disponibles...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                        Text("Cargando fechas disponibles...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                     }.frame(maxWidth: .infinity, maxHeight: .infinity).onAppear { viewModel.getBlockedDays() }
                 } else {
                     CustomCalendarView(canUserInteract: true, markedDates: viewModel.markedDates, initialSelectedDate: viewModel.selectedDate) { viewModel.checkSelectedDate($0) }
@@ -342,10 +343,10 @@ struct SelectTimeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Seleccionar Hora".localized).font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+            Text("Seleccionar Hora".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
             VStack(alignment: .leading, spacing: 4) {
-                Text("Fecha seleccionada".localized).font(.system(size: 12, weight: .medium)).foregroundColor(.white.opacity(0.4))
-                Text(viewModel.selectedDate?.toUIDateString() ?? "").font(.system(size: 24, weight: .bold)).foregroundColor(.white).lineLimit(1).minimumScaleFactor(0.7)
+                Text("Fecha seleccionada".localized).font(.madridInGameiOSFont(size: 12)).foregroundColor(.white.opacity(0.4))
+                Text(viewModel.selectedDate?.toUIDateString() ?? "").font(.madridInGameiOSFont(size: 24)).foregroundColor(.white).lineLimit(1).minimumScaleFactor(0.7)
             }
             .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 16).padding(.vertical, 16)
             .background(Color.white.opacity(0.06)).cornerRadius(12)
@@ -380,8 +381,6 @@ struct SelectSlotView: View {
     private var isEditing: Bool { viewModel.individualSelectedInformation != nil || viewModel.teamSelectedInformation != nil }
     private var canReserve: Bool { viewModel.selectedSpace != nil && !viewModel.selectedSlots.isEmpty && viewModel.selectedDate != nil }
 
-    /// En individual, si el espacio NO es simulador, el botón va al paso de preguntar simulador
-    /// Si ES simulador, va al paso de preguntar espacio extra
     private var shouldGoToAskAddon: Bool {
         viewModel.personalReservations && !isEditing
     }
@@ -392,16 +391,16 @@ struct SelectSlotView: View {
                 VStack {
                     Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                    Text("Creando la reserva...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                    Text("Creando la reserva...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                Text("Selecciona franja horaria".localized).font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+                Text("Selecciona franja horaria".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
 
                 if viewModel.availableSlots.isEmpty {
                     VStack {
                         Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                         ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                        Text("Cargando horarios disponibles...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                        Text("Cargando horarios disponibles...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                     }.frame(maxWidth: .infinity, maxHeight: .infinity)
                     .onAppear { viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate)) }
                 } else {
@@ -414,16 +413,14 @@ struct SelectSlotView: View {
 
                 let isSim = viewModel.selectedSpace?.device.lowercased().contains("simulador") ?? false
                 Text(isSim ? "Máximo 1 spots consecutivos".localized : (viewModel.personalReservations ? "Máximo 3 spots consecutivos".localized : "Máximo 2 spots consecutivos".localized))
-                    .font(.system(size: 12)).foregroundColor(.white.opacity(0.35)).frame(maxWidth: .infinity)
+                    .font(.madridInGameiOSFont(size: 12)).foregroundColor(.white.opacity(0.35)).frame(maxWidth: .infinity)
 
                 Spacer()
                 SecondaryButton(title: "Atrás".localized) { viewModel.currentStep -= 1 }
 
                 if shouldGoToAskAddon {
-                    // Individual → ir a preguntar add-on (simulador o espacio extra)
                     PrimaryButton(title: "Siguiente".localized, enabled: canReserve) { currentStep += 1 }
                 } else {
-                    // Equipo o edición → reservar/guardar directo
                     PrimaryButton(title: isEditing ? "Guardar".localized : "Reservar".localized, enabled: canReserve) {
                         if viewModel.personalReservations {
                             if viewModel.individualSelectedInformation != nil { viewModel.updateIndividualReservation() }
@@ -462,7 +459,7 @@ struct AskSimulatorView: View {
                 VStack {
                     Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                    Text("Creando la reserva...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                    Text("Creando la reserva...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 Spacer()
@@ -474,13 +471,13 @@ struct AskSimulatorView: View {
                     )
 
                 Text("¿Quieres añadir tiempo de simulador?".localized)
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.madridInGameiOSFont(size: 20))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
 
                 Text("Puedes reservar un slot de simulador adicional junto a tu reserva actual.".localized)
-                    .font(.system(size: 14))
+                    .font(.madridInGameiOSFont(size: 14))
                     .foregroundColor(.white.opacity(0.5))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 30)
@@ -507,7 +504,7 @@ struct AskSimulatorView: View {
                     currentStep += 1
                 }) {
                     Text("Sí, añadir simulador".localized)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.madridInGameiOSFont(size: 15))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .background(
@@ -537,17 +534,17 @@ struct SelectSimulatorSlotView: View {
                 VStack {
                     Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                    Text("Creando la reserva...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                    Text("Creando la reserva...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 Text("Selecciona hora de simulador".localized)
-                    .font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+                    .font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
 
                 if viewModel.availableSimulatorSlots.isEmpty {
                     VStack {
                         Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                         ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                        Text("Cargando horarios de simulador...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                        Text("Cargando horarios de simulador...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                     }.frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
@@ -560,7 +557,7 @@ struct SelectSimulatorSlotView: View {
                 }
 
                 Text("Máximo 1 spot de simulador".localized)
-                    .font(.system(size: 12)).foregroundColor(.white.opacity(0.35)).frame(maxWidth: .infinity)
+                    .font(.madridInGameiOSFont(size: 12)).foregroundColor(.white.opacity(0.35)).frame(maxWidth: .infinity)
 
                 Spacer()
 
@@ -601,7 +598,7 @@ struct AskExtraSpaceView: View {
                 VStack {
                     Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                    Text("Creando la reserva...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                    Text("Creando la reserva...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 Spacer()
@@ -613,13 +610,13 @@ struct AskExtraSpaceView: View {
                     )
 
                 Text("¿Quieres añadir otro espacio?".localized)
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.madridInGameiOSFont(size: 20))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
 
                 Text("Puedes reservar un espacio de gaming adicional junto a tu reserva de simulador.".localized)
-                    .font(.system(size: 14))
+                    .font(.madridInGameiOSFont(size: 14))
                     .foregroundColor(.white.opacity(0.5))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 30)
@@ -644,7 +641,7 @@ struct AskExtraSpaceView: View {
                     currentStep += 1
                 }) {
                     Text("Sí, añadir espacio".localized)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.madridInGameiOSFont(size: 15))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .background(
@@ -669,13 +666,13 @@ struct SelectExtraSpaceView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Selecciona un espacio extra".localized)
-                .font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+                .font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
 
             if viewModel.nonSimulatorSpaces.isEmpty {
                 VStack {
                     Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                    Text("Cargando espacios disponibles...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                    Text("Cargando espacios disponibles...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
@@ -720,22 +717,22 @@ struct SelectExtraSlotView: View {
                 VStack {
                     Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                    Text("Creando la reserva...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                    Text("Creando la reserva...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 Text("Selecciona franja horaria".localized)
-                    .font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+                    .font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
 
                 if let device = viewModel.extraSpace?.device {
                     Text(device)
-                        .font(.system(size: 14)).foregroundColor(.cyan)
+                        .font(.madridInGameiOSFont(size: 14)).foregroundColor(.cyan)
                 }
 
                 if viewModel.availableExtraSpaceSlots.isEmpty {
                     VStack {
                         Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                         ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                        Text("Cargando horarios disponibles...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                        Text("Cargando horarios disponibles...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                     }.frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ScrollView {
@@ -748,7 +745,7 @@ struct SelectExtraSlotView: View {
                 }
 
                 Text("Máximo 3 spots consecutivos".localized)
-                    .font(.system(size: 12)).foregroundColor(.white.opacity(0.35)).frame(maxWidth: .infinity)
+                    .font(.madridInGameiOSFont(size: 12)).foregroundColor(.white.opacity(0.35)).frame(maxWidth: .infinity)
 
                 Spacer()
 
@@ -783,12 +780,12 @@ struct SelectSpaceView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Selecciona un espacio".localized).font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+            Text("Selecciona un espacio".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
             if viewModel.availableSpaces.isEmpty {
                 VStack {
                     Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
-                    Text("Cargando espacios disponibles...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                    Text("Cargando espacios disponibles...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                 }.frame(maxWidth: .infinity, maxHeight: .infinity).onAppear { viewModel.fetchAvailableSpaces() }
             } else {
                 ScrollView {
