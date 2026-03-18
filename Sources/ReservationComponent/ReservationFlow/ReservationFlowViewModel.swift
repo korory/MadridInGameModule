@@ -422,6 +422,8 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Actualizar reserva con QR + envío de email
+
     func updateReservationWithQR(reservationInfo: ReserveResponse) {
         guard let reservationId = reservationInfo.id,
               let qrValue = reservationInfo.qrValue,
@@ -455,6 +457,11 @@ class ReservationFlowViewModel: ObservableObject {
                         self.isLoading = false
                         switch result {
                         case .success:
+                            // ✅ Enviar email al usuario tras completar reserva individual + QR
+                            let userEmail = self.userManager.getUser()?.email ?? ""
+                            if !userEmail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                self.reservationService.sendReservationEmail(email: userEmail)
+                            }
                             self.isCreatingReservation = true
                             self.reservationSuccess = true
                             self.onReservationSuccess()
@@ -486,9 +493,14 @@ class ReservationFlowViewModel: ObservableObject {
             return
         }
 
-        let playerIds = selectedPlayers.compactMap { username in
-            teamPlayers.first { $0.usersId?.username == username }?.usersId?.id
+        let playerIdsAndEmails = selectedPlayers.compactMap { username -> (id: String, email: String)? in
+            guard let user = teamPlayers.first(where: { $0.usersId?.username == username }),
+                  let id = user.usersId?.id else { return nil }
+            let email = user.usersId?.email ?? ""
+            return (id: id, email: email)
         }
+
+        let playerIds = playerIdsAndEmails.map { $0.id }
 
         let dateFmt = DateFormatter()
         dateFmt.dateFormat = "yyyy-MM-dd"
@@ -521,13 +533,13 @@ class ReservationFlowViewModel: ObservableObject {
                     var reserveIds: [Int] = []
                     var hasError = false
 
-                    for playerId in playerIds {
+                    for player in playerIdsAndEmails {
                         group.enter()
 
                         let reservation = Reservation(
                             id: 0, status: "active",
                             slot: slotToUse,
-                            date: date, user: playerId, team: teamId,
+                            date: date, user: player.id, team: teamId,
                             training: trainingId,
                             qrImage: nil, qrValue: nil,
                             times: self.selectedSlots, peripheralLoans: []
@@ -545,6 +557,10 @@ class ReservationFlowViewModel: ObservableObject {
                                     }
                                     reserveIds.append(reserveId)
                                     self.generateAndUploadQR(for: reserveResponse) {
+                                        // ✅ Enviar email de equipo solo si el jugador tiene email válido
+                                        if !player.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                            self.reservationService.sendTeamReservationEmail(email: player.email)
+                                        }
                                         group.leave()
                                     }
                                 case .failure(let error):
@@ -638,7 +654,6 @@ class ReservationFlowViewModel: ObservableObject {
     }
 
     // MARK: - Editar reserva de equipo centre (Training existente)
-    // Actualmente solo actualiza jugadores. Para edición completa descomentar el bloque inferior.
 
     func updateCenterTeamReservation() {
         guard let trainingId = teamSelectedInformation?.id else {
@@ -670,59 +685,6 @@ class ReservationFlowViewModel: ObservableObject {
                 }
             }
         }
-
-        // MARK: Edición completa centre (fecha, slot, times, notas) — descomentar cuando se necesite
-        //
-        // guard let date = selectedDate,
-        //       let space = selectedSpace,
-        //       let reserveId = teamSelectedInformation?.reserves?.first?.id,
-        //       !selectedSlots.isEmpty else {
-        //     Logger.shared.log("Datos incompletos para actualizar la reserva de equipo")
-        //     return
-        // }
-        // let dateFmt = DateFormatter()
-        // dateFmt.dateFormat = "yyyy-MM-dd"
-        // let dateString = dateFmt.string(from: date)
-        // let timeString = selectedSlots.sorted { $0.value < $1.value }.first?.time ?? selectedTime
-        // let typeValue = ReservationFlowViewModel.spaceTypeToBackend(selectedSpaceType)
-        //
-        // isCreatingReservation = true
-        // reservationService.updateExistingReserveForTeam(
-        //     reserveId: reserveId,
-        //     date: date,
-        //     slot: space.slots.first ?? Slot(id: 0, position: "", space: 0),
-        //     times: selectedSlots
-        // ) { [weak self] result in
-        //     guard let self else { return }
-        //     DispatchQueue.main.async {
-        //         switch result {
-        //         case .success:
-        //             self.reservationService.updateTraining(
-        //                 trainingId: trainingId, type: typeValue,
-        //                 startDate: dateString, time: timeString,
-        //                 notes: self.reservationNotes, playerIds: playerIds
-        //             ) { [weak self] result in
-        //                 guard let self else { return }
-        //                 DispatchQueue.main.async {
-        //                     self.isCreatingReservation = false
-        //                     switch result {
-        //                     case .success:
-        //                         self.reservationSuccess = true
-        //                         self.onReservationSuccess()
-        //                     case .failure(let error):
-        //                         self.reservationSuccess = false
-        //                         self.onReservationFail()
-        //                         Logger.shared.log("Error al actualizar el training: \(error.localizedDescription)")
-        //                     }
-        //                 }
-        //             }
-        //         case .failure(let error):
-        //             self.isCreatingReservation = false
-        //             self.onReservationFail()
-        //             Logger.shared.log("Error al actualizar la reserve: \(error.localizedDescription)")
-        //         }
-        //     }
-        // }
     }
 
     // MARK: - Crear training virtual
@@ -738,9 +700,14 @@ class ReservationFlowViewModel: ObservableObject {
         let dateFmt = DateFormatter()
         dateFmt.dateFormat = "yyyy-MM-dd"
 
-        let playerIds = selectedPlayers.compactMap { username -> String? in
-            teamPlayers.first { $0.usersId?.username == username }?.usersId?.id
+        let playerIdsAndEmails = selectedPlayers.compactMap { username -> (id: String, email: String)? in
+            guard let user = teamPlayers.first(where: { $0.usersId?.username == username }),
+                  let id = user.usersId?.id else { return nil }
+            let email = user.usersId?.email ?? ""
+            return (id: id, email: email)
         }
+
+        let playerIds = playerIdsAndEmails.map { $0.id }
 
         isCreatingReservation = true
 
@@ -766,6 +733,13 @@ class ReservationFlowViewModel: ObservableObject {
                     self.reservationSuccess = true
                     self.onReservationSuccess()
                     Logger.shared.log("Training virtual creado correctamente")
+
+                    // ✅ Enviar email de equipo a cada jugador con email válido
+                    for player in playerIdsAndEmails {
+                        if !player.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            self.reservationService.sendTeamReservationEmail(email: player.email)
+                        }
+                    }
                 }
             } catch {
                 await MainActor.run {
@@ -779,7 +753,6 @@ class ReservationFlowViewModel: ObservableObject {
     }
 
     // MARK: - Editar training virtual
-    // Actualmente solo actualiza jugadores. Para edición completa descomentar el bloque inferior.
 
     func updateVirtualTeamReservation() {
         guard let trainingId = teamSelectedInformation?.id else { return }
@@ -808,38 +781,5 @@ class ReservationFlowViewModel: ObservableObject {
                 }
             }
         }
-
-        // MARK: Edición completa virtual (fecha, hora, notas) — descomentar cuando se necesite
-        //
-        // guard let date = selectedDate,
-        //       !selectedTime.isEmpty else { return }
-        //
-        // let dateFmt = DateFormatter()
-        // dateFmt.dateFormat = "yyyy-MM-dd"
-        //
-        // isCreatingReservation = true
-        //
-        // reservationService.updateTraining(
-        //     trainingId: trainingId,
-        //     type: "virtual",
-        //     startDate: dateFmt.string(from: date),
-        //     time: selectedTime,
-        //     notes: reservationNotes,
-        //     playerIds: playerIds
-        // ) { [weak self] result in
-        //     guard let self else { return }
-        //     DispatchQueue.main.async {
-        //         self.isCreatingReservation = false
-        //         switch result {
-        //         case .success:
-        //             self.reservationSuccess = true
-        //             self.onReservationSuccess()
-        //         case .failure(let error):
-        //             self.reservationSuccess = false
-        //             self.onReservationFail()
-        //             Logger.shared.log("Error al actualizar training virtual: \(error.localizedDescription)")
-        //         }
-        //     }
-        // }
     }
 }

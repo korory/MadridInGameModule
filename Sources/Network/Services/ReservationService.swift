@@ -89,7 +89,7 @@ struct TrainingRequest {
     let teamId: String
     let notes: String
     let playerIds: [String]
-    let reserveIds: [Int]       // 👈 Array de IDs de reserves
+    let reserveIds: [Int]
 }
 
 struct TrainingResponseModel: Codable {
@@ -105,6 +105,7 @@ class ReservationService {
     // MARK: - Crear reserve individual
 
     func createReservation(reservation: Reservation, completion: @escaping (Result<ReserveResponse, Error>) -> Void) {
+        // ⚠️ El email NO se envía aquí. Se envía desde el ViewModel después de generar el QR.
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
@@ -152,8 +153,6 @@ class ReservationService {
 
     func createTraining(request: TrainingRequest, completion: @escaping (Result<TrainingResponse, Error>) -> Void) {
         let playersMapped = request.playerIds.map { ["users_id": $0] }
-        // Directus O2M: pasar IDs directos para vincular items existentes
-        // Esto hace que Directus setee automáticamente el FK training en cada reserve
         let reservesMapped = request.reserveIds
 
         let body: [String: Any] = [
@@ -335,6 +334,56 @@ class ReservationService {
         }
     }
 
+    // MARK: - Flow IDs por entorno
+
+    private var isPro: Bool {
+        UserDefaults.standard.value(forKey: "selectedEnvironment") as? Bool ?? true
+    }
+
+    private var individualReservationFlowId: String {
+        isPro
+            ? "4740cad9-f737-4eea-abf4-228b1d606e30"
+            : "d0e0e727-d47f-48bd-92c9-85ba3046579f"
+    }
+
+    private var teamReservationFlowId: String {
+        isPro
+            ? "a9754b93-655a-488c-b43f-5501ae6c3b11"
+            : "3a753e17-6004-461d-b548-ad3cebdb3111"
+    }
+
+    // MARK: - Enviar email de reserva individual via Directus Flow
+
+    func sendReservationEmail(email: String) {
+        Task {
+            do {
+                try await DirectusService.shared.triggerFlow(
+                    flowId: individualReservationFlowId,
+                    body: ["email": email]
+                )
+                Logger.shared.log("Email de reserva individual enviado a \(email)")
+            } catch {
+                Logger.shared.log("Error al enviar email de reserva individual: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // MARK: - Enviar email de reserva de equipo via Directus Flow
+
+    func sendTeamReservationEmail(email: String) {
+        Task {
+            do {
+                try await DirectusService.shared.triggerFlow(
+                    flowId: teamReservationFlowId,
+                    body: ["email": email]
+                )
+                Logger.shared.log("Email de reserva de equipo enviado a \(email)")
+            } catch {
+                Logger.shared.log("Error al enviar email de reserva de equipo: \(error.localizedDescription)")
+            }
+        }
+    }
+
     // MARK: - Obtener trainings
 
     func getAllTrainings(teamId: String, userId: String, completion: @escaping (Result<[EventModel], Error>) -> Void) {
@@ -425,7 +474,7 @@ class ReservationService {
             }
         }
     }
-    
+
     func updateTrainingPlayers(
         trainingId: String,
         playerIds: [String],
@@ -470,19 +519,17 @@ class ReservationService {
 
     func deleteTraining(
         trainingId: String,
-        reserveIds: [Int],          // 👈 Ahora es array, vacío si es virtual
+        reserveIds: [Int],
         completion: @escaping (Result<Void, Error>) -> Void
     ) {
         Task {
             do {
-                // Borramos el training
                 try await DirectusService.shared.sendRequestWithoutDecode(
                     endpoint: "trainings/\(trainingId)",
                     method: .DELETE,
                     body: [:]
                 )
 
-                // Borramos todas las reserves asociadas
                 for reserveId in reserveIds {
                     try await DirectusService.shared.sendRequestWithoutDecode(
                         endpoint: "gaming_space_reserves/\(reserveId)",

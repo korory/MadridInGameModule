@@ -235,7 +235,7 @@ class UserManager {
     
     func fetchTeamsByUser(userId: String, completion: @escaping (Result<[TeamModelReal], Error>) -> Void) {
         let parameters = ["filter[users][users_id][_eq]": userId]
-        let fields = "id,name,description,picture,apply_membership,status,discord,users.roles.name,users.users_id.id,users.users_id.username,users.users_id.avatar, competitions.competitions_id,date_edited"
+        let fields = "id,name,description,picture,apply_membership,status,discord,users.roles.name,users.users_id.id,users.users_id.username,users.users_id.avatar,users.users_id.email,competitions.competitions_id,date_edited"
 
         Task {
             do {
