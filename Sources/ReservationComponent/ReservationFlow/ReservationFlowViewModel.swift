@@ -30,6 +30,13 @@ class ReservationFlowViewModel: ObservableObject {
     @Published var availableSimulatorSlots: [GamingSpaceTime] = []
     @Published var simulatorSpace: Space?
 
+    // MARK: - Extra space add-on (cuando elige simulador, ofrecer consola extra)
+    @Published var wantsExtraSpace: Bool = false
+    @Published var extraSpace: Space?
+    @Published var extraSpaceSelectedSlots: [GamingSpaceTime] = []
+    @Published var availableExtraSpaceSlots: [GamingSpaceTime] = []
+    @Published var enabledExtraSpaceSlots: [GamingSpaceTime] = []
+
     var onReservationSuccess: () -> Void
     var onReservationFail: () -> Void
 
@@ -39,11 +46,17 @@ class ReservationFlowViewModel: ObservableObject {
 
     var personalStepCount: Int {
         if isSelectedSpaceSimulator {
-            return 3
-        } else if wantsSimulator {
-            return 5
+            if wantsExtraSpace {
+                return 6 // date, space, slot, ask, extra space, extra slot
+            } else {
+                return 4 // date, space, slot, ask
+            }
         } else {
-            return 4
+            if wantsSimulator {
+                return 5 // date, space, slot, ask, sim slot
+            } else {
+                return 4 // date, space, slot, ask
+            }
         }
     }
 
@@ -402,6 +415,111 @@ class ReservationFlowViewModel: ObservableObject {
         availableSimulatorSlots = []
     }
 
+    // MARK: - Extra space add-on (inverso: simulador → añadir consola)
+
+    /// Espacios disponibles excepto simulador
+    var nonSimulatorSpaces: [Space] {
+        availableSpaces.filter { !$0.device.lowercased().contains("simulador") }
+    }
+
+    func selectExtraSpace(_ space: Space) {
+        if extraSpace?.id == space.id {
+            extraSpace = nil
+            availableExtraSpaceSlots = []
+            extraSpaceSelectedSlots = []
+            enabledExtraSpaceSlots = []
+        } else {
+            extraSpace = space
+            availableExtraSpaceSlots = []
+            extraSpaceSelectedSlots = []
+            enabledExtraSpaceSlots = []
+        }
+    }
+
+    /// Carga los slots para el espacio extra (sin medias horas, como consolas normales)
+    func fetchExtraSpaceSlots(completion: (() -> Void)? = nil) {
+        let dayValue = calculateDayValue(for: selectedDate)
+        WeekTimeService.shared.fetchWeekTimeByDay(dayValue: dayValue) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { completion?(); return }
+                switch result {
+                case .success(let slots):
+                    var newSlots: [GamingSpaceTime] = []
+                    for slot in slots { for time in slot.times { newSlots.append(time.gamingSpaceTime) } }
+                    let fmt = DateFormatter()
+                    fmt.dateFormat = "HH:mm"
+                    fmt.locale = Locale(identifier: "es_ES")
+                    let sorted = newSlots.sorted {
+                        guard let d1 = fmt.date(from: $0.time), let d2 = fmt.date(from: $1.time) else { return false }
+                        return d1 < d2
+                    }
+                    // Consola normal: sin medias horas
+                    self.availableExtraSpaceSlots = sorted.filter { !$0.time.hasSuffix(":30") }
+                    self.enabledExtraSpaceSlots = self.availableExtraSpaceSlots
+                case .failure(let error):
+                    Logger.shared.log("Error fetching extra space slots: \(error)")
+                }
+                completion?()
+            }
+        }
+    }
+
+    func toggleExtraSpaceSlotSelection(_ slot: GamingSpaceTime) {
+        if extraSpaceSelectedSlots.contains(where: { $0.id == slot.id }) {
+            extraSpaceSelectedSlots.removeAll { $0.id == slot.id }
+        } else {
+            extraSpaceSelectedSlots.append(slot)
+        }
+        updateEnabledExtraSpaceSlots()
+    }
+
+    func updateEnabledExtraSpaceSlots() {
+        guard !extraSpaceSelectedSlots.isEmpty else {
+            enabledExtraSpaceSlots = availableExtraSpaceSlots
+            return
+        }
+        let maxSlots = 3 // individual max
+        let sortedSelected = extraSpaceSelectedSlots.sorted { $0.value < $1.value }
+        let minValue = sortedSelected.first?.value ?? 0
+        let maxValue = sortedSelected.last?.value ?? 0
+        enabledExtraSpaceSlots = availableExtraSpaceSlots.filter { slot in
+            (slot.value >= minValue && slot.value <= maxValue + 1 && slot.value <= minValue + (maxSlots - 1))
+            || extraSpaceSelectedSlots.contains(where: { $0.id == slot.id })
+        }
+    }
+
+    func resetExtraSpaceSelection() {
+        wantsExtraSpace = false
+        extraSpace = nil
+        extraSpaceSelectedSlots = []
+        availableExtraSpaceSlots = []
+        enabledExtraSpaceSlots = []
+    }
+
+    // MARK: - Cross-blocking entre reserva principal y add-on
+
+    /// Extrae la hora (Int) de un string "HH:mm"
+    private func hourFromTime(_ time: String) -> Int? {
+        guard let hourStr = time.split(separator: ":").first else { return nil }
+        return Int(hourStr)
+    }
+
+    /// Horas ocupadas por la reserva principal → bloquea slots del simulador
+    /// Ej: si seleccionas Xbox 18:00, 19:00, 20:00 → en simulador se bloquean 18:00, 18:30, 19:00, 19:30, 20:00, 20:30
+    func isSimulatorSlotBlockedByMain(_ slot: GamingSpaceTime) -> Bool {
+        let blockedHours = Set(selectedSlots.compactMap { hourFromTime($0.time) })
+        guard let slotHour = hourFromTime(slot.time) else { return false }
+        return blockedHours.contains(slotHour)
+    }
+
+    /// Horas ocupadas por el simulador → bloquea slots del espacio extra
+    /// Ej: si seleccionas Simulador 17:00 (o 17:30) → en espacio extra se bloquea 17:00
+    func isExtraSpaceSlotBlockedBySimulator(_ slot: GamingSpaceTime) -> Bool {
+        let blockedHours = Set(selectedSlots.compactMap { hourFromTime($0.time) })
+        guard let slotHour = hourFromTime(slot.time) else { return false }
+        return blockedHours.contains(slotHour)
+    }
+
     // MARK: - Enviar email de reserva
 
     private func formatDateForEmail(_ date: Date) -> String {
@@ -414,7 +532,7 @@ class ReservationFlowViewModel: ObservableObject {
         slots.sorted { $0.value < $1.value }.map { $0.time }.joined(separator: " - ")
     }
 
-    /// Email de reserva individual (con posible simulador extra)
+    /// Email de reserva individual (con posible simulador extra O espacio extra)
     private func sendIndividualReservationEmail() {
         guard let date = selectedDate,
               let device = selectedSpace?.device,
@@ -426,9 +544,16 @@ class ReservationFlowViewModel: ObservableObject {
         let timesStr = formatTimesForEmail(selectedSlots)
 
         var extraBlock = ""
+
+        // Caso 1: Consola normal + simulador extra
         if wantsSimulator, !simulatorSelectedSlots.isEmpty, let simDevice = simulatorSpace?.device {
             let simTimes = simulatorSelectedSlots.sorted { $0.value < $1.value }.map { $0.time }.joined(separator: " - ")
             extraBlock = "<p><strong><u>Reserva extra incluida:</u></strong><br><strong>Fecha:</strong> \(dateStr)<br><strong>Hora:</strong> \(simTimes)<br><strong>Dispositivo:</strong> \(simDevice)</p>"
+        }
+        // Caso 2: Simulador + espacio extra
+        else if wantsExtraSpace, !extraSpaceSelectedSlots.isEmpty, let extraDevice = extraSpace?.device {
+            let extraTimes = extraSpaceSelectedSlots.sorted { $0.value < $1.value }.map { $0.time }.joined(separator: " - ")
+            extraBlock = "<p><strong><u>Reserva extra incluida:</u></strong><br><strong>Fecha:</strong> \(dateStr)<br><strong>Hora:</strong> \(extraTimes)<br><strong>Dispositivo:</strong> \(extraDevice)</p>"
         }
 
         reservationService.sendReservationEmail(
@@ -499,6 +624,97 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Crear reserva add-on (simulador extra o espacio extra)
+
+    /// Determina si hay un add-on pendiente de crear y lo crea.
+    /// Llama a completion(true) si se creó correctamente o no había add-on, completion(false) si falló.
+    private func createAddonReservationIfNeeded(completion: @escaping (Bool) -> Void) {
+        guard let date = selectedDate,
+              let userId = userManager.getUser()?.id else {
+            completion(true) // no hay datos, pero no es error de add-on
+            return
+        }
+
+        let dateFmt = DateFormatter()
+        dateFmt.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFmt.string(from: date)
+
+        // Caso 1: Consola normal → añadir simulador
+        if wantsSimulator, !simulatorSelectedSlots.isEmpty, let simSpace = simulatorSpace {
+            let addonSlot = simSpace.slots.first ?? Slot(id: 0, position: "", space: 0)
+            let addonTimes = simulatorSelectedSlots.map { ["gaming_space_times_id": ["id": $0.id]] }
+
+            let body: [String: Any] = [
+                "date": dateString,
+                "user": userId,
+                "slot": addonSlot.id,
+                "times": addonTimes
+            ]
+
+            Task {
+                do {
+                    let response: ReserveResponseModel = try await DirectusService.shared.sendRequest(
+                        endpoint: "gaming_space_reserves",
+                        method: .POST,
+                        body: body
+                    )
+                    // Generar QR para la reserva add-on con los times del simulador
+                    await MainActor.run {
+                        self.generateAndUploadQR(for: response.data, times: self.simulatorSelectedSlots) {
+                            Logger.shared.log("Reserva add-on simulador creada con éxito")
+                            completion(true)
+                        }
+                    }
+                } catch {
+                    await MainActor.run {
+                        Logger.shared.log("Error al crear reserva add-on simulador: \(error.localizedDescription)")
+                        completion(false)
+                    }
+                }
+            }
+            return
+        }
+
+        // Caso 2: Simulador → añadir espacio extra
+        if wantsExtraSpace, !extraSpaceSelectedSlots.isEmpty, let extra = extraSpace {
+            let addonSlot = extra.slots.first ?? Slot(id: 0, position: "", space: 0)
+            let addonTimes = extraSpaceSelectedSlots.map { ["gaming_space_times_id": ["id": $0.id]] }
+
+            let body: [String: Any] = [
+                "date": dateString,
+                "user": userId,
+                "slot": addonSlot.id,
+                "times": addonTimes
+            ]
+
+            Task {
+                do {
+                    let response: ReserveResponseModel = try await DirectusService.shared.sendRequest(
+                        endpoint: "gaming_space_reserves",
+                        method: .POST,
+                        body: body
+                    )
+                    // Generar QR para la reserva add-on con los times del espacio extra
+                    await MainActor.run {
+                        self.generateAndUploadQR(for: response.data, times: self.extraSpaceSelectedSlots) {
+                            Logger.shared.log("Reserva add-on espacio extra creada con éxito")
+                            completion(true)
+                        }
+                    }
+                } catch {
+                    await MainActor.run {
+                        Logger.shared.log("Error al crear reserva add-on espacio extra: \(error.localizedDescription)")
+                        completion(false)
+                    }
+                }
+            }
+            return
+        }
+
+        // No hay add-on → todo OK
+        completion(true)
+    }
+
     // MARK: - Actualizar reserva individual (edición)
 
     func updateIndividualReservation() {
@@ -548,7 +764,7 @@ class ReservationFlowViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Actualizar reserva con QR + envío de email
+    // MARK: - Actualizar reserva con QR + add-on + envío de email
 
     func updateReservationWithQR(reservationInfo: ReserveResponse) {
         guard let reservationId = reservationInfo.id,
@@ -583,12 +799,25 @@ class ReservationFlowViewModel: ObservableObject {
                         self.isLoading = false
                         switch result {
                         case .success:
-                            self.sendIndividualReservationEmail()
-                            self.isCreatingReservation = true
-                            self.reservationSuccess = true
-                            self.onReservationSuccess()
+                            // Reserva principal OK → crear add-on si lo hay
+                            self.createAddonReservationIfNeeded { addonSuccess in
+                                DispatchQueue.main.async {
+                                    self.sendIndividualReservationEmail()
+                                    self.isCreatingReservation = false
+
+                                    if addonSuccess {
+                                        self.reservationSuccess = true
+                                        self.onReservationSuccess()
+                                    } else {
+                                        // La principal se creó pero el add-on falló
+                                        self.reservationSuccess = false
+                                        self.onReservationFail()
+                                        Logger.shared.log("Reserva principal creada pero el add-on falló")
+                                    }
+                                }
+                            }
                         case .failure(let error):
-                            self.isCreatingReservation = true
+                            self.isCreatingReservation = false
                             self.reservationSuccess = false
                             self.onReservationFail()
                             Logger.shared.log("Error al actualizar la reserva: \(error.localizedDescription)")
@@ -597,7 +826,7 @@ class ReservationFlowViewModel: ObservableObject {
                 }
             case .failure(let error):
                 Logger.shared.log("Error al subir la imagen: \(error.localizedDescription)")
-                self.isCreatingReservation = true
+                self.isCreatingReservation = false
                 self.reservationSuccess = false
                 self.onReservationFail()
             }
@@ -733,13 +962,16 @@ class ReservationFlowViewModel: ObservableObject {
 
     // MARK: - Helper: Generar y subir QR
 
-    private func generateAndUploadQR(for reserveResponse: ReserveResponse, completion: @escaping () -> Void) {
+    private func generateAndUploadQR(for reserveResponse: ReserveResponse, times: [GamingSpaceTime]? = nil, completion: @escaping () -> Void) {
         guard let reserveId = reserveResponse.id,
               let qrValue = reserveResponse.qrValue,
               let qrImage = QRCodeGenerator.generateQRCode(with: qrValue) else {
             completion()
             return
         }
+
+        // Usar los times pasados por parámetro, o los de la reserva principal por defecto
+        let timesToUse = times ?? selectedSlots
 
         UploadImageService().uploadImage(image: qrImage, fileName: "\(qrValue).jpg") { [weak self] result in
             guard let self else { completion(); return }
@@ -760,7 +992,7 @@ class ReservationFlowViewModel: ObservableObject {
                         slot: Slot(id: 0, position: "", space: 0),
                         date: Date(), user: nil, team: nil,
                         training: nil, qrImage: fileId, qrValue: qrValue,
-                        times: self.selectedSlots, peripheralLoans: []
+                        times: timesToUse, peripheralLoans: []
                     )
                 ) { _ in
                     completion()

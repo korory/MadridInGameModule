@@ -89,7 +89,7 @@ struct ReservationFlowView: View {
                                 .tag(viewModel.personalReservations ? 2 : 4)
                                 .contentShape(Rectangle()).simultaneousGesture(DragGesture())
 
-                            // Solo individual + espacio NO es simulador → preguntar y slot simulador
+                            // Solo individual + espacio NO es simulador → preguntar simulador
                             if viewModel.personalReservations && !viewModel.isSelectedSpaceSimulator {
                                 AskSimulatorView(currentStep: $viewModel.currentStep, viewModel: viewModel)
                                     .tag(3)
@@ -98,6 +98,23 @@ struct ReservationFlowView: View {
                                 if viewModel.wantsSimulator {
                                     SelectSimulatorSlotView(currentStep: $viewModel.currentStep, viewModel: viewModel)
                                         .tag(4)
+                                        .contentShape(Rectangle()).simultaneousGesture(DragGesture())
+                                }
+                            }
+
+                            // Solo individual + espacio ES simulador → preguntar espacio extra
+                            if viewModel.personalReservations && viewModel.isSelectedSpaceSimulator {
+                                AskExtraSpaceView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                                    .tag(3)
+                                    .contentShape(Rectangle()).simultaneousGesture(DragGesture())
+
+                                if viewModel.wantsExtraSpace {
+                                    SelectExtraSpaceView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                                        .tag(4)
+                                        .contentShape(Rectangle()).simultaneousGesture(DragGesture())
+
+                                    SelectExtraSlotView(currentStep: $viewModel.currentStep, viewModel: viewModel)
+                                        .tag(5)
                                         .contentShape(Rectangle()).simultaneousGesture(DragGesture())
                                 }
                             }
@@ -364,8 +381,9 @@ struct SelectSlotView: View {
     private var canReserve: Bool { viewModel.selectedSpace != nil && !viewModel.selectedSlots.isEmpty && viewModel.selectedDate != nil }
 
     /// En individual, si el espacio NO es simulador, el botón va al paso de preguntar simulador
-    private var shouldGoToAskSimulator: Bool {
-        viewModel.personalReservations && !viewModel.isSelectedSpaceSimulator && !isEditing
+    /// Si ES simulador, va al paso de preguntar espacio extra
+    private var shouldGoToAskAddon: Bool {
+        viewModel.personalReservations && !isEditing
     }
 
     var body: some View {
@@ -401,11 +419,11 @@ struct SelectSlotView: View {
                 Spacer()
                 SecondaryButton(title: "Atrás".localized) { viewModel.currentStep -= 1 }
 
-                if shouldGoToAskSimulator {
-                    // Individual + no simulador → ir a preguntar
+                if shouldGoToAskAddon {
+                    // Individual → ir a preguntar add-on (simulador o espacio extra)
                     PrimaryButton(title: "Siguiente".localized, enabled: canReserve) { currentStep += 1 }
                 } else {
-                    // Simulador, equipo o edición → reservar/guardar directo
+                    // Equipo o edición → reservar/guardar directo
                     PrimaryButton(title: isEditing ? "Guardar".localized : "Reservar".localized, enabled: canReserve) {
                         if viewModel.personalReservations {
                             if viewModel.individualSelectedInformation != nil { viewModel.updateIndividualReservation() }
@@ -551,8 +569,6 @@ struct SelectSimulatorSlotView: View {
                 }
 
                 PrimaryButton(title: "Reservar".localized, enabled: canReserve) {
-                    // TODO: Crear reserva principal + reserva simulador
-                    // Por ahora solo crea la principal
                     viewModel.createReservation()
                 }
             }
@@ -564,10 +580,197 @@ struct SelectSimulatorSlotView: View {
         let currentHourPlus2 = Calendar.current.component(.hour, from: Date()) + 1
         let isToday = if let date = viewModel.selectedDate { Calendar.current.isDateInToday(date) } else { false }
         let isTimeValid = slot.value > currentHourPlus2
-        let computedEnabled = isToday ? isTimeValid : true
+        let isBlockedByMain = viewModel.isSimulatorSlotBlockedByMain(slot)
+        let computedEnabled = isToday ? (isTimeValid && !isBlockedByMain) : !isBlockedByMain
 
         return PillButton(title: slot.time, isSelected: isSelected, isEnabled: computedEnabled) {
             if computedEnabled { viewModel.toggleSimulatorSlotSelection(slot) }
+        }
+    }
+}
+
+// MARK: - AskExtraSpaceView (solo individual, espacio ES simulador)
+
+struct AskExtraSpaceView: View {
+    @Binding var currentStep: Int
+    @ObservedObject var viewModel: ReservationFlowViewModel
+
+    var body: some View {
+        VStack(spacing: 24) {
+            if viewModel.isCreatingReservation {
+                VStack {
+                    Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
+                    ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
+                    Text("Creando la reserva...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                Spacer()
+
+                Image(systemName: "desktopcomputer")
+                    .font(.system(size: 48))
+                    .foregroundStyle(
+                        LinearGradient(colors: [.cyan.opacity(0.7), .purple.opacity(0.5)], startPoint: .leading, endPoint: .trailing)
+                    )
+
+                Text("¿Quieres añadir otro espacio?".localized)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+
+                Text("Puedes reservar un espacio de gaming adicional junto a tu reserva de simulador.".localized)
+                    .font(.system(size: 14))
+                    .foregroundColor(.white.opacity(0.5))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 30)
+
+                Spacer()
+
+                SecondaryButton(title: "Atrás".localized) {
+                    currentStep -= 1
+                }
+
+                PrimaryButton(title: "No, reservar solo simulador".localized, enabled: true) {
+                    viewModel.resetExtraSpaceSelection()
+                    if viewModel.individualSelectedInformation != nil {
+                        viewModel.updateIndividualReservation()
+                    } else {
+                        viewModel.createReservation()
+                    }
+                }
+
+                Button(action: {
+                    viewModel.wantsExtraSpace = true
+                    currentStep += 1
+                }) {
+                    Text("Sí, añadir espacio".localized)
+                        .font(.system(size: 15, weight: .semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            LinearGradient(colors: [.cyan, .purple.opacity(0.8)], startPoint: .leading, endPoint: .trailing)
+                        )
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+    }
+}
+
+// MARK: - SelectExtraSpaceView (seleccionar espacio extra, sin simulador)
+
+struct SelectExtraSpaceView: View {
+    @Binding var currentStep: Int
+    @ObservedObject var viewModel: ReservationFlowViewModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Selecciona un espacio extra".localized)
+                .font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+
+            if viewModel.nonSimulatorSpaces.isEmpty {
+                VStack {
+                    Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
+                    ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
+                    Text("Cargando espacios disponibles...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
+                        ForEach(viewModel.nonSimulatorSpaces) { space in
+                            extraSpaceButton(for: space)
+                        }
+                    }.padding(.horizontal, 4)
+                }
+            }
+
+            Spacer()
+
+            SecondaryButton(title: "Atrás".localized) { currentStep -= 1 }
+            PrimaryButton(title: "Siguiente".localized, enabled: viewModel.extraSpace != nil) {
+                viewModel.fetchExtraSpaceSlots()
+                currentStep += 1
+            }
+        }
+        .padding(.horizontal, 20).padding(.vertical, 16)
+    }
+
+    private func extraSpaceButton(for space: Space) -> some View {
+        let isSelected = viewModel.extraSpace?.id == space.id
+        return PillButton(title: space.device, isSelected: isSelected, isEnabled: true) {
+            viewModel.selectExtraSpace(space)
+        }
+    }
+}
+
+// MARK: - SelectExtraSlotView (slots del espacio extra, sin medias horas, max 3)
+
+struct SelectExtraSlotView: View {
+    @Binding var currentStep: Int
+    @ObservedObject var viewModel: ReservationFlowViewModel
+
+    private var canReserve: Bool { !viewModel.extraSpaceSelectedSlots.isEmpty }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if viewModel.isCreatingReservation {
+                VStack {
+                    Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
+                    ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
+                    Text("Creando la reserva...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                Text("Selecciona franja horaria".localized)
+                    .font(.system(size: 20, weight: .bold)).foregroundColor(.white)
+
+                if let device = viewModel.extraSpace?.device {
+                    Text(device)
+                        .font(.system(size: 14)).foregroundColor(.cyan)
+                }
+
+                if viewModel.availableExtraSpaceSlots.isEmpty {
+                    VStack {
+                        Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
+                        ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
+                        Text("Cargando horarios disponibles...".localized).font(.system(size: 14)).foregroundColor(.white.opacity(0.5))
+                    }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
+                            ForEach(viewModel.availableExtraSpaceSlots) { slot in
+                                extraSlotButton(for: slot)
+                            }
+                        }.padding(.horizontal, 4)
+                    }
+                }
+
+                Text("Máximo 3 spots consecutivos".localized)
+                    .font(.system(size: 12)).foregroundColor(.white.opacity(0.35)).frame(maxWidth: .infinity)
+
+                Spacer()
+
+                SecondaryButton(title: "Atrás".localized) { currentStep -= 1 }
+                PrimaryButton(title: "Reservar".localized, enabled: canReserve) {
+                    viewModel.createReservation()
+                }
+            }
+        }.padding(.horizontal, 20).padding(.vertical, 16)
+    }
+
+    private func extraSlotButton(for slot: GamingSpaceTime) -> some View {
+        let isEnabled = viewModel.enabledExtraSpaceSlots.contains(where: { $0.id == slot.id })
+        let isSelected = viewModel.extraSpaceSelectedSlots.contains(where: { $0.id == slot.id })
+        let currentHourPlus2 = Calendar.current.component(.hour, from: Date()) + 1
+        let isToday = if let date = viewModel.selectedDate { Calendar.current.isDateInToday(date) } else { false }
+        let isTimeValid = slot.value > currentHourPlus2
+        let isBlockedBySim = viewModel.isExtraSpaceSlotBlockedBySimulator(slot)
+        let computedEnabled = isToday ? (isTimeValid && isEnabled && !isBlockedBySim) : (isEnabled && !isBlockedBySim)
+
+        return PillButton(title: slot.time, isSelected: isSelected, isEnabled: computedEnabled) {
+            if computedEnabled { viewModel.toggleExtraSpaceSlotSelection(slot) }
         }
     }
 }
