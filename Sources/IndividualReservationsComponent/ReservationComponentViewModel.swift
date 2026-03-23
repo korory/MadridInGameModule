@@ -1,6 +1,10 @@
 import SwiftUI
 
 class ReservationComponentViewModel: ObservableObject {
+    
+    /// Default max reservations per team until backend provides the value
+    private static let defaultTeamReservationLimit = 3
+    
     @Published var isReservationFlowPresented = false
 
     @Published var userManager = UserManager.shared
@@ -179,7 +183,6 @@ class ReservationComponentViewModel: ObservableObject {
             guard let training = teamSelectedInformation,
                   let trainingId = training.id else { return }
 
-            // Si es centre, pasamos el reserveId para borrarla también
             let isVirtual = training.type.lowercased() == "virtual"
             let reserveId: Int? = isVirtual ? nil : training.reserves?.first?.id
 
@@ -225,6 +228,52 @@ class ReservationComponentViewModel: ObservableObject {
     }
 }
 
+// MARK: - Booking Permission Checks — Individual
+
+extension ReservationComponentViewModel {
+    
+    func userHasDNI() -> Bool {
+        guard let user = userManager.getUser() else { return false }
+        return !(user.dni ?? "").isEmpty
+    }
+    
+    func userIsValidated() -> Bool {
+        guard let user = userManager.getUser() else { return false }
+        let validStatuses = ["published", "active"]
+        return userHasDNI() && validStatuses.contains(user.status?.lowercased() ?? "")
+    }
+    
+    private func userReservationLimit() -> Int {
+        guard let user = userManager.getUser() else { return 1 }
+        return userIsValidated() ? (user.reservesAllowed ?? 1) : 1
+    }
+    
+    func userCanBook() -> Bool {
+        return allIndividualReservations.count < userReservationLimit()
+    }
+}
+
+// MARK: - Booking Permission Checks — Team
+
+extension ReservationComponentViewModel {
+    
+    func teamCanBook() -> Bool {
+        return allTeamReservations.count < teamReservationLimit()
+    }
+    
+    /// Maximum number of active reservations allowed for the team.
+    /// Currently hardcoded to `defaultTeamReservationLimit`.
+    /// TODO: Replace with a backend field from Team model when available,
+    ///       e.g. `userManager.getSelectedTeam()?.reservesAllowed ?? Self.defaultTeamReservationLimit`
+    private func teamReservationLimit() -> Int {
+        // Future: read from backend team field
+        // return userManager.getSelectedTeam()?.reservesAllowed ?? Self.defaultTeamReservationLimit
+        return Self.defaultTeamReservationLimit
+    }
+}
+
+// MARK: - DNI & Reservation Flow
+
 extension ReservationComponentViewModel {
     func checkIfDNIExists() {
         let user = userManager.getUser()
@@ -254,27 +303,38 @@ extension ReservationComponentViewModel {
         }
     }
     
-    
     func openReservationFlowIfAllowed(editInformation: Bool = false) {
         guard let user = userManager.getUser() else {
             noReservationAllowed = true
             return
         }
 
-        if !editInformation {
-            if allIndividualReservations.count >= user.numberOfBookingsAllowed && user.isUserActive {
+        // Editing always opens the flow directly
+        if editInformation {
+            isReservationFlowPresented = true
+            return
+        }
+
+        if personalReservations {
+            // Individual booking
+            if userIsValidated() && !userCanBook() {
                 noReservationAllowed = true
-            } else if allIndividualReservations.count >= user.numberOfBookingsAllowed && !user.isUserActive {
+            } else if !userIsValidated() && !userCanBook() {
                 noReservationAllowedWithoutDNI = true
             } else {
-                if user.isDNIAvailable {
+                if userHasDNI() {
                     isReservationFlowPresented = true
                 } else {
                     dniIsMissing = true
                 }
             }
         } else {
-            isReservationFlowPresented = true
+            // Team booking
+            if !teamCanBook() {
+                noReservationAllowed = true
+            } else {
+                isReservationFlowPresented = true
+            }
         }
     }
     

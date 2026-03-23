@@ -239,19 +239,13 @@ extension ReservationsComponentView {
 
     @ViewBuilder
     private var reservationButton: some View {
-        let backgroundColor: Color = if let user = viewModel.userManager.getUser() {
-            if viewModel.allIndividualReservations.count < user.numberOfBookingsAllowed {
-                Color.cyan
-            } else {
-                Color.gray
-            }
-        } else {
-            Color.gray
-        }
+        let canBook = viewModel.personalReservations
+            ? viewModel.userCanBook()
+            : viewModel.teamCanBook()
 
         CustomButton(text: "Reservar".localized,
                      needsBackground: true,
-                     backgroundColor: backgroundColor,
+                     backgroundColor: canBook ? Color.cyan : Color.gray,
                      pressEnabled: true,
                      widthButton: 280, heightButton: 50) {
             self.viewModel.openReservationFlowIfAllowed()

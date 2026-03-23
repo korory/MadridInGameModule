@@ -19,7 +19,7 @@ public struct MadridInGameiOSModule: View {
         _viewModel = StateObject(wrappedValue: MadridInGameiOSViewModel(userInfo: model, isPro: !isPreRelease, openCompetitions: false))
     }
 
-    public init(email: String, userName: String, dni: String? = nil, accessToken: String, logoMIG: UIImage?, qrMiddleLogo: UIImage?, isPreRelease: Bool = false) {
+    public init(email: String, userName: String, dni: String? = nil, accessToken: String, logoMIG: UIImage?, qrMiddleLogo: UIImage?, isPreRelease: Bool = true) {
         UserDefaults.saveAccessTokenKey(accessToken)
 
         if let logo = logoMIG {
