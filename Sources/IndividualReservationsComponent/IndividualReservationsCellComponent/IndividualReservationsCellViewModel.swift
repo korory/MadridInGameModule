@@ -10,11 +10,11 @@ import SwiftUI
 
 class IndividualReservationsCellViewModel: ObservableObject {
     @Published var reservation: IndividualReservation
-    var showDeleteOption: Bool
+    var showDeleteAndEditOption: Bool
     
-    init(reservation: IndividualReservation, showDeleteOption: Bool) {
+    init(reservation: IndividualReservation, showDeleteAndEditOption: Bool) {
         self.reservation = reservation
-        self.showDeleteOption = showDeleteOption
+        self.showDeleteAndEditOption = showDeleteAndEditOption
     }
     
     func getReservationConsole() -> String {

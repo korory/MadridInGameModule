@@ -1,4 +1,4 @@
-/* 
+/*
   Localizable.strings
   TestMadridInGame
   English
@@ -44,6 +44,7 @@
 "Mostrar Popup" = "Show Popup";
 "Máximo 2 spots consecutivos" = "Maximum 2 consecutive slots";
 "Máximo 3 spots consecutivos" = "Maximum 3 consecutive slots";
+"Máximo 1 spot" = "Maximum 1 slot";
 "NOTICIAS" = "NEWS";
 "No hay entrenamientos programados" = "There are no scheduled trainings";
 "No hay información disponible." = "No information available.";
@@ -59,6 +60,7 @@
 "Puedes usar este QR para acceder." = "You can use this QR to access.";
 "Pulsar para cambiar" = "Tap to change";
 "RESERVAS INDIVIDUALES" = "INDIVIDUAL BOOKINGS";
+"RESERVAS DE EQUIPO" = "TEAM BOOKINGS";
 "Reglas" = "Rules";
 "Reserva - %@" = "Booking - %@";
 "Reserva Confirmada" = "Reservation Confirmed";
@@ -75,11 +77,14 @@
 "Selecciona una fecha" = "Select a date";
 "Selecciona una opción" = "Select an option";
 "Seleccionar Jugador" = "Select Player";
+"Seleccionar Espacio" = "Select Space";
+"Seleccionar Hora" = "Select Hour";
 "Siguiente" = "Next";
 "Sobre Mi" = "About Me";
 "Torneos" = "Tournaments";
 "Una vez aprobemos la creación del equipo este aparecerá en tu lista de equipo" = "Once we approve the creation of the team, it will appear in your team list";
 "Ver reserva" = "View booking";
+"Editar reserva" = "Edit booking";
 "calendar" = "Calendar";
 "legend" = "Legend";
 "¿Qué equipo quieres gestionar?" = "Which team do you want to manage?";
@@ -87,7 +92,6 @@
 "Entrenamientos" = "Trainings";
 "Próximos entrenamientos" = "Upcoming trainings";
 "Dashboard" = "Dashboard";
-"Equipos" = "Teams";
 "Competiciones" = "Competitions";
 "Temporada" = "Season";
 "Preparando tu experiencia..." = "Loading your experience...";
@@ -104,7 +108,7 @@
 "No" = "No";
 "Sobre esta competición..." = "About this competition...";
 "Nombre" = "Name";
-"Apellidos"= "Last name";
+"Apellidos" = "Last name";
 "DNI" = "ID";
 "Email" = "E-mail";
 "Nick" = "Nickname";
@@ -131,12 +135,10 @@
 "EQUIPOS" = "TEAMS";
 "EQUIPO" = "TEAM";
 "Crear Equipo" = "Create team";
-"Editar" = "Edit";
 "Solicitar ingreso" = "Request to join";
 "No tienes invitaciones" = "You don't have invitations";
 
 "Jugadores Asignados" = "Assigned players";
-"Notas" = "Notes";
 "Notas (Opcional)" = "Notes (Optional)";
 "Fecha Seleccionada" = "Selected date";
 
@@ -145,10 +147,9 @@
 "Hora Seleccionada" = "Selected time";
 "Splits" = "Splits";
 
-
 "Liga Municipal" = "Municipal League";
 "Esports Series Madrid" = "Esports Series Madrid";
-"Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid. Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo." = "Madrid in Game is the Madrid City Council’s initiative to elevate amateur Esports talent through the creation of the Esports Series Madrid competitions. They consist of two seasons per year in which you can face the best players in a safe and optimal gaming environment.";
+"Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid. Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo." = "Madrid in Game is the Madrid City Council's initiative to elevate amateur Esports talent through the creation of the Esports Series Madrid competitions. They consist of two seasons per year in which you can face the best players in a safe and optimal gaming environment.";
 
 "Liga Municipal Junior" = "Junior Municipal League";
 "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League." = "The equivalent of Esports Series Madrid for schools and high schools in the city. The ESM Junior Esports is your entry point to participate with your educational center in the junior municipal league of League of Legends and Rocket League.";
@@ -157,3 +158,24 @@
 "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgarán puntos para el ranking general del Circuito de Tormenta del Split correspondiente." = "The Esports Series Madrid of Madrid in Game will be an official stop of the Circuito Tormenta. They will feature League of Legends and Valorant competitions, along with a major in-person Grand Final. The tournaments will award points for the overall ranking of the corresponding Circuito Tormenta Split.";
 
 "Otras competiciones" = "Other competitions";
+
+// MARK: - New strings from reservation flow
+
+"Editar jugadores" = "Edit players";
+"Selecciona tipo" = "Select type";
+"Selecciona un jugador" = "Select a player";
+"Atrás" = "Back";
+"Fecha seleccionada" = "Selected date";
+"Máximo 1 spots consecutivos" = "Maximum 1 consecutive slot";
+"¿Quieres añadir tiempo de simulador?" = "Do you want to add simulator time?";
+"Puedes reservar un slot de simulador adicional junto a tu reserva actual." = "You can book an additional simulator slot alongside your current reservation.";
+"No, reservar sin simulador" = "No, book without simulator";
+"Sí, añadir simulador" = "Yes, add simulator";
+"Selecciona hora de simulador" = "Select simulator time";
+"Cargando horarios de simulador..." = "Loading simulator time slots...";
+"Máximo 1 spot de simulador" = "Maximum 1 simulator slot";
+"¿Quieres añadir otro espacio?" = "Do you want to add another space?";
+"Puedes reservar un espacio de gaming adicional junto a tu reserva de simulador." = "You can book an additional gaming space alongside your simulator reservation.";
+"No, reservar solo simulador" = "No, book simulator only";
+"Sí, añadir espacio" = "Yes, add space";
+"Selecciona un espacio extra" = "Select an extra space";

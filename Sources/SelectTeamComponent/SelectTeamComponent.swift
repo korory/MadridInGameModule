@@ -1,49 +1,37 @@
-//
-//  SelectTeamComponent.swift
-//  Pods
-//
-//  Created by Arnau Rivas Rivas on 7/2/25.
-//
-
 import SwiftUI
 
 struct SelectTeamComponent: View {
     var allTeams: [TeamModelReal]
     var onTeamSelected: (TeamModelReal) -> Void
-    
+
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea(.all)
-            
-            VStack {
+            Color.black.ignoresSafeArea(.all)
+
+            VStack(spacing: 0) {
                 Spacer()
-                
+
                 Text("¿Qué equipo quieres gestionar?".localized)
                     .font(.madridInGameiOSFont(size: 20))
                     .bold()
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                    .padding(.bottom, 15)
+                    .padding(.horizontal, 30)
+                    .padding(.bottom, 24)
                     .padding(.top, 20)
 
                 ScrollView {
-                    VStack(spacing: 15) {
+                    VStack(spacing: 12) {
                         ForEach(allTeams, id: \.id) { team in
-                            VStack {
-                                SelectTeamsCellComponent(team: team) { teamSelected in
-                                    onTeamSelected(teamSelected)
-                                }
-                                .padding(.leading, 10)
+                            SelectTeamsCellComponent(team: team) { teamSelected in
+                                onTeamSelected(teamSelected)
                             }
                         }
                     }
-                    
+                    .padding(.horizontal, 20)
                 }
-                .scrollIndicators(.visible)
-                .padding(.top, 10)
-                
+                .scrollIndicators(.hidden)
+
                 Spacer()
             }
         }

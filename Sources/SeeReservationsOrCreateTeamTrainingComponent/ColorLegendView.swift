@@ -8,31 +8,49 @@
 import SwiftUI
 
 struct ColorLegendView: View {
+    private let items: [(color: Color, text: String)] = [
+        (.white, "Día actual".localized),
+        (.blue, "Reserva individual".localized),
+        (.blue.opacity(0.5), "Reserva de equipo".localized),
+        (.red, "Día bloqueado".localized)
+    ]
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 0) {
             Text("legend".localized)
                 .font(.madridInGameiOSFont(size: 20))
-                .padding(.leading, 10)
-                .padding(.bottom, 10)
-            
-            legendItem(color: .white, text: "Día actual".localized)
-            legendItem(color: .blue, text: "Reserva individual".localized)
-            legendItem(color: .blue.opacity(0.5), text: "Reserva de equipo".localized)
-            legendItem(color: .red, text: "Día bloqueado".localized)
+                .foregroundColor(.white)
+                .padding(.bottom, 20)
+                .frame(maxWidth: .infinity, alignment: .center)
+
+            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                legendItem(color: item.color, text: item.text)
+
+                if index < items.count - 1 {
+                    Divider()
+                        .background(Color.white.opacity(0.08))
+                        .padding(.horizontal, 4)
+                }
+            }
         }
-        .padding(.bottom, 25)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
     }
 
     private func legendItem(color: Color, text: String) -> some View {
-        HStack {
+        HStack(spacing: 14) {
             Circle()
                 .fill(color)
-                .frame(width: 20, height: 20)
+                .frame(width: 12, height: 12)
+                .shadow(color: color.opacity(0.5), radius: 4, x: 0, y: 0)
+
             Text(text)
                 .font(.madridInGameiOSFont(size: 15))
-            
+                .foregroundColor(.white.opacity(0.8))
+
             Spacer()
         }
-        .padding(.leading, 40)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 4)
     }
 }

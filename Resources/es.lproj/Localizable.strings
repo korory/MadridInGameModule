@@ -1,4 +1,4 @@
-/* 
+/*
   Localizable.strings
   TestMadridInGame
   Español
@@ -30,7 +30,6 @@
 "Equipos" = "Equipos";
 "Error al cargar el módulo" = "Error al cargar el módulo";
 "Fecha: %@" = "Fecha: %@";
-"Fecha: %@" = "Fecha: %@";
 "Galería" = "Galería";
 "Hola" = "Hola";
 "Horas: %@" = "Horas: %@";
@@ -45,6 +44,7 @@
 "Mostrar Popup" = "Mostrar Popup";
 "Máximo 2 spots consecutivos" = "Máximo 2 spots consecutivos";
 "Máximo 3 spots consecutivos" = "Máximo 3 spots consecutivos";
+"Máximo 1 spot" = "Máximo 1 spot";
 "NOTICIAS" = "NOTICIAS";
 "No hay entrenamientos programados" = "No hay entrenamientos programados";
 "No hay información disponible." = "No hay información disponible.";
@@ -60,6 +60,7 @@
 "Puedes usar este QR para acceder." = "Puedes usar este QR para acceder.";
 "Pulsar para cambiar" = "Pulsar para cambiar";
 "RESERVAS INDIVIDUALES" = "RESERVAS INDIVIDUALES";
+"RESERVAS DE EQUIPO" = "RESERVAS DE EQUIPO";
 "Reglas" = "Reglas";
 "Reserva - %@" = "Reserva - %@";
 "Reserva Confirmada" = "Reserva Confirmada";
@@ -76,11 +77,14 @@
 "Selecciona una fecha" = "Selecciona una fecha";
 "Selecciona una opción" = "Selecciona una opción";
 "Seleccionar Jugador" = "Seleccionar Jugador";
+"Seleccionar Espacio" = "Seleccionar Espacio";
+"Seleccionar Hora" = "Seleccionar Hora";
 "Siguiente" = "Siguiente";
 "Sobre Mi" = "Sobre Mi";
 "Torneos" = "Torneos";
 "Una vez aprobemos la creación del equipo este aparecerá en tu lista de equipo" = "Una vez aprobemos la creación del equipo este aparecerá en tu lista de equipo";
 "Ver reserva" = "Ver reserva";
+"Editar reserva" = "Editar reserva";
 "calendar" = "Calendario";
 "legend" = "Leyenda";
 "¿Qué equipo quieres gestionar?" = "¿Qué equipo quieres gestionar?";
@@ -88,7 +92,6 @@
 "Entrenamientos" = "Entrenamientos";
 "Próximos entrenamientos" = "Próximos entrenamientos";
 "Dashboard" = "Dashboard";
-"Equipos" = "Equipos";
 "Competiciones" = "Competiciones";
 "Temporada" = "Temporada";
 "Preparando tu experiencia..." = "Preparando tu experiencia...";
@@ -132,12 +135,10 @@
 "EQUIPOS" = "EQUIPOS";
 "EQUIPO" = "EQUIPO";
 "Crear Equipo" = "Crear Equipo";
-"Editar" = "Editar";
 "Solicitar ingreso" = "Solicitar ingreso";
 "No tienes invitaciones" = "No tienes invitaciones";
 
 "Jugadores Asignados" = "Jugadores Asignados";
-"Notas" = "Notas";
 "Notas (Opcional)" = "Notas (Opcional)";
 "Fecha Seleccionada" = "Fecha Seleccionada";
 
@@ -157,3 +158,24 @@
 "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgarán puntos para el ranking general del Circuito de Tormenta del Split correspondiente." = "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgarán puntos para el ranking general del Circuito de Tormenta del Split correspondiente.";
 
 "Otras competiciones" = "Otras competiciones";
+
+// MARK: - Nuevos strings del flujo de reservas
+
+"Editar jugadores" = "Editar jugadores";
+"Selecciona tipo" = "Selecciona tipo";
+"Selecciona un jugador" = "Selecciona un jugador";
+"Atrás" = "Atrás";
+"Fecha seleccionada" = "Fecha seleccionada";
+"Máximo 1 spots consecutivos" = "Máximo 1 spot consecutivo";
+"¿Quieres añadir tiempo de simulador?" = "¿Quieres añadir tiempo de simulador?";
+"Puedes reservar un slot de simulador adicional junto a tu reserva actual." = "Puedes reservar un slot de simulador adicional junto a tu reserva actual.";
+"No, reservar sin simulador" = "No, reservar sin simulador";
+"Sí, añadir simulador" = "Sí, añadir simulador";
+"Selecciona hora de simulador" = "Selecciona hora de simulador";
+"Cargando horarios de simulador..." = "Cargando horarios de simulador...";
+"Máximo 1 spot de simulador" = "Máximo 1 spot de simulador";
+"¿Quieres añadir otro espacio?" = "¿Quieres añadir otro espacio?";
+"Puedes reservar un espacio de gaming adicional junto a tu reserva de simulador." = "Puedes reservar un espacio de gaming adicional junto a tu reserva de simulador.";
+"No, reservar solo simulador" = "No, reservar solo simulador";
+"Sí, añadir espacio" = "Sí, añadir espacio";
+"Selecciona un espacio extra" = "Selecciona un espacio extra";

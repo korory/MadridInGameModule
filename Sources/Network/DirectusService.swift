@@ -203,6 +203,43 @@ actor DirectusService {
         _ = try await request(endpoint: endpoint, method: method, body: body)
     }
     
+    // MARK: - Trigger Flow (Webhook)
+    public func triggerFlow(flowId: String, body: [String: Any]) async throws {
+       guard let baseURL = environmentManager?.getBaseURL(), !baseURL.isEmpty else {
+           throw NetworkError.invalidURL
+       }
+
+       let fullURLString = "\(baseURL)/flows/trigger/\(flowId)"
+
+       guard let url = URL(string: fullURLString) else {
+           throw NetworkError.invalidURL
+       }
+
+       Logger.shared.log("🛜 Flow trigger: \(url.absoluteString)")
+
+       var request = URLRequest(url: url)
+       request.httpMethod = HTTPMethods.POST.rawValue
+       request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+       let accessToken = UserDefaults.getAccessTokenKey() ?? ""
+       request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+       request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+       let (data, response) = try await URLSession.shared.data(for: request)
+
+       guard let httpResponse = response as? HTTPURLResponse else {
+           throw NetworkError.invalidResponse
+       }
+
+       if !(200...299).contains(httpResponse.statusCode) {
+           let responseData = String(data: data, encoding: .utf8) ?? "No se pudo leer la respuesta"
+           Logger.shared.log("Error HTTP flow trigger: \(httpResponse.statusCode) - \(responseData)")
+           throw NetworkError.invalidResponse
+       }
+
+       Logger.shared.log("Flow trigger ejecutado correctamente")
+   }
 }
 
 

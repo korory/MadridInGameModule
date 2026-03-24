@@ -10,7 +10,7 @@ import SwiftUI
 enum TeamReservationCellComponentOptionSelected {
     case removeCell
     case seeDetails
-    //case editTraining
+    case editBooking
 }
 
 import SwiftUI
@@ -18,11 +18,11 @@ import SwiftUI
 class TeamReservationCellComponentViewModel: ObservableObject {
     @Published var reservation: EventModel
     @Published var environmentManager = EnvironmentManager()
-    var showDeleteOption: Bool
+    var showDeleteAndEditOption: Bool
     
-    init(reservation: EventModel, showDeleteOption: Bool) {
+    init(reservation: EventModel, showDeleteAndEditOption: Bool) {
         self.reservation = reservation
-        self.showDeleteOption = showDeleteOption
+        self.showDeleteAndEditOption = showDeleteAndEditOption
     }
     
     func getTeamName() -> String {

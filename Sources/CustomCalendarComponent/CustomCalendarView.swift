@@ -11,6 +11,7 @@ struct CustomCalendarView: View {
     @StateObject private var viewModel = CustomCalendarViewModel()
     var canUserInteract: Bool
     var markedDates: [MarkTrainingDatesAndReservations] = []
+    var initialSelectedDate: Date? = nil        // 👈 nuevo parámetro opcional
     var onDateSelected: (String) -> Void
     
     var body: some View {
@@ -20,6 +21,11 @@ struct CustomCalendarView: View {
             calendarNumberDays
         }
         .padding(.top, 20)
+        .onAppear {
+            guard let date = initialSelectedDate else { return }
+            viewModel.selectedDate = Calendar.current.startOfDay(for: date)
+            viewModel.currentDate = date
+        }
     }
     
     private var bannerSelectMonth: some View {
@@ -149,11 +155,19 @@ struct CustomCalendarView: View {
 
     
     private func createEnabledDayCircle(for date: Date) -> some View {
+        let isSelected = viewModel.selectedDate.map {
+            viewModel.calendar.isDate($0, inSameDayAs: date)
+        } ?? false
+
         return AnyView(ZStack {
             Circle()
-                .stroke(Color.clear, lineWidth: 2)
+                .fill(isSelected ? Color.cyan : Color.clear)
                 .frame(width: 32, height: 32)
-            
+
+            Circle()
+                .stroke(isSelected ? Color.cyan : Color.clear, lineWidth: 2)
+                .frame(width: 32, height: 32)
+
             Text(viewModel.dateText(for: date))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
