@@ -304,7 +304,7 @@ extension ReservationComponentViewModel {
     }
     
     func openReservationFlowIfAllowed(editInformation: Bool = false) {
-        guard let user = userManager.getUser() else {
+        guard userManager.getUser() != nil else {
             noReservationAllowed = true
             return
         }
