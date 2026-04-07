@@ -23,6 +23,7 @@ class ReservationComponentViewModel: ObservableObject {
     @Published var selectedReservation: Reservation?
 
     @Published var dniIsMissing: Bool = false
+    @Published var dniError: String? = nil
 
     @Published var noReservationAllowed: Bool = false
     @Published var noReservationAllowedWithoutDNI: Bool = false
@@ -295,9 +296,11 @@ extension ReservationComponentViewModel {
                 case .success(let profile):
                     Logger.shared.log("Dni actualizado correctamente: \(profile)")
                     self?.userManager.setDNI(dni)
+                    self?.dniIsMissing = false
                     self?.isReservationFlowPresented = true
                 case .failure(let error):
                     Logger.shared.log("Error al actualizar perfil: \(error.localizedDescription)")
+                    self?.dniError = "dni.already.in.use".localized
                 }
             }
         }

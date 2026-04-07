@@ -161,11 +161,13 @@ struct ReservationsComponentView: View {
         .overlay {
             if self.viewModel.dniIsMissing {
                 VStack {
-                    ConfirmDNIView { value in
+                    ConfirmDNIView(serverError: viewModel.dniError) { value in
                         if !value.isEmpty {
                             self.viewModel.setDNIToTheUser(value)
+                        } else {
+                            self.viewModel.dniError = nil
+                            self.viewModel.dniIsMissing = false
                         }
-                        self.viewModel.dniIsMissing = false
                     }
                 }
                 .background(.black)

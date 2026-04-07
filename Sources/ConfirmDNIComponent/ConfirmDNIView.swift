@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ConfirmDNIView: View {
+    var serverError: String? = nil
     let action: (String) -> Void
     @State private var dni: String = ""
     @State private var isDNIValid: Bool = true
@@ -19,7 +20,7 @@ struct ConfirmDNIView: View {
                             errorMessage = isDNIValid ? nil : "El DNI debe tener 8 dígitos seguidos de una letra mayúscula.".localized
                         }
 
-                    if let error = errorMessage {
+                    if let error = serverError ?? errorMessage {
                         Text(error)
                             .font(.caption)
                             .foregroundColor(.red)

@@ -179,3 +179,7 @@
 "No, reservar solo simulador" = "No, reservar solo simulador";
 "Sí, añadir espacio" = "Sí, añadir espacio";
 "Selecciona un espacio extra" = "Selecciona un espacio extra";
+
+// MARK: - DNI
+"dni.already.in.use" = "Este DNI ya está vinculado a otro usuario.";
+
