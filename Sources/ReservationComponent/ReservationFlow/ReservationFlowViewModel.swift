@@ -24,6 +24,19 @@ class ReservationFlowViewModel: ObservableObject {
     @Published var teamSelectedInformation: EventModel?
     @Published var showLegendPopup = false
 
+    // MARK: - Slot occupancy
+    @Published var occupiedTimeIds: Set<Int> = []
+    @Published var isLoadingOccupancy: Bool = false
+    @Published var occupiedSimulatorTimeIds: Set<Int> = []
+    @Published var isLoadingSimulatorOccupancy: Bool = false
+    @Published var occupiedExtraSpaceTimeIds: Set<Int> = []
+    @Published var isLoadingExtraSpaceOccupancy: Bool = false
+
+    // Per-slot occupancy maps: [slotId: Set<timeId>] — used to pick a free slot at booking time
+    private var slotOccupancyMap: [Int: Set<Int>] = [:]
+    private var simulatorSlotOccupancyMap: [Int: Set<Int>] = [:]
+    private var extraSpaceSlotOccupancyMap: [Int: Set<Int>] = [:]
+
     // MARK: - Simulator add-on
     @Published var wantsSimulator: Bool = false
     @Published var simulatorSelectedSlots: [GamingSpaceTime] = []
@@ -237,6 +250,7 @@ class ReservationFlowViewModel: ObservableObject {
         } else {
             selectedSpace = space
             availableSlots = []; selectedSlots = []; enabledSlots = []
+            occupiedTimeIds = []; isLoadingOccupancy = false
         }
     }
 
@@ -246,23 +260,46 @@ class ReservationFlowViewModel: ObservableObject {
         let isSim = selectedSpace?.device.lowercased().contains("simulador") ?? false
         apiManager.fetchSlots(dayValue: dayValue, isSimulator: isSim) { [weak self] result in
             DispatchQueue.main.async {
+                guard let self else { completion?(); return }
                 if case .success(let slots) = result {
-                    self?.availableSlots = slots
-                    self?.updateEnabledSlots()
+                    self.availableSlots = slots
+                    self.isLoadingOccupancy = true
+                    self.fetchOccupiedTimes(completion: completion)
+                } else {
+                    completion?()
                 }
+            }
+        }
+    }
+
+    private func fetchOccupiedTimes(completion: (() -> Void)? = nil) {
+        guard let space = selectedSpace, let date = selectedDate else {
+            isLoadingOccupancy = false
+            updateEnabledSlots()
+            completion?()
+            return
+        }
+        apiManager.fetchOccupiedTimeIds(space: space, date: date) { [weak self] occupied, perSlot in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.occupiedTimeIds = occupied
+                self.slotOccupancyMap = perSlot
+                self.isLoadingOccupancy = false
+                self.updateEnabledSlots()
                 completion?()
             }
         }
     }
 
     func updateEnabledSlots() {
-        guard !selectedSlots.isEmpty else { enabledSlots = availableSlots; return }
+        let notOccupied = availableSlots.filter { !occupiedTimeIds.contains($0.id) }
+        guard !selectedSlots.isEmpty else { enabledSlots = notOccupied; return }
         let isSim = selectedSpace?.device.lowercased().contains("simulador") ?? false
         let maxSlots = isSim ? 1 : (personalReservations ? 3 : 2)
         let sorted = selectedSlots.sorted { $0.value < $1.value }
         let minVal = sorted.first?.value ?? 0
         let maxVal = sorted.last?.value ?? 0
-        enabledSlots = availableSlots.filter { slot in
+        enabledSlots = notOccupied.filter { slot in
             (slot.value >= minVal && slot.value <= maxVal + 1 && slot.value <= minVal + (maxSlots - 1))
             || selectedSlots.contains(where: { $0.id == slot.id })
         }
@@ -284,7 +321,30 @@ class ReservationFlowViewModel: ObservableObject {
     func fetchSimulatorSlots(completion: (() -> Void)? = nil) {
         apiManager.fetchSlots(dayValue: calculateDayValue(for: selectedDate), isSimulator: true) { [weak self] result in
             DispatchQueue.main.async {
-                if case .success(let slots) = result { self?.availableSimulatorSlots = slots }
+                guard let self else { completion?(); return }
+                if case .success(let slots) = result {
+                    self.availableSimulatorSlots = slots
+                    self.isLoadingSimulatorOccupancy = true
+                    self.fetchOccupiedSimulatorTimes(completion: completion)
+                } else {
+                    completion?()
+                }
+            }
+        }
+    }
+
+    private func fetchOccupiedSimulatorTimes(completion: (() -> Void)? = nil) {
+        guard let space = simulatorSpace, let date = selectedDate else {
+            isLoadingSimulatorOccupancy = false
+            completion?()
+            return
+        }
+        apiManager.fetchOccupiedTimeIds(space: space, date: date) { [weak self] occupied, perSlot in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.occupiedSimulatorTimeIds = occupied
+                self.simulatorSlotOccupancyMap = perSlot
+                self.isLoadingSimulatorOccupancy = false
                 completion?()
             }
         }
@@ -298,6 +358,7 @@ class ReservationFlowViewModel: ObservableObject {
 
     func resetSimulatorSelection() {
         wantsSimulator = false; simulatorSelectedSlots = []; availableSimulatorSlots = []
+        occupiedSimulatorTimeIds = []; isLoadingSimulatorOccupancy = false
     }
 
     // MARK: - Extra space add-on
@@ -316,8 +377,29 @@ class ReservationFlowViewModel: ObservableObject {
                 guard let self else { completion?(); return }
                 if case .success(let slots) = result {
                     self.availableExtraSpaceSlots = slots
-                    self.enabledExtraSpaceSlots = slots
+                    self.isLoadingExtraSpaceOccupancy = true
+                    self.fetchOccupiedExtraSpaceTimes(completion: completion)
+                } else {
+                    completion?()
                 }
+            }
+        }
+    }
+
+    private func fetchOccupiedExtraSpaceTimes(completion: (() -> Void)? = nil) {
+        guard let space = extraSpace, let date = selectedDate else {
+            isLoadingExtraSpaceOccupancy = false
+            updateEnabledExtraSpaceSlots()
+            completion?()
+            return
+        }
+        apiManager.fetchOccupiedTimeIds(space: space, date: date) { [weak self] occupied, perSlot in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.occupiedExtraSpaceTimeIds = occupied
+                self.extraSpaceSlotOccupancyMap = perSlot
+                self.isLoadingExtraSpaceOccupancy = false
+                self.updateEnabledExtraSpaceSlots()
                 completion?()
             }
         }
@@ -331,11 +413,12 @@ class ReservationFlowViewModel: ObservableObject {
     }
 
     func updateEnabledExtraSpaceSlots() {
-        guard !extraSpaceSelectedSlots.isEmpty else { enabledExtraSpaceSlots = availableExtraSpaceSlots; return }
+        let notOccupied = availableExtraSpaceSlots.filter { !occupiedExtraSpaceTimeIds.contains($0.id) }
+        guard !extraSpaceSelectedSlots.isEmpty else { enabledExtraSpaceSlots = notOccupied; return }
         let sorted = extraSpaceSelectedSlots.sorted { $0.value < $1.value }
         let minVal = sorted.first?.value ?? 0
         let maxVal = sorted.last?.value ?? 0
-        enabledExtraSpaceSlots = availableExtraSpaceSlots.filter { slot in
+        enabledExtraSpaceSlots = notOccupied.filter { slot in
             (slot.value >= minVal && slot.value <= maxVal + 1 && slot.value <= minVal + 2)
             || extraSpaceSelectedSlots.contains(where: { $0.id == slot.id })
         }
@@ -343,6 +426,7 @@ class ReservationFlowViewModel: ObservableObject {
 
     func resetExtraSpaceSelection() {
         wantsExtraSpace = false; extraSpace = nil; extraSpaceSelectedSlots = []; availableExtraSpaceSlots = []; enabledExtraSpaceSlots = []
+        occupiedExtraSpaceTimeIds = []; isLoadingExtraSpaceOccupancy = false
     }
 
     // MARK: - Cross-blocking entre reserva principal y add-on
@@ -366,6 +450,19 @@ class ReservationFlowViewModel: ObservableObject {
 
     // MARK: - Acciones de reserva
 
+    /// Returns the first slot in the space that has NO conflict with the given times.
+    /// Falls back to slots.first if all slots are somehow taken (server will reject, not our problem).
+    private func findFreeSlot(in space: Space, occupancyMap: [Int: Set<Int>], for times: [GamingSpaceTime]) -> Slot {
+        let selectedTimeIds = Set(times.map { $0.id })
+        for slot in space.slots {
+            let bookedTimeIds = occupancyMap[slot.id] ?? []
+            if bookedTimeIds.isDisjoint(with: selectedTimeIds) {
+                return slot
+            }
+        }
+        return space.slots.first ?? Slot(id: 0, position: "", space: 0)
+    }
+
     func createReservation() {
         guard let date = selectedDate,
               let space = selectedSpace,
@@ -374,7 +471,7 @@ class ReservationFlowViewModel: ObservableObject {
 
         isCreatingReservation = true
         let teamId = personalReservations ? nil : userManager.getSelectedTeam()?.id
-        let slot = space.slots.first ?? Slot(id: 0, position: "", space: 0)
+        let slot = findFreeSlot(in: space, occupancyMap: slotOccupancyMap, for: selectedSlots)
 
         apiManager.createIndividualReservation(date: date, slot: slot, userId: userId, teamId: teamId, times: selectedSlots) { [weak self] result in
             DispatchQueue.main.async {
@@ -511,7 +608,7 @@ class ReservationFlowViewModel: ObservableObject {
         guard let date = selectedDate, let userId = userManager.getUser()?.id else { completion(true); return }
 
         if wantsSimulator, !simulatorSelectedSlots.isEmpty, let simSpace = simulatorSpace {
-            let slot = simSpace.slots.first ?? Slot(id: 0, position: "", space: 0)
+            let slot = findFreeSlot(in: simSpace, occupancyMap: simulatorSlotOccupancyMap, for: simulatorSelectedSlots)
             apiManager.createAddonReservation(date: date, userId: userId, addonSlot: slot, addonTimes: simulatorSelectedSlots) { result in
                 completion(result.isSuccess)
             }
@@ -519,7 +616,7 @@ class ReservationFlowViewModel: ObservableObject {
         }
 
         if wantsExtraSpace, !extraSpaceSelectedSlots.isEmpty, let extra = extraSpace {
-            let slot = extra.slots.first ?? Slot(id: 0, position: "", space: 0)
+            let slot = findFreeSlot(in: extra, occupancyMap: extraSpaceSlotOccupancyMap, for: extraSpaceSelectedSlots)
             apiManager.createAddonReservation(date: date, userId: userId, addonSlot: slot, addonTimes: extraSpaceSelectedSlots) { result in
                 completion(result.isSuccess)
             }

@@ -104,6 +104,42 @@ class ReservationAPIManager {
         }
     }
 
+    // MARK: - Ocupación de slots
+
+    /// Returns which time IDs are fully booked (all physical slots occupied) AND a per-slot occupancy map.
+    /// - perSlot: [slotId: Set<timeId>] — which times each slot has booked
+    func fetchOccupiedTimeIds(space: Space, date: Date, completion: @escaping (Set<Int>, [Int: Set<Int>]) -> Void) {
+        let slotIds = space.slots.map { $0.id }
+        guard !slotIds.isEmpty else { completion([], [:]); return }
+
+        let dateFmt = DateFormatter()
+        dateFmt.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFmt.string(from: date)
+        let totalSlots = slotIds.count
+
+        reservationService.getReservationsBySlots(slotIds: slotIds, date: dateString) { result in
+            switch result {
+            case .success(let entries):
+                var slotsPerTime: [Int: Set<Int>] = [:]
+                var perSlotMap: [Int: Set<Int>] = [:]
+                for entry in entries {
+                    for timeId in entry.timeIds {
+                        slotsPerTime[timeId, default: []].insert(entry.slotId)
+                    }
+                    perSlotMap[entry.slotId, default: []].formUnion(entry.timeIds)
+                }
+                // A time is fully occupied when ALL physical slots are booked at that time
+                let occupied = Set(slotsPerTime.compactMap { timeId, slots -> Int? in
+                    slots.count >= totalSlots ? timeId : nil
+                })
+                completion(occupied, perSlotMap)
+            case .failure:
+                // On error, don't block any slots — fail open
+                completion([], [:])
+            }
+        }
+    }
+
     // MARK: - Crear reserva individual + QR
 
     func createIndividualReservation(
