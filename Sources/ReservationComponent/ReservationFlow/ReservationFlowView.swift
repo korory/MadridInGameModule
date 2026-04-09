@@ -327,8 +327,15 @@ struct SelectDateView: View {
                         .frame(height: 350)
                 }
                 Spacer()
+                if viewModel.hasIndividualReservationOnSelectedDate {
+                    Text("No puedes hacer más reservas en esta fecha, por favor seleccione otra.".localized)
+                        .font(.madridInGameiOSFont(size: 13))
+                        .foregroundColor(.red.opacity(0.85))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 4)
+                }
                 if viewModel.currentStep > 0 { SecondaryButton(title: "Atrás".localized) { viewModel.currentStep -= 1 } }
-                PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedDate != nil) { viewModel.currentStep += 1 }
+                PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedDate != nil && !viewModel.hasIndividualReservationOnSelectedDate) { viewModel.currentStep += 1 }
             }.padding(.horizontal, 20).padding(.vertical, 16)
         }
     }

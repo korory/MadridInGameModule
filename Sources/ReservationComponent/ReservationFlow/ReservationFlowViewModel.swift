@@ -90,6 +90,14 @@ class ReservationFlowViewModel: ObservableObject {
         availableSpaces.filter { !$0.device.lowercased().contains("simulador") }
     }
 
+    /// True when the selected date already has an individual reservation and the user is making a new one (not editing).
+    var hasIndividualReservationOnSelectedDate: Bool {
+        guard let date = selectedDate, personalReservations, individualSelectedInformation == nil else { return false }
+        return markedDates.contains { mark in
+            mark.individualReservation && Calendar.current.isDate(mark.date, inSameDayAs: date)
+        }
+    }
+
     // MARK: - Init
 
     init(
