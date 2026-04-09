@@ -246,7 +246,7 @@ extension ReservationComponentViewModel {
     
     private func userReservationLimit() -> Int {
         guard let user = userManager.getUser() else { return 1 }
-        return userIsValidated() ? (user.reservesAllowed ?? 1) : 1
+        return user.numberOfBookingsAllowed
     }
     
     func userCanBook() -> Bool {
