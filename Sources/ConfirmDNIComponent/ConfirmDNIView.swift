@@ -40,6 +40,14 @@ enum DocumentType: CaseIterable {
         }
     }
 
+    var duplicateError: String {
+        switch self {
+        case .dniId:    return "doc.duplicate.dni_id".localized
+        case .nie:      return "doc.duplicate.nie".localized
+        case .passport: return "doc.duplicate.passport".localized
+        }
+    }
+
     func validate(_ value: String) -> Bool {
         switch self {
         case .dniId:    return DocumentValidator.validateDNI(value) || DocumentValidator.validateEuropeanID(value)
@@ -205,7 +213,7 @@ private enum DocumentValidator {
 
 struct ConfirmDNIView: View {
     var serverError: String? = nil
-    let action: (String) -> Void
+    let action: (String, DocumentType) -> Void
 
     @State private var documentType: DocumentType = .dniId
     @State private var inputValue: String = ""
@@ -312,7 +320,7 @@ extension ConfirmDNIView {
             pressEnabled: isValid,
             widthButton: 160,
             heightButton: 50
-        ) { action(inputValue) }
+        ) { action(inputValue, documentType) }
         .padding(.top, 8)
     }
 
@@ -324,7 +332,7 @@ extension ConfirmDNIView {
             pressEnabled: true,
             widthButton: 160,
             heightButton: 50
-        ) { action("") }
+        ) { action("", documentType) }
         .padding(.top, 8)
     }
 }
@@ -332,6 +340,6 @@ extension ConfirmDNIView {
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea()
-        ConfirmDNIView(action: { _ in })
+        ConfirmDNIView(action: { _, _ in })
     }
 }

@@ -302,7 +302,7 @@ extension ReservationComponentViewModel {
         }
     }
 
-    func setDNIToTheUser(_ dni: String) {
+    func setDNIToTheUser(_ dni: String, documentType: DocumentType) {
         guard let id = self.userManager.getUser()?.id else { return }
         self.isLoading = true
         ProfileInformation().updateSingleDNIInformationProfile(userId: id, dni: dni) { result in
@@ -316,7 +316,11 @@ extension ReservationComponentViewModel {
                     self?.isReservationFlowPresented = true
                 case .failure(let error):
                     Logger.shared.log("Error al actualizar perfil: \(error.localizedDescription)")
-                    self?.dniError = "dni.already.in.use".localized
+                    if case NetworkError.serverError(let statusCode) = error, statusCode == 400 || statusCode == 409 {
+                        self?.dniError = documentType.duplicateError
+                    } else {
+                        self?.dniError = "error.network.generic".localized
+                    }
                 }
             }
         }

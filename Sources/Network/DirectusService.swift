@@ -13,6 +13,7 @@ enum NetworkError: Error {
     case invalidBody
     case noData
     case invalidResponse
+    case serverError(statusCode: Int)
     case encodingError
     case decodingError
 }
@@ -38,6 +39,8 @@ extension NetworkError: LocalizedError {
             return "No Data"
         case .invalidResponse:
             return "Invalid Response"
+        case .serverError(let statusCode):
+            return "Server Error (\(statusCode))"
         case .encodingError:
             return "Encoding Error"
         case .decodingError:
@@ -113,7 +116,7 @@ actor DirectusService {
         if !(200...299).contains(httpResponse.statusCode) {
             let responseData = String(data: data, encoding: .utf8) ?? "No se pudo leer la respuesta"
             Logger.shared.log("Error HTTP: \(httpResponse.statusCode) - Respuesta: \(responseData)")
-            throw NetworkError.invalidResponse
+            throw NetworkError.serverError(statusCode: httpResponse.statusCode)
         }
         
         do {

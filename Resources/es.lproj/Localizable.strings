@@ -197,3 +197,9 @@
 "El pasaporte no corresponde a ningún formato reconocido." = "El pasaporte no corresponde a ningún formato reconocido.";
 "Importante: Debes llevar tu documento de identidad contigo para poder acceder al centro la primera vez y validar tu usuario." = "Importante: Debes llevar tu documento de identidad contigo para poder acceder al centro la primera vez y validar tu usuario.";
 
+// MARK: - Errores de duplicado / red
+"doc.duplicate.dni_id" = "Este DNI/ID ya está vinculado a otro usuario.";
+"doc.duplicate.nie" = "Este NIE ya está vinculado a otro usuario.";
+"doc.duplicate.passport" = "Este pasaporte ya está vinculado a otro usuario.";
+"error.network.generic" = "Ha ocurrido un error. Por favor, inténtalo de nuevo.";
+
