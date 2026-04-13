@@ -2,9 +2,8 @@ import SwiftUI
 
 class ReservationComponentViewModel: ObservableObject {
     
-    /// Default max reservations per team until backend provides the value
-    private static let defaultTeamReservationLimit = 3
-    
+    private var trainingsTeamLimit: Int = 3
+
     @Published var isReservationFlowPresented = false
 
     @Published var userManager = UserManager.shared
@@ -65,7 +64,15 @@ class ReservationComponentViewModel: ObservableObject {
                 self.isLoading = false
             }
         } else {
-            self.fetchTeamReservations {
+            let group = DispatchGroup()
+
+            group.enter()
+            self.fetchAppParameters { group.leave() }
+
+            group.enter()
+            self.fetchTeamReservations { group.leave() }
+
+            group.notify(queue: .main) {
                 self.isLoading = false
             }
         }
@@ -261,15 +268,24 @@ extension ReservationComponentViewModel {
     func teamCanBook() -> Bool {
         return allTeamReservations.count < teamReservationLimit()
     }
-    
-    /// Maximum number of active reservations allowed for the team.
-    /// Currently hardcoded to `defaultTeamReservationLimit`.
-    /// TODO: Replace with a backend field from Team model when available,
-    ///       e.g. `userManager.getSelectedTeam()?.reservesAllowed ?? Self.defaultTeamReservationLimit`
+
     private func teamReservationLimit() -> Int {
-        // Future: read from backend team field
-        // return userManager.getSelectedTeam()?.reservesAllowed ?? Self.defaultTeamReservationLimit
-        return Self.defaultTeamReservationLimit
+        return trainingsTeamLimit
+    }
+
+    func fetchAppParameters(completion: @escaping () -> Void) {
+        ParametersService.shared.fetchParameters { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let params):
+                    self?.trainingsTeamLimit = params.trainingsTeamLimit
+                    Logger.shared.log("trainingsTeamLimit fetched: \(params.trainingsTeamLimit)")
+                case .failure(let error):
+                    Logger.shared.log("Error fetching app parameters: \(error)")
+                }
+                completion()
+            }
+        }
     }
 }
 
@@ -332,7 +348,8 @@ extension ReservationComponentViewModel {
                 }
             }
         } else {
-            // Team booking
+            // Team booking — only managers allowed
+            guard getUserRol().lowercased() == "manager" else { return }
             if !teamCanBook() {
                 noReservationAllowed = true
             } else {
