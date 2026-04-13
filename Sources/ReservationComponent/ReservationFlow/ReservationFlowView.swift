@@ -327,8 +327,15 @@ struct SelectDateView: View {
                         .frame(height: 350)
                 }
                 Spacer()
+                if viewModel.hasIndividualReservationOnSelectedDate {
+                    Text("No puedes hacer más reservas en esta fecha, por favor seleccione otra.".localized)
+                        .font(.madridInGameiOSFont(size: 13))
+                        .foregroundColor(.red.opacity(0.85))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 4)
+                }
                 if viewModel.currentStep > 0 { SecondaryButton(title: "Atrás".localized) { viewModel.currentStep -= 1 } }
-                PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedDate != nil) { viewModel.currentStep += 1 }
+                PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedDate != nil && !viewModel.hasIndividualReservationOnSelectedDate) { viewModel.currentStep += 1 }
             }.padding(.horizontal, 20).padding(.vertical, 16)
         }
     }
@@ -396,13 +403,17 @@ struct SelectSlotView: View {
             } else {
                 Text("Selecciona franja horaria".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
 
-                if viewModel.availableSlots.isEmpty {
+                if viewModel.availableSlots.isEmpty || viewModel.isLoadingOccupancy {
                     VStack {
                         Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                         ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
                         Text("Cargando horarios disponibles...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                     }.frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .onAppear { viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate)) }
+                    .onAppear {
+                        if viewModel.availableSlots.isEmpty {
+                            viewModel.fetchAvailableSlots(for: viewModel.calculateDayValue(for: viewModel.selectedDate))
+                        }
+                    }
                 } else {
                     ScrollView {
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
@@ -540,7 +551,7 @@ struct SelectSimulatorSlotView: View {
                 Text("Selecciona hora de simulador".localized)
                     .font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
 
-                if viewModel.availableSimulatorSlots.isEmpty {
+                if viewModel.availableSimulatorSlots.isEmpty || viewModel.isLoadingSimulatorOccupancy {
                     VStack {
                         Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                         ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()
@@ -578,7 +589,8 @@ struct SelectSimulatorSlotView: View {
         let isToday = if let date = viewModel.selectedDate { Calendar.current.isDateInToday(date) } else { false }
         let isTimeValid = slot.value > currentHourPlus2
         let isBlockedByMain = viewModel.isSimulatorSlotBlockedByMain(slot)
-        let computedEnabled = isToday ? (isTimeValid && !isBlockedByMain) : !isBlockedByMain
+        let isOccupied = viewModel.occupiedSimulatorTimeIds.contains(slot.id)
+        let computedEnabled = isToday ? (isTimeValid && !isBlockedByMain && !isOccupied) : (!isBlockedByMain && !isOccupied)
 
         return PillButton(title: slot.time, isSelected: isSelected, isEnabled: computedEnabled) {
             if computedEnabled { viewModel.toggleSimulatorSlotSelection(slot) }
@@ -728,7 +740,7 @@ struct SelectExtraSlotView: View {
                         .font(.madridInGameiOSFont(size: 14)).foregroundColor(.cyan)
                 }
 
-                if viewModel.availableExtraSpaceSlots.isEmpty {
+                if viewModel.availableExtraSpaceSlots.isEmpty || viewModel.isLoadingExtraSpaceOccupancy {
                     VStack {
                         Image(uiImage: UserDefaults.getLogoMIG() ?? UIImage(systemName: "")!).resizable().scaledToFit().frame(width: 100, height: 50)
                         ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .purple)).scaleEffect(1.5).padding()

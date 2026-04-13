@@ -100,6 +100,32 @@ struct TrainingResponse: Codable {
     let id: String?
 }
 
+// MARK: - Occupancy query models (private)
+
+private struct SlotOccupancyResponse: Codable {
+    let data: [SlotOccupancyEntry]
+}
+
+private struct SlotOccupancyEntry: Codable {
+    let slot: SlotIdOnly
+    let times: [OccupancyTimeRef]
+}
+
+private struct SlotIdOnly: Codable {
+    let id: Int
+}
+
+private struct OccupancyTimeRef: Codable {
+    let gamingSpaceTimesId: OccupancyTimeId?
+    enum CodingKeys: String, CodingKey {
+        case gamingSpaceTimesId = "gaming_space_times_id"
+    }
+}
+
+private struct OccupancyTimeId: Codable {
+    let id: Int
+}
+
 class ReservationService {
 
     // MARK: - Crear reserve individual
@@ -476,6 +502,35 @@ class ReservationService {
                     parameters: parameters
                 )
                 completion(.success(response.data))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+
+    // MARK: - Ocupación de slots por espacio y fecha
+
+    func getReservationsBySlots(slotIds: [Int], date: String, completion: @escaping (Result<[(slotId: Int, timeIds: [Int])], Error>) -> Void) {
+        let slotIdsString = slotIds.map { String($0) }.joined(separator: ",")
+        let parameters: [String: String] = [
+            "fields": "slot.id,times.gaming_space_times_id.id",
+            "filter[slot][_in]": slotIdsString,
+            "filter[date][_eq]": date,
+            "limit": "-1"
+        ]
+
+        Task {
+            do {
+                let response: SlotOccupancyResponse = try await DirectusService.shared.request(
+                    endpoint: "gaming_space_reserves",
+                    method: .GET,
+                    parameters: parameters
+                )
+                let mapped = response.data.map { entry -> (slotId: Int, timeIds: [Int]) in
+                    let timeIds = entry.times.compactMap { $0.gamingSpaceTimesId?.id }
+                    return (slotId: entry.slot.id, timeIds: timeIds)
+                }
+                completion(.success(mapped))
             } catch {
                 completion(.failure(error))
             }

@@ -38,15 +38,15 @@ struct UserModel: Codable {
     }
     
     var numberOfBookingsAllowed: Int {
-        return if isUserActive {
-            reservesAllowed ?? 1
-        } else {
-            1
+        switch status?.lowercased() {
+        case "active": return 3
+        default: return 1
         }
     }
-    
+
     var isUserActive: Bool {
-        status == "published"
+        let s = status?.lowercased() ?? ""
+        return s == "published" || s == "active"
     }
     
     var isDNIAvailable: Bool {

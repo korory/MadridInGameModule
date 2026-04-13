@@ -2,9 +2,8 @@ import SwiftUI
 
 class ReservationComponentViewModel: ObservableObject {
     
-    /// Default max reservations per team until backend provides the value
-    private static let defaultTeamReservationLimit = 3
-    
+    private var trainingsTeamLimit: Int = 3
+
     @Published var isReservationFlowPresented = false
 
     @Published var userManager = UserManager.shared
@@ -23,6 +22,7 @@ class ReservationComponentViewModel: ObservableObject {
     @Published var selectedReservation: Reservation?
 
     @Published var dniIsMissing: Bool = false
+    @Published var dniError: String? = nil
 
     @Published var noReservationAllowed: Bool = false
     @Published var noReservationAllowedWithoutDNI: Bool = false
@@ -64,7 +64,15 @@ class ReservationComponentViewModel: ObservableObject {
                 self.isLoading = false
             }
         } else {
-            self.fetchTeamReservations {
+            let group = DispatchGroup()
+
+            group.enter()
+            self.fetchAppParameters { group.leave() }
+
+            group.enter()
+            self.fetchTeamReservations { group.leave() }
+
+            group.notify(queue: .main) {
                 self.isLoading = false
             }
         }
@@ -245,7 +253,7 @@ extension ReservationComponentViewModel {
     
     private func userReservationLimit() -> Int {
         guard let user = userManager.getUser() else { return 1 }
-        return userIsValidated() ? (user.reservesAllowed ?? 1) : 1
+        return user.numberOfBookingsAllowed
     }
     
     func userCanBook() -> Bool {
@@ -260,15 +268,24 @@ extension ReservationComponentViewModel {
     func teamCanBook() -> Bool {
         return allTeamReservations.count < teamReservationLimit()
     }
-    
-    /// Maximum number of active reservations allowed for the team.
-    /// Currently hardcoded to `defaultTeamReservationLimit`.
-    /// TODO: Replace with a backend field from Team model when available,
-    ///       e.g. `userManager.getSelectedTeam()?.reservesAllowed ?? Self.defaultTeamReservationLimit`
+
     private func teamReservationLimit() -> Int {
-        // Future: read from backend team field
-        // return userManager.getSelectedTeam()?.reservesAllowed ?? Self.defaultTeamReservationLimit
-        return Self.defaultTeamReservationLimit
+        return trainingsTeamLimit
+    }
+
+    func fetchAppParameters(completion: @escaping () -> Void) {
+        ParametersService.shared.fetchParameters { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let params):
+                    self?.trainingsTeamLimit = params.trainingsTeamLimit
+                    Logger.shared.log("trainingsTeamLimit fetched: \(params.trainingsTeamLimit)")
+                case .failure(let error):
+                    Logger.shared.log("Error fetching app parameters: \(error)")
+                }
+                completion()
+            }
+        }
     }
 }
 
@@ -285,7 +302,7 @@ extension ReservationComponentViewModel {
         }
     }
 
-    func setDNIToTheUser(_ dni: String) {
+    func setDNIToTheUser(_ dni: String, documentType: DocumentType) {
         guard let id = self.userManager.getUser()?.id else { return }
         self.isLoading = true
         ProfileInformation().updateSingleDNIInformationProfile(userId: id, dni: dni) { result in
@@ -295,9 +312,15 @@ extension ReservationComponentViewModel {
                 case .success(let profile):
                     Logger.shared.log("Dni actualizado correctamente: \(profile)")
                     self?.userManager.setDNI(dni)
+                    self?.dniIsMissing = false
                     self?.isReservationFlowPresented = true
                 case .failure(let error):
                     Logger.shared.log("Error al actualizar perfil: \(error.localizedDescription)")
+                    if case NetworkError.serverError(let statusCode) = error, statusCode == 400 || statusCode == 409 {
+                        self?.dniError = documentType.duplicateError
+                    } else {
+                        self?.dniError = "error.network.generic".localized
+                    }
                 }
             }
         }
@@ -329,7 +352,8 @@ extension ReservationComponentViewModel {
                 }
             }
         } else {
-            // Team booking
+            // Team booking — only managers allowed
+            guard getUserRol().lowercased() == "manager" else { return }
             if !teamCanBook() {
                 noReservationAllowed = true
             } else {

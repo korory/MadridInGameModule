@@ -47,6 +47,7 @@
 "Máximo 1 spot" = "Máximo 1 spot";
 "NOTICIAS" = "NOTICIAS";
 "No hay entrenamientos programados" = "No hay entrenamientos programados";
+"No puedes hacer más reservas en esta fecha, por favor seleccione otra." = "No puedes hacer más reservas en esta fecha, por favor seleccione otra.";
 "No hay información disponible." = "No hay información disponible.";
 "No hay noticias en este equipo actualmente" = "No hay noticias en este equipo actualmente";
 "No hay reservas" = "No hay reservas";
@@ -179,3 +180,26 @@
 "No, reservar solo simulador" = "No, reservar solo simulador";
 "Sí, añadir espacio" = "Sí, añadir espacio";
 "Selecciona un espacio extra" = "Selecciona un espacio extra";
+
+// MARK: - DNI / NIE / Pasaporte / País
+"dni.already.in.use" = "Este DNI ya está vinculado a otro usuario.";
+"Selecciona tu país" = "Selecciona tu país";
+"Buscar país..." = "Buscar país...";
+"Pasaporte" = "Pasaporte";
+"Confirma tu NIE" = "Confirma tu NIE";
+"Confirma tu DNI / ID" = "Confirma tu DNI / ID";
+"Introduce y confirma tu DNI / ID" = "Introduce y confirma tu DNI / ID";
+"El documento no corresponde a ningún formato de DNI o ID europeo reconocido." = "El documento no corresponde a ningún formato de DNI o ID europeo reconocido.";
+"Confirma tu Pasaporte" = "Confirma tu Pasaporte";
+"Introduce y confirma tu NIE" = "Introduce y confirma tu NIE";
+"Introduce y confirma tu Pasaporte" = "Introduce y confirma tu Pasaporte";
+"El NIE debe comenzar con X, Y o Z, seguido de 7 dígitos y una letra." = "El NIE debe comenzar con X, Y o Z, seguido de 7 dígitos y una letra.";
+"El pasaporte no corresponde a ningún formato reconocido." = "El pasaporte no corresponde a ningún formato reconocido.";
+"Importante: Debes llevar tu documento de identidad contigo para poder acceder al centro la primera vez y validar tu usuario." = "Importante: Debes llevar tu documento de identidad contigo para poder acceder al centro la primera vez y validar tu usuario.";
+
+// MARK: - Errores de duplicado / red
+"doc.duplicate.dni_id" = "Este DNI/ID ya está vinculado a otro usuario.";
+"doc.duplicate.nie" = "Este NIE ya está vinculado a otro usuario.";
+"doc.duplicate.passport" = "Este pasaporte ya está vinculado a otro usuario.";
+"error.network.generic" = "Ha ocurrido un error. Por favor, inténtalo de nuevo.";
+
