@@ -10,7 +10,8 @@ import SwiftUI
 
 class CompetitionsViewModel: ObservableObject {
     @Published var seasonSelected: SeasonsModel?
-    
+    @Published var isLoading: Bool = false
+
     private let competitionsService = CompetitionsService()
     @Published var competitionInformation: [CompetitionData] = []
         
@@ -29,11 +30,16 @@ class CompetitionsViewModel: ObservableObject {
     
     
     func getSeasonInformation() {
+        isLoading = true
+        competitionInformation = []
         competitionsService.getCompetitions(year: seasonSelected?.year ?? "") { [weak self] result in
-            DispatchQueue.main.async {
+            Task { @MainActor [weak self] in
+                defer { self?.isLoading = false }
                 switch result {
                 case .success(let competitions):
-                    self?.competitionInformation = competitions
+                    self?.competitionInformation = competitions.sorted {
+                        ($0.game?.priority ?? Int.max) < ($1.game?.priority ?? Int.max)
+                    }
                 case .failure(let error):
                     Logger.shared.log("Error al obtener reservas de equipo: \(error)")
                 }
@@ -73,7 +79,7 @@ class CompetitionsViewModel: ObservableObject {
     
     func filterCompetitonsByType(type: String) -> [CompetitionData] {
         return self.competitionInformation.compactMap { competition in
-            (competition.game?.type == type) ? competition : nil
+            (competition.type == type) ? competition : nil
         }
     }
     

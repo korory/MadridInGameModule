@@ -131,11 +131,29 @@ extension Bundle {
         }
         return nil
     }()
+
+    /// Returns the .lproj bundle matching the device language:
+    /// Spanish (es) or Catalan (ca) → es.lproj, everything else → en.lproj
+    static var localizedBundle: Bundle = {
+        guard let podBundle else { return .main }
+
+        let primaryLang = Locale.preferredLanguages
+            .compactMap { $0.components(separatedBy: "-").first }
+            .first ?? "en"
+
+        let targetLang = (primaryLang == "es" || primaryLang == "ca") ? "es" : "en"
+
+        if let url = podBundle.url(forResource: targetLang, withExtension: "lproj"),
+           let langBundle = Bundle(url: url) {
+            return langBundle
+        }
+        return podBundle
+    }()
 }
 
 extension String {
     var localized: String {
-        return NSLocalizedString(self, bundle: Bundle.podBundle ?? .main, comment: "\(self)_comment")
+        return NSLocalizedString(self, bundle: Bundle.localizedBundle, comment: "\(self)_comment")
     }
 
     func localized(_ args: [CVarArg]) -> String {

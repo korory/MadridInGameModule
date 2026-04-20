@@ -10,12 +10,13 @@ import SwiftUI
 struct CompetitionsCarouselComponentView: View {
     let leagueInformation: LeagueModel
     let environmentManager = EnvironmentManager()
-    
+    @State private var isDescriptionExpanded = false
+
     var body: some View {
         ZStack {
             Color.clear
                 .ignoresSafeArea(.all)
-            
+
             VStack (alignment: .leading, spacing: 20){
                 titleBanner
                 if !leagueInformation.description.isEmpty {
@@ -43,57 +44,196 @@ extension CompetitionsCarouselComponentView {
     }
     
     private var subtitleBanner: some View {
-        Text(leagueInformation.description)
-            .font(.body)
-            .foregroundStyle(Color.white)
-    }
-    
-    private var carrouselComponent: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 20) {
-                ForEach(leagueInformation.allCompetitions) { competitionInformation in
-                    VStack {
-                        NavigationLink(destination: CompetitionsDetailViewComponentView(viewModel: CompetitionsDetailViewModel(competitionsInformation: competitionInformation))) {
-                            loadImage(for: competitionInformation)
-                        }
-                    }
+        VStack(alignment: .leading, spacing: 10) {
+            Text(leagueInformation.description)
+                .font(.system(size: 12))
+                .foregroundStyle(Color.white.opacity(0.75))
+                .lineLimit(isDescriptionExpanded ? nil : 2)
+                .animation(.easeInOut(duration: 0.2), value: isDescriptionExpanded)
+
+            Button {
+                isDescriptionExpanded.toggle()
+            } label: {
+                HStack(spacing: 4) {
+                    Text(isDescriptionExpanded ? "Read less" : "Read more")
+                        .font(.system(size: 13, weight: .semibold))
+                    Image(systemName: isDescriptionExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 11, weight: .semibold))
                 }
+                .foregroundColor(.cyan)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Color.cyan.opacity(0.12))
+                .cornerRadius(20)
             }
+            .buttonStyle(PlainButtonStyle())
         }
     }
     
+    private var carrouselComponent: some View {
+        let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+        return LazyVGrid(columns: columns, spacing: 12) {
+            ForEach(leagueInformation.allCompetitions) { competitionInformation in
+                NavigationLink {
+                    CompetitionsDetailViewComponentView(viewModel: CompetitionsDetailViewModel(competitionsInformation: competitionInformation))
+                } label: {
+                    CompetitionCardView(competition: competitionInformation, environmentManager: environmentManager)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+        }
+    }
+}
+
+// MARK: - Competition Card
+
+private struct CompetitionCardView: View {
+    let competition: CompetitionData
+    let environmentManager: EnvironmentManager
+
+    private static let imageHeight: CGFloat = 200
+    private static let infoHeight: CGFloat = 130
+
+    private var modalityLabel: String {
+        switch competition.game?.type {
+        case "in-person": return "competition.modality.hybrid".localized
+        case "online":    return "competition.modality.online".localized
+        default:          return ""
+        }
+    }
+
+    private var modalityColor: Color {
+        competition.game?.type == "in-person" ? .cyan : .green
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            gameImage
+            cardInfo
+        }
+        .frame(maxWidth: .infinity)
+        .background(Color.white.opacity(0.07))
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        )
+    }
+
     @ViewBuilder
-    func loadImage(for competition: CompetitionData) -> some View {
-        if let image = competition.game?.image {
-            AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(image)")) { phase in
+    private var gameImage: some View {
+        if let imageId = competition.game?.image {
+            AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(imageId)")) { phase in
                 switch phase {
                 case .empty:
                     ProgressView()
-                        .frame(width: 50, height: 50)
+                        .frame(maxWidth: .infinity, minHeight: Self.imageHeight, maxHeight: Self.imageHeight)
                         .tint(.purple)
                 case .success(let image):
                     image
                         .resizable()
-                        .scaledToFit()
-                        .cornerRadius(15)
-                        .frame(maxWidth: 250, maxHeight: 450)
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity, minHeight: Self.imageHeight, maxHeight: Self.imageHeight)
+                        .clipped()
                 case .failure:
-                    Image(systemName: "photo")
-                        .resizable()
-                        .cornerRadius(15)
-                        .frame(width: 280, height: 470)
-                        .foregroundColor(.gray)
+                    placeholderImage
                 @unknown default:
                     EmptyView()
                 }
             }
+            .cornerRadius(16, corners: [.topLeft, .topRight])
         } else {
-            Image(systemName: "photo")
-                .resizable()
-                .cornerRadius(15)
-                .frame(width: 280, height: 470)
-                .foregroundColor(.gray)
+            placeholderImage
         }
+    }
+
+    private var placeholderImage: some View {
+        Image(systemName: "photo")
+            .resizable()
+            .scaledToFit()
+            .frame(maxWidth: .infinity, minHeight: Self.imageHeight, maxHeight: Self.imageHeight)
+            .foregroundColor(.gray)
+            .background(Color.gray.opacity(0.2))
+            .cornerRadius(16, corners: [.topLeft, .topRight])
+    }
+
+    private var cardInfo: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if let name = competition.game?.name {
+                Text(name)
+                    .font(.madridInGameiOSFont(size: 16))
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+            }
+
+            if let html = competition.game?.description, !html.isEmpty,
+               let attributed = html.htmlToAttributedString(color: .gray, size: 9) {
+                Text(attributed)
+                    .lineLimit(4)
+                    .multilineTextAlignment(.leading)
+            }
+
+            Spacer(minLength: 0)
+
+            if !modalityLabel.isEmpty {
+                Text(modalityLabel)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(modalityColor)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(modalityColor.opacity(0.15))
+                    .cornerRadius(6)
+            }
+        }
+        .padding(12)
+        .frame(height: Self.infoHeight, alignment: .top)
+    }
+}
+
+// MARK: - HTML rendering helper
+
+private extension String {
+    func htmlToAttributedString(color: UIColor, size: CGFloat) -> AttributedString? {
+        let html = "<span style=\"font-family: -apple-system; font-size: \(size)pt; color: \(color.hexString);\">\(self)</span>"
+        guard let data = html.data(using: .utf8),
+              let nsAttr = try? NSAttributedString(
+                data: data,
+                options: [.documentType: NSAttributedString.DocumentType.html,
+                          .characterEncoding: String.Encoding.utf8.rawValue],
+                documentAttributes: nil)
+        else { return nil }
+        return try? AttributedString(nsAttr, including: \.uiKit)
+    }
+}
+
+private extension UIColor {
+    var hexString: String {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        getRed(&r, green: &g, blue: &b, alpha: &a)
+        return String(format: "#%02X%02X%02X", Int(r * 255), Int(g * 255), Int(b * 255))
+    }
+}
+
+// MARK: - Corner radius helper
+
+private extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape(RoundedCorner(radius: radius, corners: corners))
+    }
+}
+
+private struct RoundedCorner: Shape {
+    var radius: CGFloat
+    var corners: UIRectCorner
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
     }
 }
 

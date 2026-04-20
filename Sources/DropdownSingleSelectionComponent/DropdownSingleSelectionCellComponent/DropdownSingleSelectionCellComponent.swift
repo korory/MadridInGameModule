@@ -28,10 +28,11 @@ extension DropdownSingleSelectionCellComponent {
     
     private var checkImageAndTitleComponent: some View {
         HStack(spacing: 20) {
-            Image(systemName: isSelected ? "checkmark" : "")
+            Image(systemName: "checkmark")
                 .resizable()
                 .frame(width: 10, height: 10)
                 .foregroundStyle(Color.cyan)
+                .opacity(isSelected ? 1 : 0)
             
             Text(title)
                 .font(.madridInGameiOSFont(size: 18))

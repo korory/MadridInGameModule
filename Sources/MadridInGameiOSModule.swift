@@ -98,7 +98,7 @@ public struct MadridInGameiOSModule: View {
             } else if viewModel.selectedTab == 1 {
                 TeamsScreenView()
             } else {
-                NavigationView {
+                NavigationStack {
                     CompetitionsView(viewModel: CompetitionsViewModel())
                 }
             }

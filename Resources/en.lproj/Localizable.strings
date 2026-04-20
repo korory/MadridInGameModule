@@ -203,4 +203,25 @@
 "doc.duplicate.passport" = "This passport is already linked to another user.";
 "error.network.generic" = "An error occurred. Please try again.";
 "user.banned" = "Your account has been suspended. You cannot make reservations.";
+// MARK: - PDF viewer
+"No se pudo cargar el documento." = "Could not load the document.";
+"pdf.download" = "Download";
+
+// MARK: - Competition modality
+"competition.modality.hybrid" = "In-Person / Online";
+"competition.modality.online" = "Online";
+"competition.loading" = "Loading competitions...";
+"contact.email.copied" = "Email copied to clipboard";
+
+// MARK: - Rules accordion sections
+"rules.section.text" = "Rules";
+"rules.section.pdf" = "Full Rulebook (PDF)";
+
+// MARK: - Rules
+"rule.smoke_free" = "Smoke-free zone";
+"rule.no_food" = "No eating or drinking allowed";
+"rule.no_running" = "No running in the venue";
+"rule.respect_environment" = "Respect the environment";
+"rule.keep_clean" = "Keep the space clean";
+"rule.no_downloads" = "No downloads or installations";
 

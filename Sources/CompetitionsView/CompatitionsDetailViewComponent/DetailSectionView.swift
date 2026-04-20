@@ -10,56 +10,35 @@ import SwiftUI
 struct DetailSectionView: View {
     var title: String
     var content: String?
-    var image: String
-    var environmentManager = EnvironmentManager()
     @State var decodedContent: String = ""
-    
+
     var body: some View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
-                    AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(image)")) { phase in
-                        switch phase {
-                        case .empty:
-                            ProgressView()
-                                .frame(width: 50, height: 50)
-                                .tint(.purple)
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .cornerRadius(15)
-                                .frame(height: 100)
-                        case .failure:
-                            Image(systemName: "photo")
-                                .resizable()
-                                .cornerRadius(15)
-                                .frame(width: 280, height: 470)
-                                .foregroundColor(.gray)
-                        @unknown default:
-                            EmptyView()
-                        }
-                    }
-                    
                     Text(title.uppercased())
                         .font(.madridInGameiOSFont(size: 20))
                         .fontWeight(.bold)
                         .foregroundColor(.white)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 5)
                     if !decodedContent.isEmpty {
                         Text(decodedContent)
                             .font(.body)
                             .foregroundColor(.white)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.top, 5)
                     } else {
-                        Spacer()
                         Text("No hay información disponible.".localized)
                             .foregroundColor(.white)
-                            .padding()
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.top, 5)
                     }
-                    
                     Spacer()
                 }
                 .padding(.leading, 20)

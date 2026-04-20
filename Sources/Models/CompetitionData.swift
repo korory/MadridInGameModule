@@ -21,6 +21,8 @@ struct CompetitionData: Codable , Identifiable{
     let teams: [Int]?
     let splits: [SplitModel]?
     let game: Game?
+    let type: String?   // league category: "esm" | "junior" | "stormCircuit" | "other"
+    let pdfFile: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -31,7 +33,8 @@ struct CompetitionData: Codable , Identifiable{
         case endSignDate = "end_sign_date"
         case overview, details, contact
         case startSignDate = "start_sign_date"
-        case teams, splits, game
+        case teams, splits, game, type
+        case pdfFile = "pdf_file"
     }
 }
 
@@ -41,7 +44,7 @@ struct SplitModel: Codable ,Identifiable {
     let id: Int?
     let name: String?
     let tournaments: [TournamentModel]?
-    
+
     enum CodingKeys: String, CodingKey {
         case competition
         case dateCreated = "date_created"
@@ -59,7 +62,7 @@ struct TournamentModel: Identifiable, Codable {
     let link: String?
     let split: Int?
     let status: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -80,6 +83,7 @@ struct Game: Codable ,Identifiable{
     let image, type, name, description: String?
     let banner: String?
     let competitions: [String]?
+    let priority: Int?
 
     enum CodingKeys: String, CodingKey {
         case id, status
@@ -87,7 +91,7 @@ struct Game: Codable ,Identifiable{
         case dateCreated = "date_created"
         case userUpdated = "user_updated"
         case dateUpdated = "date_updated"
-        case image, type, name, description, banner, competitions
+        case image, type, name, description, banner, competitions, priority
     }
 }
 
@@ -106,7 +110,7 @@ struct Game: Codable ,Identifiable{
 //    let startSignDate: String
 //    let teams: [String] // Cambia el tipo si los equipos tienen un modelo específico
 //    let title: String
-//    
+//
 //    enum CodingKeys: String, CodingKey {
 //        case contact
 //        case dateCreated = "date_created"

@@ -203,4 +203,25 @@
 "doc.duplicate.passport" = "Este pasaporte ya está vinculado a otro usuario.";
 "error.network.generic" = "Ha ocurrido un error. Por favor, inténtalo de nuevo.";
 "user.banned" = "Tu cuenta ha sido suspendida. No puedes realizar reservas.";
+// MARK: - PDF viewer
+"No se pudo cargar el documento." = "No se pudo cargar el documento.";
+"pdf.download" = "Descargar";
+
+// MARK: - Competition modality
+"competition.modality.hybrid" = "Presencial / Online";
+"competition.modality.online" = "Online";
+"competition.loading" = "Cargando competiciones...";
+"contact.email.copied" = "Email copiado al portapapeles";
+
+// MARK: - Rules accordion sections
+"rules.section.text" = "Reglas";
+"rules.section.pdf" = "Reglamento completo (PDF)";
+
+// MARK: - Rules
+"rule.smoke_free" = "Zona libre de humo";
+"rule.no_food" = "Prohibido comer o beber";
+"rule.no_running" = "No corras por el recinto";
+"rule.respect_environment" = "Respeta el ambiente";
+"rule.keep_clean" = "Mantén el espacio limpio";
+"rule.no_downloads" = "No descargas ni instalaciones";
 
