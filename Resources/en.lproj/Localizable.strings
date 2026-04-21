@@ -202,4 +202,5 @@
 "doc.duplicate.nie" = "This NIE is already linked to another user.";
 "doc.duplicate.passport" = "This passport is already linked to another user.";
 "error.network.generic" = "An error occurred. Please try again.";
+"user.banned" = "Your account has been suspended. You cannot make reservations.";
 

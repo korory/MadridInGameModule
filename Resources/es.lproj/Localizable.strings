@@ -202,4 +202,5 @@
 "doc.duplicate.nie" = "Este NIE ya está vinculado a otro usuario.";
 "doc.duplicate.passport" = "Este pasaporte ya está vinculado a otro usuario.";
 "error.network.generic" = "Ha ocurrido un error. Por favor, inténtalo de nuevo.";
+"user.banned" = "Tu cuenta ha sido suspendida. No puedes realizar reservas.";
 

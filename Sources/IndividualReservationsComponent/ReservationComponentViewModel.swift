@@ -26,6 +26,7 @@ class ReservationComponentViewModel: ObservableObject {
 
     @Published var noReservationAllowed: Bool = false
     @Published var noReservationAllowedWithoutDNI: Bool = false
+    @Published var userIsBanned: Bool = false
 
     @Published var isLoading: Bool = true
     @Published var showToastSuccess: Bool = false
@@ -332,6 +333,12 @@ extension ReservationComponentViewModel {
             return
         }
 
+        // Block banned/inactive users before anything else
+        if userManager.getUser()?.status?.lowercased() == "inactive" {
+            userIsBanned = true
+            return
+        }
+
         // Editing always opens the flow directly
         if editInformation {
             isReservationFlowPresented = true
@@ -352,8 +359,9 @@ extension ReservationComponentViewModel {
                 }
             }
         } else {
-            // Team booking — only managers allowed
-            guard getUserRol().lowercased() == "manager" else { return }
+            // Team booking — managers and trainers allowed
+            let role = getUserRol().lowercased()
+            guard role == "manager" || role == "trainer" else { return }
             if !teamCanBook() {
                 noReservationAllowed = true
             } else {
