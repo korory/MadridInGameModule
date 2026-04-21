@@ -48,39 +48,29 @@ class CompetitionsViewModel: ObservableObject {
     }
     
     func getAllInformationLeagues() -> [LeagueModel] {
-        let leagueData = [
-            ("competitions.municipalLeague".localized,
-             "Esports Series Madrid",
-             "competitions.subheadings.townLeague".localized,
-             "esm"),
+        var leagues: [LeagueModel] = []
 
-            ("competitions.juniorLeague".localized,
-             "Esports Series Madrid",
-             "competitions.subheadings.junior".localized,
-             "junior"),
-
-            ("competitions.stormCircuit".localized,
-             "Esports Series Madrid",
-             "competitions.subheadings.storm".localized,
-             "stormCircuit"),
-
-            ("competitions.otherLeague".localized,
-             "Esports Series Madrid",
-             "",
-             "other")
-        ]
-        
-        return leagueData.compactMap { title, seriesTitle, description, type in
-            let allCompetitionsInLeague = filterCompetitonsByType(type: type)
-            return allCompetitionsInLeague.isEmpty ? nil : LeagueModel(title: title, seriesTitle: seriesTitle, description: description, allCompetitions: allCompetitionsInLeague)
+        let municipalCompetitions = competitionInformation.filter { ($0.type ?? "") != "other" }
+        if !municipalCompetitions.isEmpty {
+            leagues.append(LeagueModel(
+                title: "competitions.municipalLeague".localized,
+                seriesTitle: "Esports Series Madrid",
+                description: "competitions.subheadings.townLeague".localized,
+                allCompetitions: municipalCompetitions
+            ))
         }
-    }
 
-    
-    func filterCompetitonsByType(type: String) -> [CompetitionData] {
-        return self.competitionInformation.compactMap { competition in
-            (competition.type == type) ? competition : nil
+        let otherCompetitions = competitionInformation.filter { ($0.type ?? "") == "other" }
+        if !otherCompetitions.isEmpty {
+            leagues.append(LeagueModel(
+                title: "competitions.otherLeague".localized,
+                seriesTitle: "Esports Series Madrid",
+                description: "",
+                allCompetitions: otherCompetitions
+            ))
         }
+
+        return leagues
     }
     
 //    func selectSeason(withTitle title: String) {

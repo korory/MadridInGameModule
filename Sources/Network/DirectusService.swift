@@ -183,6 +183,7 @@ actor DirectusService {
         
         // Agregar el cuerpo (body) si se necesita
         if !body.isEmpty {
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
         }
         
