@@ -101,7 +101,7 @@ struct ReservationsComponentView: View {
                     self.viewModel.resetScreen()
                 }) {
                     VStack(spacing: 10) {
-                        Text("Se ha alcanzado el máximo de reservas solicitadas".localized)
+                        Text("dashboard.profile.reserves.maxReserves".localized)
                             .font(.madridInGameiOSFont(size: 17))
                             .foregroundColor(.white)
                             .padding()
@@ -201,7 +201,7 @@ struct ReservationsComponentView: View {
 extension ReservationsComponentView {
     private var titleBanner: some View {
         HStack {
-            Text(self.viewModel.personalReservations ? "RESERVAS INDIVIDUALES".localized : "RESERVAS DE EQUIPO".localized)
+            Text(self.viewModel.personalReservations ? "dashboard.profile.reserves.title".localized : "RESERVAS DE EQUIPO".localized)
                 .font(.madridInGameiOSFont(size: 20))
                 .fontWeight(.bold)
                 .foregroundStyle(Color.white)
@@ -247,7 +247,7 @@ extension ReservationsComponentView {
     private var noReservationAvailable: some View {
         VStack(alignment: .center, spacing: 20) {
             Spacer()
-            Text("No hay reservas".localized)
+            Text("dashboard.profile.reserves.noReserves".localized)
                 .font(.madridInGameiOSFont(size: 18))
                 .foregroundStyle(Color.white)
             Spacer()
@@ -260,7 +260,7 @@ extension ReservationsComponentView {
             ? viewModel.userCanBook()
             : viewModel.teamCanBook()
 
-        CustomButton(text: "Reservar".localized,
+        CustomButton(text: "dashboard.profile.reserves.reserveButton".localized,
                      needsBackground: true,
                      backgroundColor: canBook ? Color.cyan : Color.gray,
                      pressEnabled: true,

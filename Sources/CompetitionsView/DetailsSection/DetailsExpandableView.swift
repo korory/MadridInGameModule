@@ -67,7 +67,7 @@ struct DetailsExpandableView: View {
                         .padding(.top, 5)
 
                     if items.isEmpty {
-                        Text("No hay información disponible.".localized)
+                        Text("competitions.subheadings.notFound".localized)
                             .foregroundColor(.white)
                             .padding()
                     } else {

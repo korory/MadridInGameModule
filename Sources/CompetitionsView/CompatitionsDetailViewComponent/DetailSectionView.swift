@@ -33,7 +33,7 @@ struct DetailSectionView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.top, 5)
                     } else {
-                        Text("No hay información disponible.".localized)
+                        Text("competitions.subheadings.notFound".localized)
                             .foregroundColor(.white)
                             .multilineTextAlignment(.leading)
                             .frame(maxWidth: .infinity, alignment: .leading)

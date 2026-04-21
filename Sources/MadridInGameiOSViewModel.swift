@@ -70,6 +70,8 @@ class MadridInGameiOSViewModel: ObservableObject {
     }
     
     func initializeModule() {
+        TextContentService().fetchTextContent()
+
         userManager.initializeUser(userInfo: userInfo) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }

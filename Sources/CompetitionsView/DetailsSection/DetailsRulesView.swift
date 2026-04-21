@@ -134,7 +134,7 @@ struct DetailsRulesView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
                     } else {
-                        Text("No hay información disponible.".localized)
+                        Text("competitions.subheadings.notFound".localized)
                             .foregroundColor(.white)
                             .padding(.horizontal, 20)
                     }

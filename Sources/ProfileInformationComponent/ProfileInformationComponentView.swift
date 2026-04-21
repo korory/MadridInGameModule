@@ -21,12 +21,12 @@ struct ProfileInformationComponentView: View {
                         componentAvatarSelector
                             .actionSheet(isPresented: $viewModel.showActionSheet) {
                                 ActionSheet(
-                                    title: Text("Selecciona una opción"),
+                                    title: Text("Selecciona una opción".localized),
                                     buttons: [
-                                        .default(Text("Cámara")) {
+                                        .default(Text("Cámara".localized)) {
                                             viewModel.selectCamera()
                                         },
-                                        .default(Text("Galería")) {
+                                        .default(Text("Galería".localized)) {
                                             viewModel.selectGallery()
                                         },
                                         .cancel()
@@ -117,12 +117,12 @@ extension ProfileInformationComponentView {
 //                        self.viewModel.phone = newValue
 //                    }
 //            } else {
-            ProfileInfoView(text: viewModel.firstName, label: "Nombre".localized)
-            ProfileInfoView(text: viewModel.lastName, label: "Apellidos".localized)
-            ProfileInfoView(text: viewModel.dni, label: "DNI".localized)
-            ProfileInfoView(text: viewModel.email, label: "Email".localized)
-            ProfileInfoView(text: viewModel.username, label: "Nick".localized)
-            ProfileInfoView(text: viewModel.phone, label: "Teléfono".localized)
+            ProfileInfoView(text: viewModel.firstName, label: "dashboard.profile.about.form.name".localized)
+            ProfileInfoView(text: viewModel.lastName, label: "dashboard.profile.about.form.surname".localized)
+            ProfileInfoView(text: viewModel.dni, label: "dashboard.profile.about.form.dni".localized)
+            ProfileInfoView(text: viewModel.email, label: "dashboard.profile.about.form.email".localized)
+            ProfileInfoView(text: viewModel.username, label: "dashboard.profile.about.form.nick".localized)
+            ProfileInfoView(text: viewModel.phone, label: "dashboard.profile.about.form.phone".localized)
             //}
         }
         .padding(.bottom, 20)
@@ -136,7 +136,7 @@ extension ProfileInformationComponentView {
     private var editButton: some View {
         VStack (alignment: .center){
             if !viewModel.isEditing {
-                CustomButton(text: "Área Personal".localized, needsBackground: true, backgroundColor: .cyan, pressEnabled: true, widthButton: 280, heightButton: 20) {
+                CustomButton(text: "dashboard.profile.about.title".localized, needsBackground: true, backgroundColor: .cyan, pressEnabled: true, widthButton: 280, heightButton: 20) {
                     viewModel.openSafariToPersonalArea()//toggleEditing()
                     //viewModel.toggleEditing()
                 }
@@ -144,11 +144,11 @@ extension ProfileInformationComponentView {
                 .padding()
             } else {
                 HStack {
-                    CustomButton(text: "Descartar".localized, needsBackground: false, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
+                    CustomButton(text: "dashboard.profile.about.form.discard".localized, needsBackground: false, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
                         viewModel.discardChanges()
                     }
                     
-                    CustomButton(text: "Guardar".localized, needsBackground: true, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
+                    CustomButton(text: "dashboard.profile.about.form.save".localized, needsBackground: true, backgroundColor: Color.cyan, pressEnabled: true, widthButton: 150, heightButton: 30) {
 //                        Task {
 //                            await viewModel.saveChanges()
 //                        }

@@ -61,7 +61,7 @@ struct TeamsComponentView: View {
 extension TeamsComponentView {
     private var titleBanner: some View {
         HStack {
-            Text(viewModel.isUserMode ? "EQUIPOS".localized: "EQUIPO".localized)
+            Text(viewModel.isUserMode ? "dashboard.profile.teams.title".localized: "dashboard.teams.team".localized)
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundStyle(Color.white)
@@ -74,7 +74,7 @@ extension TeamsComponentView {
                     viewModel.createTeamButtonPressed.toggle()
                 } label: {
                     HStack {
-                        Text(viewModel.isUserMode ? "Crear Equipo".localized : "Editar".localized)
+                        Text(viewModel.isUserMode ? "dashboard.profile.teams.createTeam".localized : "dashboard.teams.teamAreas.editTeam.buttonForm".localized)
                             .font(.system(size: 17))
                             .bold()
                             .foregroundStyle(Color.white)
@@ -94,7 +94,7 @@ extension TeamsComponentView {
     
     private var applyForAdmissionComponent: some View {
         VStack (spacing: 40){
-            CustomButton(text: "Solicitar ingreso".localized,
+            CustomButton(text: "dashboard.profile.teams.requestTeam".localized,
                          needsBackground: false,
                          backgroundColor: Color.cyan,
                          pressEnabled: true,
@@ -102,7 +102,7 @@ extension TeamsComponentView {
                 viewModel.applyForAdmisionButtonPressed.toggle()
             }
             
-            CustomButton(text: "No tienes invitaciones".localized,
+            CustomButton(text: "dashboard.profile.teams.noInvitations".localized,
                          needsBackground: true,
                          backgroundColor: Color.white.opacity(0.7),
                          pressEnabled: true,

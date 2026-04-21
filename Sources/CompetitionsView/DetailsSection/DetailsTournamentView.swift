@@ -28,7 +28,7 @@ struct DetailsTournamentView: View {
                             TournamentCellView(date: singleContent.date ?? "", name: singleContent.name ?? "", targetURL: singleContent.link ?? "", statusString: singleContent.status ?? "")
                         }
                     } else {
-                        Text("No hay información disponible.".localized)
+                        Text("competitions.subheadings.notFound".localized)
                             .foregroundColor(.white)
                             .padding()
                     }

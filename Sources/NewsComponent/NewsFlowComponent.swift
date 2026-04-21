@@ -33,7 +33,7 @@ struct NewsFlowComponent: View {
 extension NewsFlowComponent {
     private var titleBanner: some View {
         HStack {
-            Text("Noticias".localized)
+            Text("dashboard.teams.teamAreas.news.newsListTitle".localized)
                 .font(.madridInGameiOSFont(size: 25))
                 .foregroundColor(.white)
                 .padding(.leading, 5)

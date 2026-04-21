@@ -42,7 +42,7 @@ struct NewsComponentView: View {
 extension NewsComponentView {
     private var titleAndPlusButtonBanner: some View {
         HStack {
-            Text("NOTICIAS".localized)
+            Text("dashboard.teams.teamAreas.news.newsListTitle".localized)
                 .font(.madridInGameiOSFont(size: 25))
                 .foregroundStyle(Color.white)
             
@@ -64,7 +64,7 @@ extension NewsComponentView {
     private var noNewsComponent: some View {
         VStack {
             Spacer()
-            Text("No hay noticias en este equipo actualmente".localized)
+            Text("dashboard.teams.teamAreas.news.noNewsList".localized)
                 .font(.madridInGameiOSFont(size: 15))
                 .foregroundStyle(Color.gray)
                 .padding()

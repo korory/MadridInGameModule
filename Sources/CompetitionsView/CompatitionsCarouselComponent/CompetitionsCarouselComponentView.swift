@@ -55,7 +55,7 @@ extension CompetitionsCarouselComponentView {
                 isDescriptionExpanded.toggle()
             } label: {
                 HStack(spacing: 4) {
-                    Text(isDescriptionExpanded ? "Read less" : "Read more")
+                    Text(isDescriptionExpanded ? "dashboard.profile.seeLess".localized : "dashboard.profile.seeMore".localized)
                         .font(.system(size: 13, weight: .semibold))
                     Image(systemName: isDescriptionExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 11, weight: .semibold))

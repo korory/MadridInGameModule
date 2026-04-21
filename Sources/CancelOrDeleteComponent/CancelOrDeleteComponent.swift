@@ -50,7 +50,7 @@ struct CancelOrDeleteComponent: View {
             VStack(spacing: 10) {
                 // Botón principal (aceptar/confirmar)
                 Button(action: acceptedAction) {
-                    Text(acceptTitle ?? "Aceptar".localized)
+                    Text(acceptTitle ?? "dashboard.teams.accept".localized)
                         .font(.madridInGameiOSFont(size: 15))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
@@ -61,7 +61,7 @@ struct CancelOrDeleteComponent: View {
 
                 // Botón secundario (cancelar/rechazar)
                 Button(action: rejectedAction) {
-                    Text(cancelTitle ?? "Rechazar".localized)
+                    Text(cancelTitle ?? "dashboard.teams.decline".localized)
                         .font(.madridInGameiOSFont(size: 15))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)

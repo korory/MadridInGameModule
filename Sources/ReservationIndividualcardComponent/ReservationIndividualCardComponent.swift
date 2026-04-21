@@ -42,7 +42,7 @@ struct ReservationIndividualCardComponent: View {
                         VStack {
                             cardBase(showEffects: false) {
                                 VStack(spacing: 10) {
-                                    Text("Normas de uso".localized)
+                                    Text("dashboard.teams.teamAreas.reserves.reserveTerms".localized)
                                         .font(.madridInGameiOSFont(size: 20))
                                         .foregroundColor(.white)
                                     imageNormasUso(rulesSize)
@@ -88,7 +88,7 @@ struct ReservationIndividualCardComponent: View {
                 )
 
                 CustomButton(
-                    text: viewModel.isFlipped ? "Detalles".localized : "Normas de uso".localized,
+                    text: viewModel.isFlipped ? "competitions.details".localized : "dashboard.teams.teamAreas.reserves.reserveTerms".localized,
                     needsBackground: true,
                     backgroundColor: Color.cyan,
                     pressEnabled: true,

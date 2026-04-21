@@ -49,24 +49,24 @@ class CompetitionsViewModel: ObservableObject {
     
     func getAllInformationLeagues() -> [LeagueModel] {
         let leagueData = [
-            ("Liga Municipal".localized,
-             "Esports Series Madrid".localized,
-             "Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid. Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo.".localized,
+            ("competitions.municipalLeague".localized,
+             "Esports Series Madrid",
+             "competitions.subheadings.townLeague".localized,
              "esm"),
 
-            ("Liga Municipal Junior".localized,
-             "Esports Series Madrid".localized,
-             "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League.".localized,
+            ("competitions.juniorLeague".localized,
+             "Esports Series Madrid",
+             "competitions.subheadings.junior".localized,
              "junior"),
 
-            ("Circuito Tormenta".localized,
-             "Esports Series Madrid".localized,
-             "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgarán puntos para el ranking general del Circuito de Tormenta del Split correspondiente.".localized,
+            ("competitions.stormCircuit".localized,
+             "Esports Series Madrid",
+             "competitions.subheadings.storm".localized,
              "stormCircuit"),
 
-            ("Otras competiciones".localized,
-             "Esports Series Madrid".localized,
-             "".localized,
+            ("competitions.otherLeague".localized,
+             "Esports Series Madrid",
+             "",
              "other")
         ]
         

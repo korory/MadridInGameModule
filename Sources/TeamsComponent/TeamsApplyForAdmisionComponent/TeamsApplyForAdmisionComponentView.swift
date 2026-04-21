@@ -18,7 +18,7 @@ struct TeamsApplyForAdmisionComponentView: View {
 
 extension TeamsApplyForAdmisionComponentView {
     private var titleComponent: some View {
-        Text("BUSCA EQUIPOS".localized)
+        Text("dashboard.profile.teams.searchTeams".localized)
             .font(.largeTitle)
             .fontWeight(.bold)
             .foregroundStyle(Color.white)

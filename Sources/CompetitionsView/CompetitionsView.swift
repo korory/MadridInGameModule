@@ -45,7 +45,7 @@ struct CompetitionsView: View {
 
 extension CompetitionsView {
     private var titleBanner: some View {
-        Text("COMPETICIONES".localized)
+        Text("competitions.heading".localized)
             .font(.madridInGameiOSFont(size: 24))
             .foregroundColor(.white)
             .padding(.leading, 20)
@@ -61,7 +61,7 @@ extension CompetitionsView {
             return DropdownSingleSelectionModel(title: season.year, isOptionSelected: isSelected)
         }
         
-        return DropdownSingleSelectionComponentView(options: options, textTop: "Temporada".localized, onOptionSelected: { optionSelected in
+        return DropdownSingleSelectionComponentView(options: options, textTop: "competitions.season".localized, onOptionSelected: { optionSelected in
             self.viewModel.seasonSelected = SeasonsModel(year: optionSelected.title, isOptionSelected: optionSelected.isOptionSelected)
             viewModel.getSeasonInformation()
         })

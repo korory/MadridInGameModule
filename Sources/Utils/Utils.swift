@@ -153,6 +153,9 @@ extension Bundle {
 
 extension String {
     var localized: String {
+        if let remote = LocalizationManager.shared.string(for: self) {
+            return remote
+        }
         return NSLocalizedString(self, bundle: Bundle.localizedBundle, comment: "\(self)_comment")
     }
 

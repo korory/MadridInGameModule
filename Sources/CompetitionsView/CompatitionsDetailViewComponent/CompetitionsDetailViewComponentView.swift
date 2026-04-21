@@ -47,7 +47,7 @@ struct CompetitionsDetailViewComponentView: View {
                         Spacer()
                     }
                 } else {
-                    Text("No hay información disponible.".localized)
+                    Text("competitions.subheadings.notFound".localized)
                         .foregroundColor(.white)
                         .padding()
                     Spacer()
@@ -178,36 +178,36 @@ struct CompetitionsDetailViewComponentView: View {
     private var tabBarComponent: some View {
         TabView(selection: $viewModel.selectedTab) {
             DetailSectionView(
-                title: "Sobre esta competición...".localized,
+                title: "competitions.about".localized,
                 content: viewModel.competitionsInformation.overview
             )
-            .tabItem { Label("Overview".localized, systemImage: "info.circle") }
+            .tabItem { Label("competitions.overview".localized, systemImage: "info.circle") }
             .tag(Tab.overview)
 
-            DetailsExpandableView(title: "Detalles".localized)
-                .tabItem { Label("Detalles".localized, systemImage: "person.2") }
+            DetailsExpandableView(title: "competitions.details".localized)
+                .tabItem { Label("competitions.details".localized, systemImage: "person.2") }
                 .tag(Tab.teams)
 
             DetailsRulesView(
-                title: "Reglas".localized,
+                title: "competitions.rules".localized,
                 rulesText: viewModel.competitionsInformation.rules,
                 pdfFile: viewModel.competitionsInformation.pdfFile
             )
-            .tabItem { Label("Reglas".localized, systemImage: "clock") }
+            .tabItem { Label("competitions.rules".localized, systemImage: "clock") }
             .tag(Tab.schedule)
 
             DetailsContactView(
-                sectionTitle: "Contacto".localized,
+                sectionTitle: "competitions.contact".localized,
                 contact: viewModel.competitionsInformation.contact
             )
-            .tabItem { Label("Contacto".localized, systemImage: "envelope.fill") }
+            .tabItem { Label("competitions.contact".localized, systemImage: "envelope.fill") }
             .tag(Tab.results)
 
             DetailsTournamentView(
-                title: "Torneos".localized,
+                title: "competitions.tournaments".localized,
                 content: viewModel.optionTabSelected?.tournaments
             )
-            .tabItem { Label("Torneos".localized, systemImage: "trophy.fill") }
+            .tabItem { Label("competitions.tournaments".localized, systemImage: "trophy.fill") }
             .tag(Tab.tournaments)
         }
         .accentColor(.cyan)
