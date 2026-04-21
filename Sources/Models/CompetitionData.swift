@@ -43,6 +43,12 @@ struct SplitModel: Codable ,Identifiable {
     let dateCreated: String?
     let id: Int?
     let name: String?
+    let active: Bool?
+    let banner: String?
+    let overview: String?
+    let details: String?
+    let rules: String?
+    let contact: String?
     let tournaments: [TournamentModel]?
 
     enum CodingKeys: String, CodingKey {
@@ -50,6 +56,12 @@ struct SplitModel: Codable ,Identifiable {
         case dateCreated = "date_created"
         case id
         case name
+        case active
+        case banner
+        case overview
+        case details
+        case rules
+        case contact
         case tournaments
     }
 }

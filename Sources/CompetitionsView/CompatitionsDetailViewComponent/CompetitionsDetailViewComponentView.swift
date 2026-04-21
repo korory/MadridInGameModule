@@ -106,7 +106,7 @@ struct CompetitionsDetailViewComponentView: View {
     // MARK: - Banner header
 
     private var bannerHeader: some View {
-        let bannerPath = viewModel.competitionsInformation.game?.banner ?? ""
+        let bannerPath = viewModel.optionTabSelected?.banner ?? viewModel.competitionsInformation.game?.banner ?? ""
         let bannerURL = URL(string: "\(environmentManager.getBaseURL())/assets/\(bannerPath)")
         let totalHeight: CGFloat = safeAreaTop + 140
 
@@ -158,7 +158,7 @@ struct CompetitionsDetailViewComponentView: View {
                     Button {
                         viewModel.optionTabSelected = split
                     } label: {
-                        Text(split.name ?? "")
+                        Text((split.name ?? "").uppercased())
                             .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
                             .foregroundColor(isSelected ? .black : .white)
                             .padding(.horizontal, 14)
@@ -176,10 +176,13 @@ struct CompetitionsDetailViewComponentView: View {
     // MARK: - Tab bar
 
     private var tabBarComponent: some View {
-        TabView(selection: $viewModel.selectedTab) {
+        let split = viewModel.optionTabSelected
+        let competition = viewModel.competitionsInformation
+
+        return TabView(selection: $viewModel.selectedTab) {
             DetailSectionView(
                 title: "competitions.about".localized,
-                content: viewModel.competitionsInformation.overview
+                content: split?.overview ?? competition.overview
             )
             .tabItem { Label("competitions.overview".localized, systemImage: "info.circle") }
             .tag(Tab.overview)
@@ -190,22 +193,22 @@ struct CompetitionsDetailViewComponentView: View {
 
             DetailsRulesView(
                 title: "competitions.rules".localized,
-                rulesText: viewModel.competitionsInformation.rules,
-                pdfFile: viewModel.competitionsInformation.pdfFile
+                rulesText: split?.rules ?? competition.rules,
+                pdfFile: competition.pdfFile
             )
             .tabItem { Label("competitions.rules".localized, systemImage: "clock") }
             .tag(Tab.schedule)
 
             DetailsContactView(
                 sectionTitle: "competitions.contact".localized,
-                contact: viewModel.competitionsInformation.contact
+                contact: split?.contact ?? competition.contact
             )
             .tabItem { Label("competitions.contact".localized, systemImage: "envelope.fill") }
             .tag(Tab.results)
 
             DetailsTournamentView(
                 title: "competitions.tournaments".localized,
-                content: viewModel.optionTabSelected?.tournaments
+                content: split?.tournaments
             )
             .tabItem { Label("competitions.tournaments".localized, systemImage: "trophy.fill") }
             .tag(Tab.tournaments)

@@ -49,12 +49,23 @@ struct DetailsRulesView: View {
         }
     }
 
+    private var ruleItems: [(icon: String, text: String)] {
+        [
+            ("smoke.fill",         "rule.smoke_free".localized),
+            ("fork.knife",         "rule.no_food".localized),
+            ("figure.run",         "rule.no_running".localized),
+            ("speaker.slash.fill", "rule.respect_environment".localized),
+            ("trash.fill",         "rule.keep_clean".localized),
+            ("xmark.icloud.fill",  "rule.no_downloads".localized)
+        ]
+    }
+
     // MARK: - Content layout
 
     @ViewBuilder
     private var contentLayout: some View {
-        if hasText && pdfURL != nil {
-            // Accordion: both sections available
+        if let url = pdfURL {
+            // Accordion: rules grid + PDF
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     titleRow
@@ -62,7 +73,6 @@ struct DetailsRulesView: View {
                         .padding(.horizontal, 20)
                         .padding(.bottom, 12)
 
-                    // Text section
                     accordionHeader(
                         label: "rules.section.text".localized,
                         icon: "doc.text",
@@ -74,12 +84,9 @@ struct DetailsRulesView: View {
                     }
 
                     if expandedSection == .text {
-                        Text(rulesText ?? "")
-                            .font(.system(size: 14))
-                            .foregroundColor(.white.opacity(0.85))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 20)
-                            .padding(.top, 10)
+                        rulesGrid
+                            .padding(.horizontal, 16)
+                            .padding(.top, 8)
                             .padding(.bottom, 16)
                             .transition(.opacity.combined(with: .move(edge: .top)))
                     }
@@ -88,7 +95,6 @@ struct DetailsRulesView: View {
                         .background(Color.white.opacity(0.15))
                         .padding(.horizontal, 20)
 
-                    // PDF section
                     accordionHeader(
                         label: "rules.section.pdf".localized,
                         icon: "doc.richtext",
@@ -100,7 +106,7 @@ struct DetailsRulesView: View {
                     }
 
                     if expandedSection == .pdf {
-                        PDFReaderView(url: pdfURL!)
+                        PDFReaderView(url: url)
                             .frame(height: 460)
                             .padding(.top, 8)
                             .transition(.opacity.combined(with: .move(edge: .top)))
@@ -108,38 +114,28 @@ struct DetailsRulesView: View {
                 }
                 .animation(.easeInOut(duration: 0.22), value: expandedSection)
             }
-
-        } else if let url = pdfURL {
-            // Only PDF
-            VStack(alignment: .leading, spacing: 10) {
-                titleRow
-                    .padding(.top, 5)
-                    .padding(.horizontal, 20)
-                PDFReaderView(url: url)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-
         } else {
-            // Only text, or neither
+            // No PDF: show grid directly
             ScrollView {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 16) {
                     titleRow
                         .padding(.top, 5)
                         .padding(.horizontal, 20)
-
-                    if hasText {
-                        Text(rulesText ?? "")
-                            .font(.system(size: 14))
-                            .foregroundColor(.white.opacity(0.85))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 20)
-                    } else {
-                        Text("competitions.subheadings.notFound".localized)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 20)
-                    }
+                    rulesGrid
+                        .padding(.horizontal, 16)
                 }
-                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .padding(.bottom, 20)
+            }
+        }
+    }
+
+    private var rulesGrid: some View {
+        LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 2),
+            spacing: 12
+        ) {
+            ForEach(ruleItems, id: \.text) { item in
+                RuleCell(icon: item.icon, text: item.text)
             }
         }
     }
@@ -152,13 +148,10 @@ struct DetailsRulesView: View {
                 Image(systemName: icon)
                     .font(.system(size: 14))
                     .foregroundColor(.cyan)
-
                 Text(label)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(.white)
-
                 Spacer()
-
                 Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(.white.opacity(0.5))
@@ -168,6 +161,32 @@ struct DetailsRulesView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(PlainButtonStyle())
+    }
+
+    // MARK: - Rule cell
+
+    private struct RuleCell: View {
+        let icon: String
+        let text: String
+
+        var body: some View {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                    .foregroundColor(.white)
+                    .frame(width: 22, alignment: .center)
+                Text(text)
+                    .font(.system(size: 11))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
+            .background(Color.white.opacity(0.08))
+            .cornerRadius(12)
+        }
     }
 
     // MARK: - Title row

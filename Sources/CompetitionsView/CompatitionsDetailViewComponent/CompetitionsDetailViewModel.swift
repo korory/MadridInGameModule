@@ -20,10 +20,12 @@ class CompetitionsDetailViewModel: ObservableObject {
     }
     
     func getFirstOptionSelected() {
-        if let firstSplit = competitionsInformation.splits?.first {
-            self.optionTabSelected = firstSplit
-        } else {
+        selectedTab = .overview
+        guard let splits = competitionsInformation.splits, !splits.isEmpty else {
             Logger.shared.log("No splits found for this competition", type: .error)
+            return
         }
+        let activeSplit = splits.first { $0.active == true } ?? splits.first
+        self.optionTabSelected = activeSplit
     }
 }
