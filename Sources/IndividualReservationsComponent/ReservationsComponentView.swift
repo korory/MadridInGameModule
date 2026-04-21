@@ -54,7 +54,8 @@ struct ReservationsComponentView: View {
                         if self.viewModel.personalReservations {
                             reservationButton
                         } else {
-                            if self.viewModel.getUserRol() == "Manager" {
+                            let role = self.viewModel.getUserRol().lowercased()
+                            if role == "manager" || role == "trainer" {
                                 reservationButton
                             }
                         }
@@ -116,6 +117,20 @@ struct ReservationsComponentView: View {
                         Text("Se ha alcanzado el máximo de reservas solicitadas para usuarios no verificados. Por favor, verifica tu DNI y vuelve a intentarlo.".localized)
                             .font(.madridInGameiOSFont(size: 17))
                             .foregroundColor(.white)
+                            .padding()
+                    }
+                }
+                .transition(.scale)
+                .zIndex(1)
+
+                CustomPopup(isPresented: $viewModel.userIsBanned, onDismiss: {
+                    self.viewModel.userIsBanned = false
+                }) {
+                    VStack(spacing: 10) {
+                        Text("user.banned".localized)
+                            .font(.madridInGameiOSFont(size: 17))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
                             .padding()
                     }
                 }
