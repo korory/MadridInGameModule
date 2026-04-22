@@ -40,6 +40,29 @@ struct CompetitionData: Codable , Identifiable{
     }
 }
 
+extension TournamentModel {
+    func isRegistrationOpen(now: Date = Date()) -> Bool {
+        guard let start = parseSignDate(startSignDate),
+              let end = parseSignDate(endSignDate) else { return true }
+        return start <= now && now <= end
+    }
+
+    private func parseSignDate(_ raw: String?) -> Date? {
+        guard let raw else { return nil }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        // Try datetime first (preserves hour), then date-only (start of that day)
+        let formats = ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd"]
+        for format in formats {
+            formatter.dateFormat = format
+            if let date = formatter.date(from: raw) {
+                return date
+            }
+        }
+        return nil
+    }
+}
+
 struct SplitModel: Codable ,Identifiable {
     let competition: String?
     let dateCreated: String?
@@ -76,6 +99,9 @@ struct TournamentModel: Identifiable, Codable {
     let link: String?
     let split: Int?
     let status: String?
+    let type: String?
+    let startSignDate: String?
+    let endSignDate: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -85,6 +111,9 @@ struct TournamentModel: Identifiable, Codable {
         case link
         case split
         case status
+        case type
+        case startSignDate = "start_sign_date"
+        case endSignDate = "end_sign_date"
     }
 }
 

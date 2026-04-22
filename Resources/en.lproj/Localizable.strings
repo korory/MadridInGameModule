@@ -261,10 +261,14 @@
 "competitions.status.open" = "Open";
 "competitions.stormCircuit" = "Storm Circuit";
 "competitions.subheadings.junior" = "The equivalent of the Esports Series Madrid for schools and high schools in the city. The ESM Junior Esports is your gateway to participate with your educational center in the junior municipal league for League of Legends and Rocket League.";
-"competitions.subheadings.notFound" = "No competitions found";
+"competitions.subheadings.notFound" = "No active competitions at the moment";
 "competitions.subheadings.others" = "ESPORTS SERIES MADRID - Other competitions /";
 "competitions.subheadings.storm" = "The Esports Series Madrid of Madrid in Game will be the official stop of the Storm Circuit. They will have League of Legends and Valorant competitions, in addition to a great in-person Final. The tournaments will award points for the general ranking of the Storm Circuit of the corresponding Split.";
 "competitions.subheadings.townLeague" = "Madrid in Game is the Madrid City Council's initiative to elevate amateur esports talent through the creation of the Esports Series Madrid competitions. These consist of two seasons per year, where you can compete against the best players in a safe and optimal gaming environment.";
+"competitions.tournament.type.elimination" = "Elimination";
+"competitions.tournament.type.points" = "By points";
+"competitions.tournament.type.groups" = "Groups";
+"competitions.tournament.type.roundRobin" = "Round robin";
 "competitions.tournament.buttonDetail" = "Details";
 "competitions.tournament.buttonInscription" = "Sign me up";
 "competitions.tournament.buttonSoon" = "Soon";

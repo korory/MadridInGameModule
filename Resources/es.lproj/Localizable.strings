@@ -261,10 +261,14 @@
 "competitions.status.open" = "Abierta";
 "competitions.stormCircuit" = "Circuito Tormenta";
 "competitions.subheadings.junior" = "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League.";
-"competitions.subheadings.notFound" = "No se han encontrado competiciones";
+"competitions.subheadings.notFound" = "No hay competiciones activas actualmente";
 "competitions.subheadings.others" = "ESPORTS SERIES MADRID - Otras competiciones /";
 "competitions.subheadings.storm" = "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgaran puntos para el ranking general del Circuito de Tormenta del Split correspondiente.";
 "competitions.subheadings.townLeague" = "Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid . Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo.";
+"competitions.tournament.type.elimination" = "Eliminación";
+"competitions.tournament.type.points" = "Por puntos";
+"competitions.tournament.type.groups" = "Grupos";
+"competitions.tournament.type.roundRobin" = "Todos contra todos";
 "competitions.tournament.buttonDetail" = "Detalles";
 "competitions.tournament.buttonInscription" = "Inscríbeme";
 "competitions.tournament.buttonSoon" = "Próximamente";

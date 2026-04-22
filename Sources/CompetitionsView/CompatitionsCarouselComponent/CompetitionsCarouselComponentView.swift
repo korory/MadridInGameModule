@@ -91,7 +91,8 @@ private struct CompetitionCardView: View {
     let competition: CompetitionData
     let environmentManager: EnvironmentManager
 
-    private static let imageHeight: CGFloat = 110
+    private static let imageMinHeight: CGFloat = 110
+    private static let imageMaxHeight: CGFloat = 320
     private static let infoHeight: CGFloat = 130
 
     private var modalityLabel: String {
@@ -127,13 +128,13 @@ private struct CompetitionCardView: View {
                 switch phase {
                 case .empty:
                     ProgressView()
-                        .frame(maxWidth: .infinity, minHeight: Self.imageHeight, maxHeight: Self.imageHeight)
+                        .frame(maxWidth: .infinity, minHeight: Self.imageMinHeight, maxHeight: Self.imageMaxHeight)
                         .tint(.purple)
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFit()
-                        .frame(maxWidth: .infinity, minHeight: Self.imageHeight, maxHeight: Self.imageHeight)
+                        .frame(maxWidth: .infinity, minHeight: Self.imageMinHeight, maxHeight: Self.imageMaxHeight)
                 case .failure:
                     placeholderImage
                 @unknown default:
@@ -150,7 +151,7 @@ private struct CompetitionCardView: View {
         Image(systemName: "photo")
             .resizable()
             .scaledToFit()
-            .frame(maxWidth: .infinity, minHeight: Self.imageHeight, maxHeight: Self.imageHeight)
+            .frame(maxWidth: .infinity, minHeight: Self.imageMinHeight, maxHeight: Self.imageMaxHeight)
             .foregroundColor(.gray)
             .background(Color.gray.opacity(0.2))
             .cornerRadius(16, corners: [.topLeft, .topRight])

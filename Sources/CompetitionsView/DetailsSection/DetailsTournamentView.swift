@@ -30,13 +30,14 @@ struct DetailsTournamentView: View {
                         .foregroundColor(.white)
                         .padding(.top, 5)
 
-                    if let content, !content.isEmpty {
-                        ForEach(content) { singleContent in
+                    let visibleTournaments = (content ?? []).filter { $0.isRegistrationOpen() }
+                    if !visibleTournaments.isEmpty {
+                        ForEach(visibleTournaments) { singleContent in
                             TournamentCellView(
                                 date: singleContent.date ?? "",
                                 name: singleContent.name ?? "",
                                 targetURL: singleContent.link ?? "",
-                                statusString: singleContent.status ?? ""
+                                statusString: localizedTournamentType(singleContent.type)
                             ) { url in
                                 selectedURL = url
                                 selectedTournamentId = singleContent.id
@@ -102,6 +103,16 @@ struct DetailsTournamentView: View {
                 .padding(.bottom, 8)
             }
             .zIndex(1)
+        }
+    }
+
+    private func localizedTournamentType(_ type: String?) -> String {
+        switch type?.lowercased() {
+        case "elimination": return "competitions.tournament.type.elimination".localized
+        case "points":      return "competitions.tournament.type.points".localized
+        case "groups":      return "competitions.tournament.type.groups".localized
+        case "roundrobin", "round_robin": return "competitions.tournament.type.roundRobin".localized
+        default:            return type?.capitalized ?? ""
         }
     }
 
