@@ -159,7 +159,7 @@ struct CompetitionsDetailViewComponentView: View {
                         viewModel.optionTabSelected = split
                     } label: {
                         Text((split.name ?? "").uppercased())
-                            .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
+                            .font(.system(size: 13, weight: .bold))
                             .foregroundColor(isSelected ? .black : .white)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)

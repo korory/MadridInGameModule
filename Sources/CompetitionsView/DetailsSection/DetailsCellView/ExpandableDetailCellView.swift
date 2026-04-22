@@ -21,6 +21,7 @@ struct ExpandableDetailCellView: View {
                 expandedContent
             }
         }
+        .clipped()
         .background(
             RoundedRectangle(cornerRadius: 14)
                 .fill(
@@ -80,6 +81,6 @@ struct ExpandableDetailCellView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .transition(.opacity.combined(with: .move(edge: .top)))
+            .transition(.opacity)
     }
 }

@@ -23,6 +23,7 @@ struct CompetitionData: Codable , Identifiable{
     let game: Game?
     let type: String?   // league category: "esm" | "junior" | "stormCircuit" | "other"
     let pdfFile: String?
+    let image: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -35,6 +36,7 @@ struct CompetitionData: Codable , Identifiable{
         case startSignDate = "start_sign_date"
         case teams, splits, game, type
         case pdfFile = "pdf_file"
+        case image
     }
 }
 

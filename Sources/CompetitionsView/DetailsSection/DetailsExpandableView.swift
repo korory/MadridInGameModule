@@ -9,7 +9,7 @@ import SwiftUI
 
 // TODO: Replace with Codable model and Directus integration when backend is ready
 struct ExpandableDetailItemModel: Identifiable {
-    let id = UUID()
+    let id: String          // stable key, e.g. CMS key
     let icon: String        // SF Symbol name
     let title: String
     let description: String
@@ -19,35 +19,38 @@ struct ExpandableDetailItemModel: Identifiable {
 struct DetailsExpandableView: View {
     var title: String
 
-    // TODO: Replace with `var items: [ExpandableDetailItemModel]` received from API/ViewModel
-    private let items: [ExpandableDetailItemModel] = [
+    private var items: [ExpandableDetailItemModel] {[
         ExpandableDetailItemModel(
+            id: "tournamentFormat",
             icon: "desktopcomputer",
-            title: "Formato de torneos",
-            description: "Cada torneo se juega en formato competitivo adaptado al juego.\nIncluye fases clasificatorias y eliminatorias según el número de participantes.",
+            title: "competitions.details.cards.tournamentFormat.title".localized,
+            description: "competitions.details.cards.tournamentFormat.description".localized,
             color: Color(red: 0.18, green: 0.35, blue: 0.85)
         ),
         ExpandableDetailItemModel(
+            id: "pointsSystem",
             icon: "gamecontroller",
-            title: "Sistema de puntos",
-            description: "Los puntos se acumulan por cada partida jugada y se reflejan en la clasificación general.",
+            title: "competitions.details.cards.pointsSystem.title".localized,
+            description: "competitions.details.cards.pointsSystem.description".localized,
             color: Color(red: 0.75, green: 0.15, blue: 0.55)
         ),
         ExpandableDetailItemModel(
+            id: "splitsAndSeason",
             icon: "trophy",
-            title: "Splits y temporada",
-            description: "La temporada está dividida en splits. Cada split tiene su propio ranking y premio final.",
+            title: "competitions.details.cards.splitsAndSeason.title".localized,
+            description: "competitions.details.cards.splitsAndSeason.description".localized,
             color: Color(red: 0.45, green: 0.15, blue: 0.75)
         ),
         ExpandableDetailItemModel(
+            id: "participation",
             icon: "person.2",
-            title: "Participación",
-            description: "La liga está abierta a jugadores de todos los niveles.",
+            title: "competitions.details.cards.participation.title".localized,
+            description: "competitions.details.cards.participation.description".localized,
             color: Color(red: 0.15, green: 0.55, blue: 0.25)
         )
-    ]
+    ]}
 
-    @State private var expandedItemID: UUID? = nil
+    @State private var expandedItemID: String? = nil
 
     var body: some View {
         ZStack {

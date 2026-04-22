@@ -51,12 +51,12 @@ struct DetailsRulesView: View {
 
     private var ruleItems: [(icon: String, text: String)] {
         [
-            ("smoke.fill",         "rule.smoke_free".localized),
-            ("fork.knife",         "rule.no_food".localized),
-            ("figure.run",         "rule.no_running".localized),
-            ("speaker.slash.fill", "rule.respect_environment".localized),
-            ("trash.fill",         "rule.keep_clean".localized),
-            ("xmark.icloud.fill",  "rule.no_downloads".localized)
+            ("smoke.fill",         "competitions.rules.cards.noSmoking".localized),
+            ("fork.knife",         "competitions.rules.cards.noFoodOrDrink".localized),
+            ("figure.run",         "competitions.rules.cards.noRunning".localized),
+            ("speaker.slash.fill", "competitions.rules.cards.respectEnvironment".localized),
+            ("trash.fill",         "competitions.rules.cards.keepClean".localized),
+            ("xmark.icloud.fill",  "competitions.rules.cards.noDownloads".localized)
         ]
     }
 

@@ -224,6 +224,12 @@
 "rule.respect_environment" = "Respeta el ambiente";
 "rule.keep_clean" = "Mantén el espacio limpio";
 "rule.no_downloads" = "No descargas ni instalaciones";
+"competitions.rules.cards.noSmoking" = "Zona libre de humo";
+"competitions.rules.cards.noFoodOrDrink" = "Prohibido comer o beber";
+"competitions.rules.cards.noRunning" = "No corras por el recinto";
+"competitions.rules.cards.respectEnvironment" = "Respeta el ambiente";
+"competitions.rules.cards.keepClean" = "Mantén el espacio limpio";
+"competitions.rules.cards.noDownloads" = "No descargas ni instalaciones";
 
 // MARK: - CMS Text Content (text_content_mig)
 
@@ -618,4 +624,14 @@
 "tournament.inscription.inscription" = "Inscripción";
 "tournament.inscription.nickname" = "Alias";
 "tournament.overview.title" = "Sobre este torneo...";
+
+// MARK: - Competition detail cards
+"competitions.details.cards.tournamentFormat.title" = "Formato de torneos";
+"competitions.details.cards.tournamentFormat.description" = "Cada torneo se juega en formato competitivo adaptado al juego. Incluye fases clasificatorias y eliminatorias según el número de participantes.";
+"competitions.details.cards.pointsSystem.title" = "Sistema de puntos";
+"competitions.details.cards.pointsSystem.description" = "Los puntos se acumulan por cada partida jugada y se reflejan en la clasificación general.";
+"competitions.details.cards.splitsAndSeason.title" = "Splits y temporada";
+"competitions.details.cards.splitsAndSeason.description" = "La temporada está dividida en splits. Cada split tiene su propio ranking y premio final.";
+"competitions.details.cards.participation.title" = "Participación";
+"competitions.details.cards.participation.description" = "La liga está abierta a jugadores de todos los niveles.";
 

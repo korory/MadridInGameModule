@@ -91,7 +91,7 @@ private struct CompetitionCardView: View {
     let competition: CompetitionData
     let environmentManager: EnvironmentManager
 
-    private static let imageHeight: CGFloat = 200
+    private static let imageHeight: CGFloat = 110
     private static let infoHeight: CGFloat = 130
 
     private var modalityLabel: String {
@@ -122,7 +122,7 @@ private struct CompetitionCardView: View {
 
     @ViewBuilder
     private var gameImage: some View {
-        if let imageId = competition.game?.image {
+        if let imageId = competition.image ?? competition.game?.image {
             AsyncImage(url: URL(string: "\(environmentManager.getBaseURL())/assets/\(imageId)")) { phase in
                 switch phase {
                 case .empty:
@@ -132,9 +132,8 @@ private struct CompetitionCardView: View {
                 case .success(let image):
                     image
                         .resizable()
-                        .scaledToFill()
+                        .scaledToFit()
                         .frame(maxWidth: .infinity, minHeight: Self.imageHeight, maxHeight: Self.imageHeight)
-                        .clipped()
                 case .failure:
                     placeholderImage
                 @unknown default:
@@ -159,12 +158,11 @@ private struct CompetitionCardView: View {
 
     private var cardInfo: some View {
         VStack(alignment: .leading, spacing: 6) {
-            if let name = competition.game?.name {
-                Text(name)
+            if let title = competition.title {
+                Text(title.uppercased())
                     .font(.madridInGameiOSFont(size: 16))
-                    .fontWeight(.bold)
                     .foregroundColor(.white)
-                    .lineLimit(1)
+                    .lineLimit(2)
             }
 
             if let html = competition.game?.description, !html.isEmpty,

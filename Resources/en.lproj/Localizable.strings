@@ -224,6 +224,12 @@
 "rule.respect_environment" = "Respect the environment";
 "rule.keep_clean" = "Keep the space clean";
 "rule.no_downloads" = "No downloads or installations";
+"competitions.rules.cards.noSmoking" = "Smoke-free zone";
+"competitions.rules.cards.noFoodOrDrink" = "No eating or drinking allowed";
+"competitions.rules.cards.noRunning" = "No running in the venue";
+"competitions.rules.cards.respectEnvironment" = "Respect the environment";
+"competitions.rules.cards.keepClean" = "Keep the space clean";
+"competitions.rules.cards.noDownloads" = "No downloads or installations";
 
 // MARK: - CMS Text Content (text_content_mig)
 
@@ -618,4 +624,14 @@
 "tournament.inscription.inscription" = "Inscription";
 "tournament.inscription.nickname" = "Nickname";
 "tournament.overview.title" = "About this tournament...";
+
+// MARK: - Competition detail cards
+"competitions.details.cards.tournamentFormat.title" = "Tournament Format";
+"competitions.details.cards.tournamentFormat.description" = "Each tournament is played in a competitive format adapted to the game. Includes qualifying and elimination rounds based on the number of participants.";
+"competitions.details.cards.pointsSystem.title" = "Points System";
+"competitions.details.cards.pointsSystem.description" = "Points are accumulated for each game played and reflected in the overall standings.";
+"competitions.details.cards.splitsAndSeason.title" = "Splits & Season";
+"competitions.details.cards.splitsAndSeason.description" = "The season is divided into splits. Each split has its own ranking and final prize.";
+"competitions.details.cards.participation.title" = "Participation";
+"competitions.details.cards.participation.description" = "The league is open to players of all skill levels.";
 
