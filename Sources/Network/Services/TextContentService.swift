@@ -1,23 +1,26 @@
 //
 //  TextContentService.swift
-//  Pods
-//
-//  Created by Arnau Rivas Rivas on 20/4/25.
+//  MadridInGameiOSModule
 //
 
 class TextContentService {
 
-    func getTextContent(completion: @escaping (Result<[TextContentItem], Error>) -> Void) {
+    func fetchTextContent() {
+        let parameters: [String: String] = [
+            "fields": "key,en,es",
+            "limit": "-1"
+        ]
+
         Task {
             do {
                 let response: TextContentResponse = try await DirectusService.shared.request(
                     endpoint: "text_content_mig",
                     method: .GET,
-                    parameters: ["fields": "key,en,es"]
+                    parameters: parameters
                 )
-                completion(.success(response.data))
+                LocalizationManager.shared.load(items: response.data)
             } catch {
-                completion(.failure(error))
+                Logger.shared.log("TextContentService error: \(error)")
             }
         }
     }

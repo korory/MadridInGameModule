@@ -35,7 +35,7 @@ struct SeasonsModel {
 }
 
 struct LeagueModel: Identifiable {
-    var id = UUID()
+    var id: String { title }
     var title: String
     var seriesTitle: String
     var description: String

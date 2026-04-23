@@ -7,7 +7,7 @@ struct ReservationSummaryView: View {
     var body: some View {
         VStack(spacing: 4) {
             Text(viewModel.teamSelectedInformation != nil && !viewModel.personalReservations
-                 ? "Editar jugadores".localized : "Reservar espacio".localized)
+                 ? "Editar jugadores".localized : "dashboard.teams.teamAreas.reserves.reserveSpace".localized)
                 .font(.madridInGameiOSFont(size: 22))
                 .foregroundColor(.white)
             if !viewModel.summaryTokens.isEmpty {
@@ -205,7 +205,7 @@ struct SelectPlaceAndNotesView: View {
 
             ZStack(alignment: .topLeading) {
                 if viewModel.reservationNotes.isEmpty {
-                    Text("Notas (Opcional)".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.3)).padding(.horizontal, 16).padding(.vertical, 16)
+                    Text("dashboard.teams.teamAreas.training.notesPlaceholder".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.3)).padding(.horizontal, 16).padding(.vertical, 16)
                 }
                 TextEditor(text: $viewModel.reservationNotes).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white).scrollContentBackground(.hidden)
                     .padding(.horizontal, 12).padding(.vertical, 12).frame(minHeight: 100).focused($notesIsFocused)
@@ -214,7 +214,7 @@ struct SelectPlaceAndNotesView: View {
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.15), lineWidth: 1))
 
             Spacer()
-            PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedSpaceType != nil) {
+            PrimaryButton(title: "dashboard.teams.teamAreas.reserves.next".localized, enabled: viewModel.selectedSpaceType != nil) {
                 notesIsFocused = false; currentStep += 1
             }
         }
@@ -279,7 +279,7 @@ struct SelectPlayerView: View {
             Spacer()
 
             if isEditingTeamTraining {
-                PrimaryButton(title: "Guardar".localized, enabled: !viewModel.selectedPlayers.isEmpty) {
+                PrimaryButton(title: "dashboard.profile.about.form.save".localized, enabled: !viewModel.selectedPlayers.isEmpty) {
                     if viewModel.selectedSpaceType?.lowercased() == "virtual" || viewModel.teamSelectedInformation?.type.lowercased() == "virtual" {
                         viewModel.updateVirtualTeamReservation()
                     } else {
@@ -287,8 +287,8 @@ struct SelectPlayerView: View {
                     }
                 }
             } else {
-                SecondaryButton(title: "Atrás".localized) { currentStep -= 1 }
-                PrimaryButton(title: "Siguiente".localized, enabled: !viewModel.selectedPlayers.isEmpty) { currentStep += 1 }
+                SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) { currentStep -= 1 }
+                PrimaryButton(title: "dashboard.teams.teamAreas.reserves.next".localized, enabled: !viewModel.selectedPlayers.isEmpty) { currentStep += 1 }
             }
         }
         .padding(.horizontal, 20).padding(.vertical, 16)
@@ -310,7 +310,7 @@ struct SelectDateView: View {
             }
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("Selecciona una fecha".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
+                    Text("dashboard.teams.teamAreas.reserves.selectDate".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
                     Spacer()
                     Button { viewModel.showLegendPopup.toggle() } label: {
                         Text("legend".localized).font(.madridInGameiOSFont(size: 13)).foregroundColor(.cyan)
@@ -328,14 +328,14 @@ struct SelectDateView: View {
                 }
                 Spacer()
                 if viewModel.hasIndividualReservationOnSelectedDate {
-                    Text("No puedes hacer más reservas en esta fecha, por favor seleccione otra.".localized)
+                    Text("dashboard.teams.teamAreas.reserves.noMoreReservesOnDate".localized)
                         .font(.madridInGameiOSFont(size: 13))
                         .foregroundColor(.red.opacity(0.85))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 4)
                 }
-                if viewModel.currentStep > 0 { SecondaryButton(title: "Atrás".localized) { viewModel.currentStep -= 1 } }
-                PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedDate != nil && !viewModel.hasIndividualReservationOnSelectedDate) { viewModel.currentStep += 1 }
+                if viewModel.currentStep > 0 { SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) { viewModel.currentStep -= 1 } }
+                PrimaryButton(title: "dashboard.teams.teamAreas.reserves.next".localized, enabled: viewModel.selectedDate != nil && !viewModel.hasIndividualReservationOnSelectedDate) { viewModel.currentStep += 1 }
             }.padding(.horizontal, 20).padding(.vertical, 16)
         }
     }
@@ -370,8 +370,8 @@ struct SelectTimeView: View {
                     else { let f = DateFormatter(); f.dateFormat = "HH:mm"; viewModel.selectedTime = f.string(from: pickerTime) }
                 }
             Spacer()
-            SecondaryButton(title: "Atrás".localized) { viewModel.currentStep -= 1 }
-            PrimaryButton(title: "Reservar".localized, enabled: true) {
+            SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) { viewModel.currentStep -= 1 }
+            PrimaryButton(title: "dashboard.teams.teamAreas.reserves.reserve".localized, enabled: true) {
                 if viewModel.teamSelectedInformation != nil { viewModel.updateVirtualTeamReservation() }
                 else { viewModel.createVirtualTeamReservation() }
             }
@@ -401,7 +401,7 @@ struct SelectSlotView: View {
                     Text("Creando la reserva...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                Text("Selecciona franja horaria".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
+                Text("dashboard.teams.teamAreas.reserves.selectTimeSlot".localized).font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
 
                 if viewModel.availableSlots.isEmpty || viewModel.isLoadingOccupancy {
                     VStack {
@@ -427,12 +427,12 @@ struct SelectSlotView: View {
                     .font(.madridInGameiOSFont(size: 12)).foregroundColor(.white.opacity(0.35)).frame(maxWidth: .infinity)
 
                 Spacer()
-                SecondaryButton(title: "Atrás".localized) { viewModel.currentStep -= 1 }
+                SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) { viewModel.currentStep -= 1 }
 
                 if shouldGoToAskAddon {
-                    PrimaryButton(title: "Siguiente".localized, enabled: canReserve) { currentStep += 1 }
+                    PrimaryButton(title: "dashboard.teams.teamAreas.reserves.next".localized, enabled: canReserve) { currentStep += 1 }
                 } else {
-                    PrimaryButton(title: isEditing ? "Guardar".localized : "Reservar".localized, enabled: canReserve) {
+                    PrimaryButton(title: isEditing ? "dashboard.profile.about.form.save".localized : "dashboard.teams.teamAreas.reserves.reserve".localized, enabled: canReserve) {
                         if viewModel.personalReservations {
                             if viewModel.individualSelectedInformation != nil { viewModel.updateIndividualReservation() }
                             else { viewModel.createReservation() }
@@ -495,7 +495,7 @@ struct AskSimulatorView: View {
 
                 Spacer()
 
-                SecondaryButton(title: "Atrás".localized) {
+                SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) {
                     currentStep -= 1
                 }
 
@@ -572,11 +572,11 @@ struct SelectSimulatorSlotView: View {
 
                 Spacer()
 
-                SecondaryButton(title: "Atrás".localized) {
+                SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) {
                     currentStep -= 1
                 }
 
-                PrimaryButton(title: "Reservar".localized, enabled: canReserve) {
+                PrimaryButton(title: "dashboard.teams.teamAreas.reserves.reserve".localized, enabled: canReserve) {
                     viewModel.createReservation()
                 }
             }
@@ -635,7 +635,7 @@ struct AskExtraSpaceView: View {
 
                 Spacer()
 
-                SecondaryButton(title: "Atrás".localized) {
+                SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) {
                     currentStep -= 1
                 }
 
@@ -698,8 +698,8 @@ struct SelectExtraSpaceView: View {
 
             Spacer()
 
-            SecondaryButton(title: "Atrás".localized) { currentStep -= 1 }
-            PrimaryButton(title: "Siguiente".localized, enabled: viewModel.extraSpace != nil) {
+            SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) { currentStep -= 1 }
+            PrimaryButton(title: "dashboard.teams.teamAreas.reserves.next".localized, enabled: viewModel.extraSpace != nil) {
                 viewModel.fetchExtraSpaceSlots()
                 currentStep += 1
             }
@@ -732,7 +732,7 @@ struct SelectExtraSlotView: View {
                     Text("Creando la reserva...".localized).font(.madridInGameiOSFont(size: 14)).foregroundColor(.white.opacity(0.5))
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                Text("Selecciona franja horaria".localized)
+                Text("dashboard.teams.teamAreas.reserves.selectTimeSlot".localized)
                     .font(.madridInGameiOSFont(size: 20)).foregroundColor(.white)
 
                 if let device = viewModel.extraSpace?.device {
@@ -761,8 +761,8 @@ struct SelectExtraSlotView: View {
 
                 Spacer()
 
-                SecondaryButton(title: "Atrás".localized) { currentStep -= 1 }
-                PrimaryButton(title: "Reservar".localized, enabled: canReserve) {
+                SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) { currentStep -= 1 }
+                PrimaryButton(title: "dashboard.teams.teamAreas.reserves.reserve".localized, enabled: canReserve) {
                     viewModel.createReservation()
                 }
             }
@@ -807,8 +807,8 @@ struct SelectSpaceView: View {
                 }
             }
             Spacer()
-            SecondaryButton(title: "Atrás".localized) { currentStep -= 1 }
-            PrimaryButton(title: "Siguiente".localized, enabled: viewModel.selectedSpace != nil) { currentStep += 1 }
+            SecondaryButton(title: "dashboard.teams.teamAreas.reserves.back".localized) { currentStep -= 1 }
+            PrimaryButton(title: "dashboard.teams.teamAreas.reserves.next".localized, enabled: viewModel.selectedSpace != nil) { currentStep += 1 }
         }.padding(.horizontal, 20).padding(.vertical, 16)
     }
 

@@ -22,7 +22,7 @@ struct PlayersTeamComponentView: View {
 
 extension PlayersTeamComponentView {
     private var titleBanner: some View {
-        Text("JUGADORES".localized)
+        Text("dashboard.sections.players".localized)
             .font(.madridInGameiOSFont(size: 25))
             .foregroundStyle(Color.white)
     }

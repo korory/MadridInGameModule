@@ -32,7 +32,7 @@ extension ReservationQRView {
     private var titleSubtitleComponent: some View {
         VStack (alignment: .leading, spacing: 12) {
             
-            Text("ESPACIO RESERVADO".localized)
+            Text("dashboard.teams.teamAreas.reserves.reservedSpace".localized)
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundStyle(Color.white)
@@ -60,7 +60,7 @@ extension ReservationQRView {
     
     private var qrImageComponent: some View {
         VStack (spacing: 25){
-            Text("Puedes usar este QR para acceder.".localized)
+            Text("dashboard.teams.teamAreas.reserves.qrUsage".localized)
                 .font(.body)
                 .foregroundStyle(Color.white)
                 .padding(.top, 10)
@@ -83,7 +83,7 @@ extension ReservationQRView {
     }
     
     private var rulesDropdownComponent: some View {
-        DropdownComponentView(dropdownText: "Normas de uso".localized)
+        DropdownComponentView(dropdownText: "dashboard.teams.teamAreas.reserves.reserveTerms".localized)
             .padding(.bottom, 15)
     }
     
@@ -99,7 +99,7 @@ extension ReservationQRView {
             }
             
             
-            Text("Importante: Debes llevar tu DNI contigo para poder acceder al centro la primera vez para validar tu usuario".localized)
+            Text("dashboard.teams.teamAreas.reserves.reserveIdRequired".localized)
                 .font(.body)
                 .foregroundStyle(Color.white)
         }
@@ -107,7 +107,7 @@ extension ReservationQRView {
     }
     
     private var acceptButton: some View {
-        CustomButton(text: "Aceptar".localized,
+        CustomButton(text: "dashboard.teams.accept".localized,
                      needsBackground: true,
                      backgroundColor: Color.cyan,
                      pressEnabled: true,

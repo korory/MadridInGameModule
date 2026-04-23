@@ -73,7 +73,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
                 if !viewModel.isUserMode {
                     loadTeamImage
                 }
-                TextWithUnderlineComponent(title: viewModel.isUserMode ? "calendar".localized : "calendar".localized, underlineColor: Color.cyan)
+                TextWithUnderlineComponent(title: "dashboard.sections.calendar".localized, underlineColor: Color.cyan)
                     .padding(.top, viewModel.isUserMode ? 10 : 0)
                     .padding(.leading, viewModel.isUserMode ? 5 : 0)
                 Spacer()
@@ -110,7 +110,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
     private var nextTrainingBanner: some View {
         VStack {
             HStack (spacing: 8){
-                TextWithUnderlineComponent(title: viewModel.isDateSelected ? "Entrenamientos".localized : "Próximos entrenamientos".localized, underlineColor: Color.cyan)
+                TextWithUnderlineComponent(title: viewModel.isDateSelected ? "dashboard.layout.trainings".localized : "dashboard.teams.teamAreas.training.upcoming".localized, underlineColor: Color.cyan)
                     .padding(.top, viewModel.isUserMode ? 10 : 0)
                     .padding(.leading, viewModel.isUserMode ? 5 : 0)
                 
@@ -165,7 +165,7 @@ extension SeeReservationsOrCreateTeamTrainingComponentView {
             
             
             if viewModel.allIndividualReservations.isEmpty && viewModel.allReservations.isEmpty {
-                Text("No hay entrenamientos programados".localized)
+                Text("dashboard.teams.teamAreas.trainings.noTrainings".localized)
                     .font(.madridInGameiOSFont(size: 14))
                     .foregroundColor(.white)
                     .opacity(0.7)

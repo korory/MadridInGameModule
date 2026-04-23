@@ -22,7 +22,7 @@ extension DashboardScreenView {
                 TabView(selection: $viewModel.selectedTab) {
                     SeeReservationsOrCreateTeamTrainingComponentView(viewModel: SeeReservationsOrCreateTeamTrainingViewModel(isUserMode: true, selectedTeam: nil))
                         .tabItem {
-                            Label("calendar".localized, systemImage: "calendar")
+                            Label("dashboard.sections.calendar".localized, systemImage: "calendar")
                         }
                         .tag(TabBarDashboardBottom.calendar)
 

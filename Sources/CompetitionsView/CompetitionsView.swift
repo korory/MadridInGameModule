@@ -14,31 +14,38 @@ struct CompetitionsView: View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.black, Color.black, Color.white.opacity(0.15)]), startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea(.all)
-            ScrollView {
-                VStack (alignment: .leading){
-                    titleBanner
-                    dropdownSplitSelectorComponent
-                    if !viewModel.competitionInformation.isEmpty {
-                        leaguesInformation
-                    }
-                    Spacer()
-                }
-                .onAppear {
-                    let currentYear = Calendar.current.component(.year, from: Date())
-                    
-                    if viewModel.seasonSelected == nil, let allSeasons = viewModel.initAllSeasons().first(where: { $0.year == String(currentYear) }) {
-                        viewModel.seasonSelected = SeasonsModel(year: allSeasons.year, isOptionSelected: true)
-                        viewModel.getSeasonInformation()
+            VStack(alignment: .leading, spacing: 0) {
+                titleBanner
+                dropdownSplitSelectorComponent
+                if viewModel.isLoading {
+                    LoadingView(message: "competition.loading".localized)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading) {
+                            if !viewModel.competitionInformation.isEmpty {
+                                leaguesInformation
+                            }
+                            Spacer()
+                        }
                     }
                 }
             }
+            .onAppear {
+                let currentYear = Calendar.current.component(.year, from: Date())
+                if viewModel.seasonSelected == nil, let allSeasons = viewModel.initAllSeasons().first(where: { $0.year == String(currentYear) }) {
+                    viewModel.seasonSelected = SeasonsModel(year: allSeasons.year, isOptionSelected: true)
+                    viewModel.getSeasonInformation()
+                }
+            }
         }
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
 extension CompetitionsView {
     private var titleBanner: some View {
-        Text("COMPETICIONES".localized)
+        Text("competitions.heading".localized)
             .font(.madridInGameiOSFont(size: 24))
             .foregroundColor(.white)
             .padding(.leading, 20)
@@ -54,7 +61,7 @@ extension CompetitionsView {
             return DropdownSingleSelectionModel(title: season.year, isOptionSelected: isSelected)
         }
         
-        return DropdownSingleSelectionComponentView(options: options, textTop: "Temporada".localized, onOptionSelected: { optionSelected in
+        return DropdownSingleSelectionComponentView(options: options, textTop: "competitions.season".localized, onOptionSelected: { optionSelected in
             self.viewModel.seasonSelected = SeasonsModel(year: optionSelected.title, isOptionSelected: optionSelected.isOptionSelected)
             viewModel.getSeasonInformation()
         })

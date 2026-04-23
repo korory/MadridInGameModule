@@ -94,7 +94,7 @@ extension IndividualReservationsCellComponent {
                         .scaledToFit()
                         .frame(height: 15)
                         .foregroundColor(.cyan)
-                    Text("Ver reserva".localized)
+                    Text("dashboard.profile.reserves.seeReserve".localized)
                         .font(.madridInGameiOSFont(size: 14))
                         .foregroundColor(.cyan)
                 }

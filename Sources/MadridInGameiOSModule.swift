@@ -85,11 +85,11 @@ public struct MadridInGameiOSModule: View {
                 }
                 .padding(.trailing, 10)
                 
-                tabButton(title: "Dashboard".localized, tab: 0)
+                tabButton(title: "dashboard.layout.dashboard".localized, tab: 0)
                 if !viewModel.getUserTeams().isEmpty {
-                    tabButton(title: "Equipos".localized, tab: 1)
+                    tabButton(title: "dashboard.layout.teams".localized, tab: 1)
                 }
-                tabButton(title: "Competiciones".localized, tab: 2)
+                tabButton(title: "competitions.heading".localized, tab: 2)
             }
             .padding(.horizontal, 10)
             
@@ -98,7 +98,7 @@ public struct MadridInGameiOSModule: View {
             } else if viewModel.selectedTab == 1 {
                 TeamsScreenView()
             } else {
-                NavigationView {
+                NavigationStack {
                     CompetitionsView(viewModel: CompetitionsViewModel())
                 }
             }

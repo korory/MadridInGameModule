@@ -13,9 +13,8 @@ struct TournamentCellView: View {
     let name: String
     let targetURL: String
     let statusString: String
-    
-    @State private var showWebView = false
-    
+    let onSubscribeTapped: (String) -> Void
+
     var body: some View {
         VStack {
             HStack {
@@ -24,17 +23,19 @@ struct TournamentCellView: View {
                 Spacer()
             }
             .padding()
-            
+
             subscribeButton
         }
         .background(Color.black.opacity(0.9))
         .cornerRadius(20)
         .shadow(radius: 2)
+        .contentShape(Rectangle())
+        .onTapGesture { onSubscribeTapped(targetURL) }
     }
 }
 
 extension TournamentCellView {
-    
+
     private var rectangleDateNumber: some View {
         VStack {
             RoundedRectangle(cornerRadius: 10)
@@ -50,8 +51,8 @@ extension TournamentCellView {
                             .font(.madridInGameiOSFont(size: 40))
                             .fontWeight(.bold)
                             .foregroundColor(.white)
-                        
-                        Text(getDayAndMonth()?.month ?? "") // Cambia este segundo día si es necesario
+
+                        Text(getDayAndMonth()?.month ?? "")
                             .font(.madridInGameiOSFont(size: 10))
                             .fontWeight(.bold)
                             .foregroundColor(.white)
@@ -60,38 +61,31 @@ extension TournamentCellView {
             Spacer()
         }
     }
-    
+
     private var tornamentNameAndStatus: some View {
-        VStack (alignment: .leading, spacing: 10){
+        VStack(alignment: .leading, spacing: 10) {
             Text(name)
                 .font(.madridInGameiOSFont(size: 20))
                 .foregroundColor(.white)
                 .padding(.leading, 8)
-            
+
             Text(statusString.capitalized)
                 .font(.system(size: 15))
                 .foregroundColor(.white)
                 .padding(.leading, 8)
         }
     }
-    
-    
+
     private var subscribeButton: some View {
         Button {
-            if let url = URL(string: targetURL) {
-                UIApplication.shared.open(url)
-            } else {
-                let url = URL(string: "https://webesports.madridingame.es/esports-center/")!
-                UIApplication.shared.open(url)
-            }
-
+            onSubscribeTapped(targetURL)
         } label: {
-            HStack (alignment: .center, spacing: 5){
-                Text("Inscríbete".localized)
+            HStack(alignment: .center, spacing: 5) {
+                Text("competitions.tournament.buttonInscription".localized)
                     .font(.madridInGameiOSFont(size: 15))
                     .foregroundColor(.white)
                     .padding(.leading, 8)
-                
+
                 Image(systemName: "chevron.forward.circle")
                     .resizable()
                     .scaledToFit()
@@ -102,25 +96,24 @@ extension TournamentCellView {
             .padding(.bottom, 20)
         }
     }
-    
+
     func getDayAndMonth() -> (day: String, month: String)? {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        
+
         if let date = formatter.date(from: date) {
             let dayFormatter = DateFormatter()
             dayFormatter.dateFormat = "dd"
             let day = dayFormatter.string(from: date)
-            
+
             let monthFormatter = DateFormatter()
             monthFormatter.dateFormat = "MMMM"
             monthFormatter.locale = Locale(identifier: "es_ES")
             let month = monthFormatter.string(from: date)
-            
+
             return (day: day, month: month)
         } else {
             return nil
         }
     }
 }
-

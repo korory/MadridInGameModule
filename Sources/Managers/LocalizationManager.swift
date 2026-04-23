@@ -1,31 +1,33 @@
 //
 //  LocalizationManager.swift
-//  Pods
-//
-//  Created by Arnau Rivas Rivas on 20/4/25.
+//  MadridInGameiOSModule
 //
 
 import Foundation
 
-class LocalizationManager {
+final class LocalizationManager {
     static let shared = LocalizationManager()
-
-    private var strings: [String: String] = [:]
-
     private init() {}
 
+    private var translations: [String: String] = [:]
+
     func load(items: [TextContentItem]) {
-        let langCode = Locale.current.language.languageCode?.identifier ?? "en"
+        let primaryLang = Locale.preferredLanguages
+            .compactMap { $0.components(separatedBy: "-").first }
+            .first ?? "en"
+        let useSpanish = primaryLang == "es" || primaryLang == "ca"
+
+        var dict: [String: String] = [:]
         for item in items {
-            guard let key = item.key else { continue }
-            let value = langCode == "es" ? item.es : item.en
-            if let value {
-                strings[key] = value
+            let value = useSpanish ? item.es : item.en
+            if let value, !value.isEmpty {
+                dict[item.key] = value
             }
         }
+        translations = dict
     }
 
     func string(for key: String) -> String? {
-        return strings[key]
+        return translations[key]
     }
 }

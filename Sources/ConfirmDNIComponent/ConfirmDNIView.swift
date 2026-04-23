@@ -314,7 +314,7 @@ extension ConfirmDNIView {
 
     private var acceptButton: some View {
         CustomButton(
-            text: "Aceptar".localized,
+            text: "dashboard.teams.accept".localized,
             needsBackground: true,
             backgroundColor: isValid ? Color.cyan : Color.gray,
             pressEnabled: isValid,
@@ -326,7 +326,7 @@ extension ConfirmDNIView {
 
     private var cancelButton: some View {
         CustomButton(
-            text: "Cancelar".localized,
+            text: "dashboard.teams.teamAreas.reserves.cancel".localized,
             needsBackground: true,
             backgroundColor: Color.cyan,
             pressEnabled: true,

@@ -27,7 +27,7 @@ struct EditTrainingComponentView: View {
 extension EditTrainingComponentView {
     
     private var titleBanner: some View {
-        Text("Editar Entrenamiento".localized)
+        Text("dashboard.teams.teamAreas.training.editTraining".localized)
             .font(.title)
             .foregroundStyle(Color.white)
     }
@@ -52,7 +52,7 @@ extension EditTrainingComponentView {
         VStack (alignment: .leading, spacing: 28){
             TextWithUnderlineComponent(title: "Notas".localized, underlineColor: Color.cyan)
 
-            FloatingTextField(text: "", placeholderText: "Notas (Opcional)".localized, isDescripcionTextfield: true)
+            FloatingTextField(text: "", placeholderText: "dashboard.teams.teamAreas.training.notesPlaceholder".localized, isDescripcionTextfield: true)
         }
         .padding(.leading, 10)
     }

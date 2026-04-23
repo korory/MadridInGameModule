@@ -10,7 +10,8 @@ import SwiftUI
 
 class CompetitionsViewModel: ObservableObject {
     @Published var seasonSelected: SeasonsModel?
-    
+    @Published var isLoading: Bool = false
+
     private let competitionsService = CompetitionsService()
     @Published var competitionInformation: [CompetitionData] = []
         
@@ -29,11 +30,16 @@ class CompetitionsViewModel: ObservableObject {
     
     
     func getSeasonInformation() {
+        isLoading = true
+        competitionInformation = []
         competitionsService.getCompetitions(year: seasonSelected?.year ?? "") { [weak self] result in
-            DispatchQueue.main.async {
+            Task { @MainActor [weak self] in
+                defer { self?.isLoading = false }
                 switch result {
                 case .success(let competitions):
-                    self?.competitionInformation = competitions
+                    self?.competitionInformation = competitions.sorted {
+                        ($0.game?.priority ?? Int.max) < ($1.game?.priority ?? Int.max)
+                    }
                 case .failure(let error):
                     Logger.shared.log("Error al obtener reservas de equipo: \(error)")
                 }
@@ -42,39 +48,29 @@ class CompetitionsViewModel: ObservableObject {
     }
     
     func getAllInformationLeagues() -> [LeagueModel] {
-        let leagueData = [
-            ("Liga Municipal".localized,
-             "Esports Series Madrid".localized,
-             "Madrid in Game es la apuesta del Ayuntamiento de Madrid para elevar el talento amateur de los Esports con la creación de las competiciones: Esports Series Madrid. Constan de dos temporadas al año en las que podrás enfrentarte a los mejores jugadores en un entorno de juego seguro y óptimo.".localized,
-             "esm"),
+        var leagues: [LeagueModel] = []
 
-            ("Liga Municipal Junior".localized,
-             "Esports Series Madrid".localized,
-             "El equivalente de la Esports Series Madrid para colegios e institutos de la ciudad. La ESM Junior Esports es tu puerta de entrada para que puedas participar con tu centro educativo en la liga municipal junior de League of Legends y Rocket League.".localized,
-             "junior"),
-
-            ("Circuito Tormenta".localized,
-             "Esports Series Madrid".localized,
-             "Las Esports Series Madrid de Madrid in Game serán parada oficial del Circuito de Tormenta. Contarán con las competiciones de League of Legends y Valorant, además de disputarse una gran Final presencial. Los torneos otorgarán puntos para el ranking general del Circuito de Tormenta del Split correspondiente.".localized,
-             "stormCircuit"),
-
-            ("Otras competiciones".localized,
-             "Esports Series Madrid".localized,
-             "".localized,
-             "other")
-        ]
-        
-        return leagueData.compactMap { title, seriesTitle, description, type in
-            let allCompetitionsInLeague = filterCompetitonsByType(type: type)
-            return allCompetitionsInLeague.isEmpty ? nil : LeagueModel(title: title, seriesTitle: seriesTitle, description: description, allCompetitions: allCompetitionsInLeague)
+        let municipalCompetitions = competitionInformation.filter { ($0.type ?? "") != "other" }
+        if !municipalCompetitions.isEmpty {
+            leagues.append(LeagueModel(
+                title: "competitions.municipalLeague".localized,
+                seriesTitle: "Esports Series Madrid",
+                description: "competitions.subheadings.townLeague".localized,
+                allCompetitions: municipalCompetitions
+            ))
         }
-    }
 
-    
-    func filterCompetitonsByType(type: String) -> [CompetitionData] {
-        return self.competitionInformation.compactMap { competition in
-            (competition.game?.type == type) ? competition : nil
+        let otherCompetitions = competitionInformation.filter { ($0.type ?? "") == "other" }
+        if !otherCompetitions.isEmpty {
+            leagues.append(LeagueModel(
+                title: "competitions.otherLeague".localized,
+                seriesTitle: "Esports Series Madrid",
+                description: "",
+                allCompetitions: otherCompetitions
+            ))
         }
+
+        return leagues
     }
     
 //    func selectSeason(withTitle title: String) {
